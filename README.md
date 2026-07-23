@@ -18,9 +18,8 @@ App web móvil para que una pareja gestione una lista de la compra compartida, c
    ```bash
    npm install
    ```
-4. Genera la configuración del cliente (lee las variables de entorno y crea `src/common/config.generated.js`):
+4. Genera la configuración del cliente (lee `.env` y crea `src/common/config.generated.js`; requiere Node 20.6+):
    ```bash
-   # exporta las variables de tu .env en la shell, o usa una herramienta como `dotenv-cli`
    npm run build
    ```
 5. Sirve la carpeta con cualquier servidor estático, por ejemplo:
