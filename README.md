@@ -18,7 +18,7 @@ App web móvil para que una pareja gestione una lista de la compra compartida, c
    ```bash
    npm install
    ```
-4. Genera la configuración del cliente (lee `.env` y crea `src/common/config.generated.js`; requiere Node 20.6+):
+4. Genera la configuración del cliente (lee `.env` si existe, o las variables de entorno reales si no — así funciona igual en local que en Vercel — y crea `src/common/config.generated.js`):
    ```bash
    npm run build
    ```

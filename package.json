@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node --env-file=.env scripts/generate-config.js",
+    "build": "node scripts/generate-config.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },
