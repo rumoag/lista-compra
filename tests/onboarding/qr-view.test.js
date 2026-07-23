@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('qrcode', () => ({
+vi.mock('https://esm.sh/qrcode@1.5.4', () => ({
   default: {
     toDataURL: vi.fn().mockResolvedValue('data:image/png;base64,fakepng'),
   },
 }));
 
 const { renderQrView } = await import('../../src/onboarding/qr-view.js');
-const QRCode = (await import('qrcode')).default;
+const QRCode = (await import('https://esm.sh/qrcode@1.5.4')).default;
 
 describe('renderQrView', () => {
   it('muestra la URL del household', async () => {

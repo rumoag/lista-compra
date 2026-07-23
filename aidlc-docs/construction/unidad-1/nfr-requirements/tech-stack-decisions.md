@@ -13,6 +13,7 @@
 | Gestión de dependencias | `package-lock.json` committeado, sin dependencias no usadas | Cumple SECURITY-10 |
 
 ## Dependencias de proyecto (Unidad 1)
-- `@supabase/supabase-js` (cliente Supabase)
 - `vitest` (dev dependency, testing)
 - `fast-check` (dev dependency, PBT)
+
+**Actualización post-despliegue**: `@supabase/supabase-js` originalmente se resolvía en el navegador vía import map (bare specifier + `<script type="importmap">`), con la librería añadida como `dependency` de npm solo para referencia de versión. Al desplegar en Vercel, el import map (tanto inline como en un archivo externo `/importmap.json`) nunca llegó a registrarse en el navegador y la app se quedaba en blanco. Se sustituyó por un **import directo por URL completa** (`import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8'`) en `src/common/supabase-client.js`, que no depende de import maps. Como consecuencia, `@supabase/supabase-js` ya **no** aparece en `package.json` — se referencia únicamente por URL en el código fuente, y ya no es analizada por `npm audit` (ver nota en `security-test-instructions.md` sobre la vulnerabilidad de `@supabase/auth-js` que motivó originalmente su actualización de versión).

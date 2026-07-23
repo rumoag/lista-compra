@@ -1,5 +1,5 @@
 // Vista de QR (US-5.3, BR-19) — genera el QR client-side a partir de la URL del household.
-import QRCode from 'qrcode';
+import QRCode from 'https://esm.sh/qrcode@1.5.4';
 
 export async function renderQrView(container, { householdId }) {
   const url = `${window.location.origin}/${householdId}`;

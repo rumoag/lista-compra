@@ -21,6 +21,9 @@ npm audit
 - [x] Dependencias de fuentes oficiales (registro npm).
 - [ ] SBOM: no generado (fuera de alcance para un proyecto personal; `package-lock.json` cumple una función equivalente básica).
 
+### Nota importante: `@supabase/supabase-js` y `qrcode` ya no son dependencias de npm
+Tras un problema de import maps no funcionando en producción (ver `aidlc-docs/construction/unidad-1/infrastructure-design/infrastructure-design.md`), ambas librerías se cargan en el navegador mediante `import ... from 'https://esm.sh/...'` directamente en el código fuente, en vez de instalarse vía npm. Esto significa que **`npm audit` ya no las escanea** — quedan fuera del alcance automático de SECURITY-10. Como mitigación, las versiones están fijadas explícitamente en la URL (`@2.110.8`, `@1.5.4`), y se recomienda revisar manualmente los avisos de seguridad de estos paquetes en el registro de npm/GitHub Advisories periódicamente (o antes de cada actualización de versión), ya que no hay escaneo automático para dependencias cargadas por CDN.
+
 ## 2. Cabeceras de seguridad HTTP (SECURITY-04)
 
 ### Comando (tras desplegar en Vercel)

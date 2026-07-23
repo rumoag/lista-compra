@@ -5,7 +5,7 @@ App web móvil para que una pareja gestione una lista de la compra compartida, c
 **Estado actual**: MVP completo (Unidades 1-4) — CRUD de productos pendientes, tiempo real, selección múltiple/marcar en lote, historial con filtros/corrección, estadísticas, onboarding de nombre local, creación de hogar, generación de QR y PWA instalable (sin icono personalizado todavía, ver más abajo).
 
 ## Stack
-- Frontend: vanilla JS/HTML (sin bundler), `@supabase/supabase-js` vía import map (CDN esm.sh)
+- Frontend: vanilla JS/HTML (sin bundler), `@supabase/supabase-js` y `qrcode` importados directamente por URL desde esm.sh (`import ... from 'https://esm.sh/...'`) — sin import map, sin instalar estos paquetes vía npm
 - Backend/datos: [Supabase](https://supabase.com) (Postgres + RLS + API autogenerada)
 - Hosting: [Vercel](https://vercel.com)
 - Testing: [Vitest](https://vitest.dev) + [fast-check](https://fast-check.dev) (property-based testing)
