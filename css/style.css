@@ -1,0 +1,102 @@
+:root {
+  color-scheme: light dark;
+  --spacing: 0.75rem;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: var(--spacing);
+}
+
+.app-header h1 {
+  font-size: 1.4rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.card {
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+}
+
+.product-form input[type="text"],
+.product-form select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  font-size: 1rem;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.chip {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.chip[aria-pressed="true"] {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 1rem;
+  background: #2563eb;
+  color: white;
+}
+
+button.secondary {
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: -0.25rem 0 0.5rem;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.15);
+}
+
+.product-item .meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.empty-state {
+  opacity: 0.7;
+  text-align: center;
+  padding: 2rem 1rem;
+}

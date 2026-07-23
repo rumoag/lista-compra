@@ -1,0 +1,47 @@
+# Unit Test Execution
+
+## Run Unit Tests
+
+### 1. Execute All Unit Tests
+```bash
+npm test
+```
+
+### 2. Review Test Results
+- **Expected**: 88 tests pass, 0 failures, en 16 archivos de test
+- **Test Coverage**: no se mide cobertura formal (sin herramienta de coverage configurada); la cobertura funcional se rastrea vía trazabilidad manual a historias de usuario (ver cada `frontend-summary.md`/`business-logic-summary.md` por unidad)
+- **Test Report Location**: salida de consola de Vitest (no se genera reporte HTML en esta configuración)
+
+### 3. Resultado real verificado en este entorno
+88/88 tests pasan. Desglose por archivo:
+
+| Archivo | Tests |
+|---|---|
+| tests/common/validation.test.js | 17 |
+| tests/common/optimistic.test.js | 3 |
+| tests/common/pagination.test.js | 5 |
+| tests/list/product-form.test.js | 4 |
+| tests/list/product-item.test.js | 8 |
+| tests/onboarding/name-prompt.test.js | 6 |
+| tests/onboarding/qr-view.test.js | 3 |
+| tests/bulk-actions/selection-state.test.js | 9 |
+| tests/bulk-actions/selection-bar.test.js | 3 |
+| tests/bulk-actions/realtime-subscription.test.js | 5 |
+| tests/history/filters.test.js | 5 |
+| tests/history/history-filters.test.js | 2 |
+| tests/stats/calculations.test.js | 11 |
+| tests/stats/stats-ranking.test.js | 2 |
+| tests/stats/stats-cadence.test.js | 3 |
+| tests/stats/stats-distribution.test.js | 2 |
+| **Total** | **88** |
+
+### 4. Fix Failing Tests
+Si un test falla:
+1. Revisar la salida de Vitest en consola (incluye diff esperado/recibido y, para PBT con fast-check, el caso mínimo reproducible tras shrinking).
+2. Determinar si el fallo es un bug de producción o un bug del propio test (durante esta ejecución, 2 de los 3 fallos encontrados fueron bugs en tests, no en el código — ver `build-and-test-summary.md`).
+3. Corregir y volver a ejecutar `npm test` hasta que todo pase.
+
+## Property-Based Testing (PBT) — notas de ejecución
+- Framework: `fast-check`, integrado con Vitest.
+- Reproducibilidad (PBT-08): fast-check registra una semilla en la salida cuando una propiedad falla, permitiendo reproducir el caso exacto.
+- Reglas bloqueantes en modo parcial: PBT-02, PBT-03, PBT-07, PBT-08, PBT-09 — todas verificadas como cumplidas en las unidades donde aplican (ver `nfr-requirements.md` de cada unidad).

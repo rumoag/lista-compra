@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Lista de la Compra Compartida</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <script type="importmap">
+    {
+      "imports": {
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.110.8",
+        "qrcode": "https://esm.sh/qrcode@1.5.4"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app-root" data-testid="app-root">
+    <header class="app-header">
+      <h1>🛒 Lista de la Compra</h1>
+    </header>
+    <main id="app-main" data-testid="app-main"></main>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

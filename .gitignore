@@ -1,0 +1,9 @@
+node_modules/
+.env
+.vercel
+src/common/config.generated.js
+.claude/
+
+# Material de referencia del framework AI-DLC (no forma parte de la app)
+aidlc-workflows-main/
+.aidlc-rule-details/

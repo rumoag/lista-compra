@@ -1,0 +1,9 @@
+{
+  "name": "Lista de la Compra Compartida",
+  "short_name": "Lista Compra",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": []
+}
