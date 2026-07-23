@@ -22,3 +22,8 @@ Al combinar Question 1 = B (previews automáticos) con Question 2 = A (un único
 ## Configuración de Vercel
 - `vercel.json` con sección `headers` aplicando CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy (SECURITY-04) a todas las rutas HTML.
 - Build estático simple (sin funciones serverless en esta unidad).
+
+## Nota post-despliegue: `'unsafe-inline'` en `script-src` (excepción documentada, SECURITY-04)
+Al desplegar en Vercel, la app cargaba pero quedaba en blanco: la CSP original (`script-src 'self' https://esm.sh`, sin `'unsafe-inline'`) bloqueaba el `<script type="importmap">` inline de `index.html` — los navegadores tratan el import map como un script inline normal a efectos de CSP. Sin el import map registrado, las importaciones `bare specifier` de `@supabase/supabase-js` y `qrcode` fallaban y detenían toda la app silenciosamente.
+
+**Corrección**: se añadió `'unsafe-inline'` a `script-src` en `vercel.json`. **Justificación de la excepción** (permitida explícitamente por SECURITY-04 con justificación documentada): el único script inline de la página es el import map estático (sin lógica ejecutable, solo datos de resolución de módulos); toda la lógica de aplicación sigue cargándose exclusivamente desde `'self'` (archivos `.js` propios) o desde `https://esm.sh` (dominio ya explícitamente permitido). El riesgo real de XSS vía inyección de script inline no aumenta de forma significativa dado que no hay renderizado de HTML no confiable en la página (todo el contenido dinámico se inserta vía `innerHTML` con datos ya escapados, ver `escapeHtml` en los componentes de `src/`).
