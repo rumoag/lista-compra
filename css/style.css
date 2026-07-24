@@ -100,3 +100,161 @@ button.secondary {
   text-align: center;
   padding: 2rem 1rem;
 }
+
+/* Unidad 5 — pantalla de inicio, tarjetas de lista y modales */
+
+.home-screen-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing);
+}
+
+.list-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list-card-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.list-card-icon {
+  font-size: 1.8rem;
+}
+
+.list-card-title {
+  font-weight: 600;
+}
+
+.list-actions-menu {
+  position: relative;
+}
+
+.list-actions-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+  background: canvas;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+/* El atributo [hidden] debe ganar siempre a "display: flex" de arriba,
+   si no, el dropdown queda visible permanentemente pese a toggle-arse en JS. */
+.list-actions-menu-dropdown[hidden] {
+  display: none;
+}
+
+.list-actions-menu-dropdown button {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+  padding: 0.6rem 0.9rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--spacing);
+}
+
+.modal-panel {
+  background: canvas;
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close-button {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  background: canvas;
+  color: inherit;
+  font-size: 1rem;
+  transition: border-color 0.15s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.icon-picker-option {
+  background: transparent;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  border-radius: 8px;
+  font-size: 1.4rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.icon-picker-option[aria-pressed="true"] {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.15);
+}
+
+.delete-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: var(--spacing);
+}

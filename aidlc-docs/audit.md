@@ -804,3 +804,151 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Context**: Build and Test stage - Step 9 approval gate passed; CONSTRUCTION PHASE completa
 
 ---
+
+## New Request: UX/Usability Improvement Cycle
+**Timestamp**: 2026-07-24T00:00:00Z
+**User Input**: "como experto en usabilidad y flujos de usuario, vamos a comenzar a arreglar el proyecto. ya tenemos la base de programacion."
+**AI Response**: "Solicitud identificada como Enhancement (mejora de usabilidad/UX) sobre proyecto ya construido, no como nuevo proyecto. Intent: vago/incompleto en cuanto a qué problemas concretos arreglar. Se procede a Requirements Analysis (adaptive, depth mínima/estándar) para acotar alcance antes de tocar código. Se crea requirement-verification-questions.md."
+**Context**: Nueva solicitud tras CONSTRUCTION PHASE COMPLETE; se reabre Requirements Analysis para esta iteración de mejora UX
+
+---
+
+## Requirements Clarification Questions (UX Cycle - Round 2)
+**Timestamp**: 2026-07-24T00:05:00Z
+**User Input**: "continue" (tras rellenar requirement-verification-questions.md con: Q1=A ha usado la app real y detectado problemas concretos, Q2=ALL todas las zonas priorizadas, Q3=B problemas de interacción, Q4=B ya tiene una lista de problemas concretos que va a pasar ahora, Q5=A solo UI/UX sin tocar modelo de datos ni reglas de negocio)"
+**AI Response**: "Respuestas sin contradicciones. Q4=B implica que el usuario compartirá su lista de problemas concretos a continuación en el chat. Se solicita dicha lista antes de generar requirements.md."
+**Context**: Requirements Analysis stage (UX cycle) - Step 6 answers received, esperando input del usuario con la lista concreta de problemas
+
+---
+
+## Pantalla 1 descrita: Listado de listas activas
+**Timestamp**: 2026-07-24T00:10:00Z
+**User Input**: "vamos a ir 1 a 1. La pantalla inicial lista de la compra debe mostrar un listado de las listas de las compras activas. El listado constara de titulo de la lista de la compra, imagen, listado de participantes que han añadido algo y boton de 3 puntitios con las opciones de eliminar, editar o acceder al QR, estas opciones se abririan en un modal. La opcion de eliminar es una accion restrictiva por tanto debera el usuario confirmar que quiere eliminar esa lista. El Qr tambien se mostrara en un modal. La opcion de editar se mostrara en un modal. Todos los modales deben poderser cerrar mediante una X en lado derecho superior del modal. EL boton de Crear nueva lista debe ser visible en la parte superior del listado, el boton abrira un modal para añadir un titulo de la lista e imagen. El modal de editar y crear debe ser el mismo. dudas?"
+**AI Response**: "Detectada contradicción con Q5 de la ronda anterior (solo UI/UX) ya que esta pantalla implica un concepto nuevo de 'múltiples listas' con cambios de modelo de datos y lógica de negocio, no solo visuales. Además detectados 5 vacíos funcionales: origen de las listas mostradas (riesgo de fuga de privacidad si es consulta abierta a la BD dado que no hay login), campo imagen inexistente en el modelo, definición de 'participantes', comportamiento del QR con la nueva pantalla de inicio, y alcance del borrado de una lista. Creado requirements-clarification-questions.md con 6 preguntas. Esperando respuestas antes de continuar con la Pantalla 2."
+**Context**: Requirements Analysis stage (UX cycle) - Step 5 Thorough Completeness Analysis + contradiction detection sobre la Pantalla 1
+
+---
+
+## Clarificación Pantalla 1 respondida
+**Timestamp**: 2026-07-24T00:15:00Z
+**User Input**: "continue" (tras rellenar requirements-clarification-questions.md con: CQ1=A ampliar alcance a múltiples listas con cambios de datos/lógica, CQ2=Other 'Que se muestren todas las listas para todos por ahora, luego lo arreglo dandome credenciales para esa pagina', CQ3=B iconos/emojis predefinidos, CQ4=B participantes = histórico completo (añadido o comprado alguna vez), CQ5=A el QR sigue llevando directo a la lista concreta, CQ6=A borrado en cascada real)"
+**AI Response**: "Respuestas sin contradicciones entre sí. CQ2 es una decisión de riesgo de seguridad/privacidad explícita y aceptada por el usuario (exponer todas las listas de todos los hogares sin autenticación, temporalmente, hasta implementar credenciales en un ciclo futuro) — se documentará como excepción de seguridad aceptada (SECURITY, similar a SECURITY-08 de la Unidad 1), no bloqueante dado que el usuario la reconoce explícitamente como temporal. Pantalla 1 queda completamente especificada. Se invita al usuario a describir la Pantalla 2."
+**Context**: Requirements Analysis stage (UX cycle) - Pantalla 1 cerrada; excepción de seguridad documentada como pendiente de incluir en requirements.md
+
+---
+
+## Requirements Document Updated (Ciclo 2 — Pantalla 1)
+**Timestamp**: 2026-07-24T00:20:00Z
+**User Input**: "vamos primero a generar esta primera pantalla bien hecha"
+**AI Response**: "Usuario pide priorizar la implementación de la Pantalla 1 antes de seguir describiendo más pantallas. Se añade sección 'Ciclo 2' a requirements.md con FR-1 a FR-6, NFR-1 a NFR-4 (incluyendo excepción de seguridad aceptada) y decisión de saltar User Stories (justificada) para ir directo a Functional Design y Code Generation de esta pantalla."
+**Context**: Requirements Analysis stage (UX cycle) - Step 7 documento generado; pendiente de aprobación del usuario antes de proceder a Functional Design
+
+---
+
+## Requirements Approval (Ciclo 2 — Pantalla 1)
+**Timestamp**: 2026-07-24T00:25:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Requirements de la Pantalla 1 (Ciclo 2) aprobados. Se crea la Unidad 5 (Listado de listas activas) y se procede a Functional Design. Generado unidad-5-functional-design-plan.md con 7 preguntas: set de iconos, validación de título, migración de listas existentes sin título, estado vacío, orden del listado, visualización de participantes con muchos nombres, nivel de fricción de la confirmación de borrado. Esperando respuestas."
+**Context**: Requirements Analysis (UX cycle) approval gate passed; Construction Phase - Unidad 5 - Functional Design, Steps 1-4
+
+---
+
+## Functional Design Plan Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:30:00Z
+**User Input**: "Continue" (tras rellenar con Q1=A set de iconos propuesto, Q2=B título permisivo sin restricción de caracteres, Q3=A migración con valores por defecto, Q4=A mensaje de estado vacío, Q5=A orden por más recientes, Q6=B truncar participantes a 3 + contador, Q7=A confirmación simple de borrado)
+**AI Response**: "Respuestas sin ambigüedades ni contradicciones. Procediendo a generar los artefactos de diseño funcional de la Unidad 5."
+**Context**: Construction Phase - Unidad 5 - Functional Design, Steps 5-6
+
+---
+
+## Functional Design Artifacts Generated (Unidad 5)
+**Timestamp**: 2026-07-24T00:35:00Z
+**User Input**: N/A (automated step)
+**AI Response**: "Generados domain-entities.md (Household extendido con title/image_icon, concepto derivado de Participantes, set cerrado de 12 iconos), business-rules.md (BR-24 a BR-34, incluyendo BR-34 que documenta explícitamente la excepción de seguridad de visibilidad sin filtro), business-logic-model.md (6 flujos + Testable Properties), frontend-components.md (modal.js genérico reutilizable, home-screen.js, list-card.js, list-actions-menu.js, list-form-modal.js, qr-modal.js, delete-confirm-modal.js, households-api.js, cambios en main.js y schema.sql). Presentando para revisión del usuario."
+**Context**: Construction Phase - Unidad 5 - Functional Design, Step 7
+
+---
+
+## Functional Design Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:40:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Functional Design de la Unidad 5 marcado como completo. Procediendo a NFR Requirements (Unidad 5). Generado unidad-5-nfr-requirements-plan.md con 2 preguntas: estrategia de consulta para participantes (N+1 vs agregada), confirmación de que no se requieren cambios de RLS. Esperando respuestas."
+**Context**: Construction Phase - Unidad 5 - Functional Design, Steps 8-9 approval gate passed; NFR Requirements Steps 2-4
+
+---
+
+## NFR Requirements Plan Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:42:00Z
+**User Input**: "Continue" (tras rellenar con Q1=B consulta agregada única para participantes, Q2=A sin cambios de RLS)
+**AI Response**: "Respuestas sin ambigüedades. Generados nfr-requirements.md (rendimiento, seguridad con SECURITY-08 trasladado, fiabilidad, mantenibilidad) y tech-stack-decisions.md (sin dependencias nuevas). Presentando para revisión."
+**Context**: Construction Phase - Unidad 5 - NFR Requirements, Steps 5-7
+
+---
+
+## NFR Requirements Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:44:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "NFR Requirements de la Unidad 5 marcado como completo. Procediendo a NFR Design (Unidad 5). Todas las decisiones ya estaban resueltas en NFR Requirements (rendimiento, seguridad, RLS); Resilience/Scalability Patterns N/A. Generados nfr-design-patterns.md y logical-components.md directamente sin ronda de preguntas, siguiendo el mismo criterio que Unidades 3 y 4."
+**Context**: Construction Phase - Unidad 5 - NFR Requirements, Steps 8-9 approval gate passed; NFR Design
+
+---
+
+## NFR Design Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:46:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "NFR Design de la Unidad 5 marcado como completo. Procediendo a Infrastructure Design (Unidad 5). Sin cambios reales de infraestructura (mismo Vercel+Supabase); único cambio es migración de esquema aditiva vía SQL versionado. Generados infrastructure-design.md y deployment-architecture.md directamente sin ronda de preguntas."
+**Context**: Construction Phase - Unidad 5 - NFR Design, approval gate passed; Infrastructure Design
+
+---
+
+## Infrastructure Design Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:48:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Infrastructure Design de la Unidad 5 marcado como completo. Procediendo a Code Generation (Unidad 5). Generado unidad-5-code-generation-plan.md con 11 pasos (migración de esquema, modal.js genérico, households-api.js + tests, componentes de presentación + tests, modales especializados + tests, integración en main.js, eliminación de create-household.js obsoleto, documentación). Presentando resumen para aprobación."
+**Context**: Construction Phase - Unidad 5 - Infrastructure Design, approval gate passed; Code Generation Part 1 Planning
+
+---
+
+## Code Generation Plan Approval (Unidad 5)
+**Timestamp**: 2026-07-24T00:50:00Z
+**User Input**: "Continue"
+**AI Response**: "Plan aprobado. Procediendo a Parte 2 - Generación."
+**Context**: Construction Phase - Unidad 5 - Code Generation, Steps 6-9 approval gate passed
+
+---
+
+## Code Generation Complete + Tests Verified (Unidad 5)
+**Timestamp**: 2026-07-24T01:10:00Z
+**User Input**: N/A (automated generation + verification step)
+**AI Response**: "Generado código de la Unidad 5: supabase/schema.sql (migración title/image_icon + backfill + constraints), src/common/modal.js, src/home/participants.js, households-api.js, list-actions-menu.js, list-card.js, list-form-modal.js, qr-modal.js, delete-confirm-modal.js, home-screen.js, cambios en src/main.js y src/common/validation.js, css/style.css, README.md. Eliminado src/onboarding/create-household.js (obsoleto). Desviación de diseño detectada y documentada: buildParticipantsMap/formatParticipants se extrajeron de households-api.js a un nuevo módulo participants.js sin dependencias de red, para que list-card.js (presentación pura) no arrastrara una dependencia transitiva de config.generated.js (que no existe hasta 'npm run build'). Ejecutado 'npm test': 126/126 tests pasan (24 nuevos). Ejecutado 'npm run build' con variables de prueba: éxito."
+**Context**: Construction Phase - Unidad 5 - Code Generation, Part 2 completa + verificación
+
+---
+
+## Code Generation Approval (Unidad 5) — Unidad 5 COMPLETA
+**Timestamp**: 2026-07-24T01:15:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Unidad 5 (Pantalla 1 — Listado de listas activas) completa: Functional Design, NFR Requirements, NFR Design, Infrastructure Design y Code Generation, todos aprobados, con 126/126 tests verificados. Procediendo a Build and Test (incremental)."
+**Context**: Construction Phase - Unidad 5 completa; transición a Build and Test
+
+---
+
+## Build and Test Stage (Unidad 5, incremental)
+**Timestamp**: 2026-07-24T01:20:00Z
+**Build Status**: Success
+**Test Status**: Pass (126/126 unit tests)
+**Files Updated**:
+- unit-test-instructions.md (conteo actualizado a 126, desglose de los 9 archivos de test nuevos)
+- integration-test-instructions.md (Scenario 6 nuevo: crear/editar/QR/eliminar lista desde la pantalla de inicio; nota de migración pendiente en Supabase ya desplegado)
+- security-test-instructions.md (excepción SECURITY-08 ampliada para cubrir BR-34; npm audit re-verificado sin dependencias nuevas)
+- build-and-test-summary.md (resumen actualizado)
+**AI Response**: "Ejecutado npm test (126/126) y npm audit (sin dependencias nuevas, mismo resultado que Unidad 1-4). Actualizados incrementalmente los artefactos de Build and Test existentes (no regenerados desde cero) para incorporar la Unidad 5. build-instructions.md y performance-test-instructions.md sin cambios (N/A / sin cambios de proceso de build)."
+**Context**: Construction Phase - Unidad 5 - Build and Test incremental
+
+---
+
+## Build and Test Approval (Unidad 5) — CICLO 2 / Pantalla 1 COMPLETA
+**Timestamp**: 2026-07-24T01:25:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Build and Test de la Unidad 5 marcado como completo. Pantalla 1 (Listado de listas activas) del Ciclo 2 de mejora de usabilidad queda completa de extremo a extremo (Requirements → Code Generation → Build and Test). Procediendo a OPERATIONS PHASE (placeholder) para esta unidad; despliegue real y verificación manual de integration-test-instructions.md quedan como próximos pasos del usuario. Se invita al usuario a describir la Pantalla 2."
+**Context**: Construction Phase - Unidad 5 completa; Build and Test approval gate passed; CICLO 2 Pantalla 1 completa

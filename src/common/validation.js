@@ -60,3 +60,29 @@ export function validateCategory(category) {
   }
   return { valid: true, value: normalized || null };
 }
+
+// Unidad 5 — validación de listas (households con title/image_icon, BR-24/BR-25)
+const HOUSEHOLD_TITLE_MAX_LENGTH = 50;
+
+export const HOUSEHOLD_ICON_SET = ['🛒', '🥦', '🧴', '🍞', '🥛', '🧻', '🍎', '🧀', '🍗', '🧃', '🏠', '📦'];
+
+export function validateHouseholdTitle(title) {
+  if (typeof title !== 'string') {
+    return { valid: false, error: 'El título es obligatorio.' };
+  }
+  const normalized = normalizeWhitespace(title);
+  if (normalized.length === 0) {
+    return { valid: false, error: 'El título es obligatorio.' };
+  }
+  if (normalized.length > HOUSEHOLD_TITLE_MAX_LENGTH) {
+    return { valid: false, error: `El título no puede superar los ${HOUSEHOLD_TITLE_MAX_LENGTH} caracteres.` };
+  }
+  return { valid: true, value: normalized };
+}
+
+export function validateHouseholdIcon(icon) {
+  if (!HOUSEHOLD_ICON_SET.includes(icon)) {
+    return { valid: false, error: 'Elige un icono de la lista.' };
+  }
+  return { valid: true, value: icon };
+}

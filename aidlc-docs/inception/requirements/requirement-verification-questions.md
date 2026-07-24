@@ -1,114 +1,72 @@
-# Requirements Clarification Questions — Lista de la Compra Compartida
+# Preguntas de Clarificación — Ciclo de Mejora de Usabilidad (Round 2)
 
-Tu Project Brief ya es muy completo. Estas preguntas cubren: (1) las preguntas abiertas que tú mismo planteaste en la sección 10, (2) un par de vacíos funcionales menores, y (3) los opt-in de extensiones estándar de AI-DLC (seguridad, resiliencia, testing basado en propiedades).
+**Nota**: Este archivo se reutiliza para una nueva ronda de requisitos. Las preguntas de la Round 1 (stack, categorías, estadísticas, etc.) ya fueron respondidas y quedaron incorporadas en `requirements.md` y en las 4 unidades construidas.
 
-Responde rellenando la letra tras cada `[Answer]:`.
+La base de programación (4 unidades: Fundaciones, Tiempo real/lote, Historial/Estadísticas, Onboarding/Acceso) está completa y desplegada. Antes de proponer cambios de UX necesito acotar qué "arreglar" significa en la práctica.
 
-## Question 1 — Stack de frontend
-¿Qué stack de frontend prefieres?
+## Question 1
+¿Cuál es el origen de esta iniciativa de usabilidad?
 
-A) React + Vite (más código boilerplate, pero más mantenible/escalable a futuro)
+A) He usado la app real (en el móvil, con el QR) y he notado problemas concretos de uso
 
-B) HTML/JS simple (vanilla) + Supabase JS client (mínimo, rápido de lanzar, menos abstracciones)
+B) Quiero una revisión general de usabilidad desde cero (heurística/experta), sin problemas concretos detectados aún
 
-C) Otro framework (Vue, Svelte, etc. — indícalo)
+C) Hay quejas o fricción reportada por la otra persona que usa la app (tu pareja)
 
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
-## Question 2 — Categorías de producto
-¿Cómo quieres manejar la categoría del producto al añadirlo?
-
-A) Texto totalmente libre siempre (tal como dice el brief, sin restricciones)
-
-B) Chips rápidos con categorías frecuentes (lácteos, limpieza, fruta...) + opción de escribir una nueva
-
-C) Sin categoría en el MVP (se puede añadir más adelante)
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
-## Question 3 — Visualización de estadísticas
-¿Cómo prefieres ver las estadísticas en el MVP?
-
-A) Gráficos (barras/líneas) para frecuencia y cadencia
-
-B) Listas numéricas simples (tablas/rankings, sin librería de gráficos)
-
-C) Combinación: listas simples primero, gráficos si da tiempo (nice-to-have, no bloqueante)
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: C
-
-## Question 4 — Edición/borrado de productos ya comprados
-El brief cubre editar/eliminar productos *pendientes*, pero no dice si un producto ya marcado como "comprado" se puede editar o eliminar del historial.
-
-A) El historial es inmutable: una vez comprado, no se puede editar ni borrar (solo consultar)
-
-B) Se puede corregir errores (ej. desmarcar "comprado" por error) o eliminar entradas del historial
-
-C) Otro criterio (indícalo)
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
-## Question 5 — Conflictos de edición simultánea
-Con dos personas editando la misma lista en tiempo real, ¿qué pasa si ambos intentan marcar/eliminar el mismo producto casi a la vez?
-
-A) No importa gestionarlo de forma especial: "el último que actúa gana" (last write wins), es un caso raro y de bajo impacto
-
-B) Hay que evitar duplicados/errores visibles aunque sea con una solución simple (ej. ignorar la segunda acción sobre un producto ya movido de estado)
-
-X) Other (please describe after [Answer]: tag below)
+D) Other (please describe after [Answer]: tag below)
 
 [Answer]: A
 
-## Question 6 — Creación del "hogar" (household)
-¿Cómo se crea el primer registro `household` (el que genera el UUID del QR)?
+## Question 2
+¿Qué zonas de la app quieres priorizar primero? (puedes marcar varias separadas por comas)
 
-A) Un botón "Crear nueva lista" en una pantalla inicial genérica (sin UUID en la URL) que crea el household y redirige a la URL con su UUID, lista para generar el QR
+A) Alta/edición de productos y lista de pendientes (flujo principal del día a día)
 
-B) Se ejecuta manualmente (ej. script/consola de Supabase) antes de usar la app — no hace falta UI para esto en el MVP
+B) Selección múltiple y "marcar como comprados"
 
-X) Other (please describe after [Answer]: tag below)
+C) Historial y estadísticas (navegación, lectura de datos)
 
-[Answer]: A
+D) Onboarding: primer acceso vía QR, elegir nombre, cambiar nombre
 
-## Question 7 — Extensión: Seguridad (Security Baseline)
-¿Aplicamos la línea base de reglas de seguridad de AI-DLC como restricciones obligatorias durante el diseño y generación de código?
+E) Other (please describe after [Answer]: tag below)
 
-A) Sí — aplicar todas las reglas de SEGURIDAD como restricciones bloqueantes (recomendado incluso para proyectos personales que exponen datos por URL no adivinable)
+[Answer]: ALL
 
-B) No — omitir las reglas de seguridad extendidas (proyecto personal de bajo riesgo, sin datos sensibles)
+## Question 3
+¿Qué tipo de problema te preocupa más ahora mismo?
 
-X) Other (please describe after [Answer]: tag below)
+A) Visual/estético (se ve poco cuidado, inconsistente, feo)
 
-[Answer]: A
+B) Interacción (botones poco claros, pasos confusos, cosas difíciles de encontrar)
 
-## Question 8 — Extensión: Resiliencia (Resiliency Baseline)
-¿Aplicamos la línea base de resiliencia (alta disponibilidad, recuperación ante fallos, observabilidad) de AI-DLC?
+C) Rendimiento percibido (lentitud, parpadeos, saltos al usar la app)
 
-A) Sí — aplicar como guía de diseño (recomendado para cargas de trabajo críticas de negocio)
+D) Accesibilidad/ergonomía táctil (tamaños de toque, contraste, uso con una mano)
 
-B) No — omitir (adecuado para PoCs/prototipos/proyectos personales como este, donde iterar rápido importa más que la resiliencia formal)
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: A
-
-## Question 9 — Extensión: Testing basado en propiedades (Property-Based Testing)
-¿Aplicamos reglas de testing basado en propiedades (PBT)?
-
-A) Sí — aplicar como restricciones obligatorias (recomendado si hay lógica de negocio compleja, transformaciones de datos o componentes con estado)
-
-B) Parcial — solo para funciones puras y round-trips de serialización (ej. cálculo de cadencia media entre compras)
-
-C) No — omitir (adecuado para apps CRUD simples o capas de integración finas, como es este proyecto)
-
-X) Other (please describe after [Answer]: tag below)
+E) Other (please describe after [Answer]: tag below)
 
 [Answer]: B
+
+## Question 4
+¿Cómo prefieres que trabajemos este ciclo?
+
+A) Yo reviso la app primero (código + uso real en el navegador) y te propongo una lista priorizada de problemas de usabilidad concretos para que la valides antes de tocar código
+
+B) Ya tengo una lista de problemas concretos que te voy a pasar ahora mismo, empecemos por ahí directamente
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: B
+
+## Question 5
+¿Hay restricciones a respetar en los cambios de UX? (puedes marcar varias separadas por comas)
+
+A) No cambiar el modelo de datos ni las reglas de negocio ya implementadas, solo UI/UX
+
+B) Se puede tocar lógica si mejora la experiencia (p. ej. cambiar validaciones, flujos)
+
+C) Mantener el enfoque "sin librerías de UI externas" (vanilla JS/CSS, como el resto del proyecto)
+
+D) Other (please describe after [Answer]: tag below)
+
+[Answer]: A

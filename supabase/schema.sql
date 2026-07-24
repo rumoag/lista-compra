@@ -64,3 +64,24 @@ create policy products_delete on products for delete using (true);
 -- postgres_changes (INSERT/UPDATE/DELETE) sobre products.
 -- ---------------------------------------------------------------------------
 alter publication supabase_realtime add table products;
+
+-- ---------------------------------------------------------------------------
+-- Unidad 5 — título e icono de lista (households pasa a mostrarse en un
+-- listado de "listas activas" en la pantalla de inicio, ver BR-24/BR-25/BR-26)
+-- ---------------------------------------------------------------------------
+alter table households add column if not exists title text;
+alter table households add column if not exists image_icon text;
+
+-- BR-26: backfill de listas creadas antes de este cambio
+update households set title = 'Lista sin nombre' where title is null;
+update households set image_icon = '🛒' where image_icon is null;
+
+alter table households alter column title set not null;
+alter table households alter column image_icon set not null;
+
+-- BR-24: título obligatorio, máx 50 caracteres (cualquier carácter permitido)
+alter table households add constraint households_title_length check (char_length(title) between 1 and 50);
+
+-- BR-25: icono debe pertenecer al set cerrado definido en domain-entities.md
+alter table households add constraint households_image_icon_valid
+  check (image_icon in ('🛒', '🥦', '🧴', '🍞', '🥛', '🧻', '🍎', '🧀', '🍗', '🧃', '🏠', '📦'));

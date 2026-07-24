@@ -1,6 +1,8 @@
 // Punto de entrada — enrutado mínimo por household_id en la URL (US-5.2, US-5.3)
 // + navegación entre Lista / Historial / Estadísticas / QR (Unidad 3-4) + botón "Cambiar nombre" (Unidad 4).
-import { renderCreateHousehold } from './onboarding/create-household.js';
+// Unidad 5: sin householdId en la URL se muestra el listado de listas activas (home-screen.js),
+// que sustituye a la pantalla de creación directa de la Unidad 1/4.
+import { renderHomeScreen } from './home/home-screen.js';
 import { ensureLocalName, renderChangeNameButton } from './onboarding/name-prompt.js';
 import { renderQrView } from './onboarding/qr-view.js';
 import { renderProductList } from './list/product-list.js';
@@ -47,7 +49,7 @@ async function start() {
   const householdId = getHouseholdIdFromPath();
 
   if (!householdId) {
-    renderCreateHousehold(appMain);
+    await renderHomeScreen(appMain);
     return;
   }
 
