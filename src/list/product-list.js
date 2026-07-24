@@ -75,14 +75,11 @@ export async function renderProductList(container, { householdId }) {
       );
     });
 
-    const selectedCount = selection.getSelection().size;
-    const allSelected = !hasMore && items.length > 0 && selectedCount === items.length;
-
     renderSelectionBar(selectionBarContainer, {
-      selectedCount,
-      allSelected,
+      selectedCount: selection.getSelection().size,
       onMarkAsBought: handleMarkAsBought,
-      onToggleSelectAll: handleToggleSelectAll,
+      onDeselectAll: handleDeselectAll,
+      onSelectAll: handleSelectAll,
       onDeleteSelected: handleDeleteSelected,
     });
   }
@@ -126,20 +123,16 @@ export async function renderProductList(container, { householdId }) {
 
   // BR-43: "Seleccionar todos" fuerza la carga de todas las páginas restantes antes
   // de seleccionar, para que "todos" sea realmente todos los pendientes.
-  async function handleToggleSelectAll() {
-    const items = paginator.getItems();
-    const currentlyAllSelected = !hasMore && items.length > 0 && selection.getSelection().size === items.length;
-
-    if (currentlyAllSelected) {
-      selection.clearSelection();
-      renderList();
-      return;
-    }
-
+  async function handleSelectAll() {
     while (hasMore) {
       await loadNextPageIfAny();
     }
     selection.selectAll(paginator.getItems().map((item) => item.id));
+    renderList();
+  }
+
+  function handleDeselectAll() {
+    selection.clearSelection();
     renderList();
   }
 
@@ -375,6 +368,7 @@ export async function renderProductList(container, { householdId }) {
     realtime.unsubscribe();
     observer.disconnect();
     window.removeEventListener('pagehide', cleanup);
+    document.body.classList.remove('has-selection');
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 

@@ -262,7 +262,12 @@ describe('renderProductList (Unidad 6)', () => {
     container.querySelector('[data-testid="product-item-p0"] [data-testid="product-item-body"]').click();
 
     queueResponse({ data: page3, error: null });
-    container.querySelector('[data-testid="selection-bar-toggle-all-button"]').click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-select-all"]')
+      .click();
     await new Promise((r) => setTimeout(r, 0));
     await new Promise((r) => setTimeout(r, 0));
 

@@ -259,10 +259,6 @@ button.secondary {
   margin-top: var(--spacing);
 }
 
-button.danger {
-  background: #dc2626;
-}
-
 .modal-panel--fullscreen {
   max-width: 100%;
   width: 100%;
@@ -377,4 +373,57 @@ button.danger {
   border: 1px solid rgba(127, 127, 127, 0.4);
   background: canvas;
   color: inherit;
+}
+
+/* Header de selección múltiple: fijo al viewport, se superpone a la cabecera normal
+   (oculta vía body.has-selection) mientras haya al menos un producto seleccionado. */
+.selection-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  z-index: 60;
+  background: canvas;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+  padding: 0.6rem var(--spacing);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selection-header-left,
+.selection-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.icon-button {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.35rem;
+}
+
+.icon-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.7rem;
+}
+
+body.has-selection {
+  padding-top: 3.25rem;
+}
+
+body.has-selection [data-testid="list-header"],
+body.has-selection [data-testid="greeting"] {
+  display: none;
 }

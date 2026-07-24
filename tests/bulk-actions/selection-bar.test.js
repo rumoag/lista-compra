@@ -1,16 +1,20 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderSelectionBar } from '../../src/bulk-actions/selection-bar.js';
 
 function render(container, overrides = {}) {
   renderSelectionBar(container, {
     selectedCount: 2,
-    allSelected: false,
+    onDeselectAll: vi.fn(),
     onMarkAsBought: vi.fn(),
-    onToggleSelectAll: vi.fn(),
     onDeleteSelected: vi.fn(),
+    onSelectAll: vi.fn(),
     ...overrides,
   });
 }
+
+beforeEach(() => {
+  document.body.classList.remove('has-selection');
+});
 
 describe('renderSelectionBar', () => {
   it('se oculta cuando no hay productos seleccionados (US-2.1)', () => {
@@ -19,17 +23,29 @@ describe('renderSelectionBar', () => {
 
     expect(container.hidden).toBe(true);
     expect(container.innerHTML).toBe('');
+    expect(document.body.classList.contains('has-selection')).toBe(false);
   });
 
-  it('muestra el contador de seleccionados', () => {
+  it('muestra el contador de seleccionados y marca body.has-selection', () => {
     const container = document.createElement('div');
     render(container, { selectedCount: 3 });
 
     expect(container.hidden).toBe(false);
     expect(container.querySelector('[data-testid="selection-bar-count"]').textContent).toContain('3');
+    expect(document.body.classList.contains('has-selection')).toBe(true);
   });
 
-  it('llama a onMarkAsBought al pulsar el botón', () => {
+  it('la X llama a onDeselectAll', () => {
+    const container = document.createElement('div');
+    const onDeselectAll = vi.fn();
+    render(container, { onDeselectAll });
+
+    container.querySelector('[data-testid="selection-bar-close-button"]').click();
+
+    expect(onDeselectAll).toHaveBeenCalledOnce();
+  });
+
+  it('llama a onMarkAsBought al pulsar "Comprados"', () => {
     const container = document.createElement('div');
     const onMarkAsBought = vi.fn();
     render(container, { onMarkAsBought });
@@ -39,28 +55,7 @@ describe('renderSelectionBar', () => {
     expect(onMarkAsBought).toHaveBeenCalledOnce();
   });
 
-  it('muestra "Seleccionar todos" cuando allSelected es false, y llama a onToggleSelectAll', () => {
-    const container = document.createElement('div');
-    const onToggleSelectAll = vi.fn();
-    render(container, { allSelected: false, onToggleSelectAll });
-
-    const button = container.querySelector('[data-testid="selection-bar-toggle-all-button"]');
-    expect(button.textContent).toBe('Seleccionar todos');
-
-    button.click();
-    expect(onToggleSelectAll).toHaveBeenCalledOnce();
-  });
-
-  it('muestra "Deseleccionar todos" cuando allSelected es true (FR-17)', () => {
-    const container = document.createElement('div');
-    render(container, { allSelected: true });
-
-    expect(container.querySelector('[data-testid="selection-bar-toggle-all-button"]').textContent).toBe(
-      'Deseleccionar todos'
-    );
-  });
-
-  it('llama a onDeleteSelected al pulsar "Eliminar seleccionados" (FR-17)', () => {
+  it('llama a onDeleteSelected al pulsar el icono de eliminar (FR-17)', () => {
     const container = document.createElement('div');
     const onDeleteSelected = vi.fn();
     render(container, { onDeleteSelected });
@@ -68,5 +63,29 @@ describe('renderSelectionBar', () => {
     container.querySelector('[data-testid="selection-bar-delete-button"]').click();
 
     expect(onDeleteSelected).toHaveBeenCalledOnce();
+  });
+
+  it('el icono de eliminar tiene tooltip nativo (title) para desktop', () => {
+    const container = document.createElement('div');
+    render(container);
+
+    expect(container.querySelector('[data-testid="selection-bar-delete-button"]').title).toBe(
+      'Eliminar seleccionados'
+    );
+  });
+
+  it('"Seleccionar todos" está dentro del menú de 3 puntos y llama a onSelectAll', () => {
+    const container = document.createElement('div');
+    const onSelectAll = vi.fn();
+    render(container, { onSelectAll });
+
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-select-all"]')
+      .click();
+
+    expect(onSelectAll).toHaveBeenCalledOnce();
   });
 });
