@@ -20,7 +20,7 @@ const PAGE_SIZE = 20;
 export async function renderProductList(container, { householdId }) {
   container.innerHTML = `
     <div id="selection-bar-container" hidden></div>
-    <div class="card">
+    <div class="card card--flush">
       <div id="product-list-items" data-testid="product-list-items"></div>
       <div id="product-list-empty" class="empty-state" data-testid="product-list-empty" hidden>
         No hay nada en tu cesta de la compra todavía. ¿Te gustaría añadir el primero?

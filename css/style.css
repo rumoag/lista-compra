@@ -28,6 +28,12 @@ body {
   margin-bottom: var(--spacing);
 }
 
+/* Lista de productos: sin stroke, ni en la tarjeta contenedora ni entre items. */
+.card--flush {
+  border: none;
+  padding: 0;
+}
+
 .product-form input[type="text"],
 .product-form select {
   width: 100%;
@@ -87,7 +93,6 @@ button.secondary {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(127, 127, 127, 0.15);
 }
 
 .product-item .meta {
@@ -142,7 +147,7 @@ button.secondary {
   top: 100%;
   z-index: 10;
   background: canvas;
-  border: 1px solid rgba(127, 127, 127, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
