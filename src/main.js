@@ -44,8 +44,8 @@ async function start() {
   const household = await fetchHousehold(householdId);
 
   appMain.innerHTML = `
-    <div id="list-header-container"></div>
     <div id="greeting-container"></div>
+    <div id="list-header-container"></div>
     <nav id="app-tabs" data-testid="app-tabs" style="display:flex; gap:0.5rem; flex-wrap:wrap;"></nav>
     <div id="app-view"></div>
   `;
