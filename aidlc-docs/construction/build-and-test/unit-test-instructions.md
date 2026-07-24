@@ -8,18 +8,19 @@ npm test
 ```
 
 ### 2. Review Test Results
-- **Expected**: 88 tests pass, 0 failures, en 16 archivos de test
+- **Expected**: 126 tests pass, 0 failures, en 25 archivos de test (Unidades 1-5)
 - **Test Coverage**: no se mide cobertura formal (sin herramienta de coverage configurada); la cobertura funcional se rastrea vía trazabilidad manual a historias de usuario (ver cada `frontend-summary.md`/`business-logic-summary.md` por unidad)
 - **Test Report Location**: salida de consola de Vitest (no se genera reporte HTML en esta configuración)
 
 ### 3. Resultado real verificado en este entorno
-88/88 tests pasan. Desglose por archivo:
+126/126 tests pasan. Desglose por archivo:
 
 | Archivo | Tests |
 |---|---|
 | tests/common/validation.test.js | 17 |
 | tests/common/optimistic.test.js | 3 |
 | tests/common/pagination.test.js | 5 |
+| tests/common/modal.test.js | 6 |
 | tests/list/product-form.test.js | 4 |
 | tests/list/product-item.test.js | 8 |
 | tests/onboarding/name-prompt.test.js | 6 |
@@ -33,7 +34,15 @@ npm test
 | tests/stats/stats-ranking.test.js | 2 |
 | tests/stats/stats-cadence.test.js | 3 |
 | tests/stats/stats-distribution.test.js | 2 |
-| **Total** | **88** |
+| tests/home/households-api.test.js | 6 |
+| tests/home/participants.test.js | 4 |
+| tests/home/list-actions-menu.test.js | 5 |
+| tests/home/list-card.test.js | 4 |
+| tests/home/list-form-modal.test.js | 4 |
+| tests/home/qr-modal.test.js | 1 |
+| tests/home/delete-confirm-modal.test.js | 4 |
+| tests/home/home-screen.test.js | 4 |
+| **Total** | **126** |
 
 ### 4. Fix Failing Tests
 Si un test falla:

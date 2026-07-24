@@ -34,15 +34,28 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - **Test Steps**: pulsar "Crear nueva lista", luego abrir la pestaña "QR" y escanear el código con la cámara de otro móvil.
 - **Expected Results**: el segundo dispositivo accede directamente a la misma lista, se le pide un nombre local, y puede interactuar con la lista compartida (US-5.2, US-5.3).
 
+### Scenario 6 (Unidad 5): Pantalla de inicio — crear, editar, ver QR y eliminar una lista
+- **Setup**: entrar a la URL raíz del sitio desplegado, con al menos una lista ya existente y con productos añadidos por 2+ nombres distintos.
+- **Test Steps**:
+  1. Verificar que la pantalla de inicio muestra una tarjeta por cada lista existente, con título, icono y participantes correctos.
+  2. Pulsar "Crear nueva lista", rellenar título e icono, confirmar → aparece una tarjeta nueva.
+  3. Abrir el menú de 3 puntos de una tarjeta → "Editar" → cambiar título/icono → confirmar → la tarjeta refleja el cambio.
+  4. Abrir el menú de 3 puntos → "Ver QR" → confirmar que se muestra el QR correcto para esa lista.
+  5. Abrir el menú de 3 puntos → "Eliminar" → confirmar en el modal → la tarjeta desaparece y sus productos/historial dejan de existir.
+  6. Click en el área principal de una tarjeta (fuera del menú) → navega a `/{householdId}` y muestra esa lista.
+- **Expected Results**: todos los pasos anteriores funcionan sin errores, y los modales se cierran correctamente con la "X" y con "Cancelar" (BR-31 a BR-33).
+- **⚠️ Nota de privacidad esperada (comportamiento intencional, BR-34)**: en este escenario, la pantalla de inicio debe mostrar **todas** las listas existentes en el proyecto Supabase, no solo las creadas/visitadas desde este dispositivo — esto es el comportamiento diseñado, no un bug.
+- **Cleanup**: eliminar la lista de prueba creada en el paso 2 si no se eliminó ya en el paso 5.
+
 ## Setup Integration Test Environment
 
 ### 1. Requisitos
-- Proyecto Supabase real con `supabase/schema.sql` ejecutado.
+- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidad 5)**: si el proyecto Supabase ya existía de un despliegue anterior a la Unidad 5, hay que volver a ejecutar `supabase/schema.sql` (o al menos el bloque final de migración de `households`) para aplicar las columnas `title`/`image_icon` — no es un esquema nuevo, es aditivo sobre el existente.
 - Variables de entorno configuradas (`SUPABASE_URL`, `SUPABASE_ANON_KEY`).
 - Sitio desplegado en Vercel (o servido localmente con `npx serve .` tras `npm run build`).
 
 ### 2. Ejecución
-Seguir manualmente los 5 escenarios anteriores, usando dos pestañas/dispositivos.
+Seguir manualmente los 6 escenarios anteriores, usando dos pestañas/dispositivos.
 
 ## Limitación en este entorno de trabajo
 No se dispone de un proyecto Supabase real conectado en este entorno para ejecutar estos escenarios automáticamente. **Quedan pendientes de verificación manual por el usuario** tras el despliegue.

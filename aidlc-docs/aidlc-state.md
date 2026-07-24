@@ -85,6 +85,27 @@
 ### OPERATIONS PHASE
 - [ ] Placeholder (sin trabajo activo — despliegue real y verificación manual quedan como próximos pasos del usuario)
 
+---
+
+## CICLO 2 — Mejora de Usabilidad (iniciado 2026-07-24)
+
+**Contexto**: Nueva solicitud del usuario tras CONSTRUCTION PHASE COMPLETE, para rediseñar la UX de la app "pantalla a pantalla". Se reabre Requirements Analysis solo para el alcance de cada pantalla nueva, sin reabrir las unidades 1-4 ya completas.
+
+### Pantalla 1 — Listado de listas activas (Unidad 5)
+- [x] Requirements Analysis — contradicción detectada y resuelta (alcance ampliado más allá de "solo UI/UX"); excepción de seguridad aceptada (BR-34); requirements.md ampliado con sección "Ciclo 2"; aprobado
+- [x] Functional Design — domain-entities, business-rules (BR-24 a BR-34), business-logic-model (6 flujos + Testable Properties), frontend-components; aprobado
+- [x] NFR Requirements — consulta agregada para participantes, sin cambios de RLS; aprobado
+- [x] NFR Design — patrones de rendimiento/seguridad/fiabilidad, componentes lógicos; aprobado
+- [x] Infrastructure Design — sin cambios reales, migración de esquema aditiva; aprobado
+- [x] Code Generation — código y tests generados; 126/126 tests verificados (npm test); aprobado
+- [x] Build and Test (incremental) — build success, integration-test-instructions.md/security-test-instructions.md/build-and-test-summary.md actualizados con el Scenario 6 y la excepción SECURITY-08 ampliada
+
+**UNIDAD 5 (Pantalla 1): COMPLETA** — próximo paso del usuario: reejecutar `supabase/schema.sql` en el proyecto Supabase ya desplegado y verificar manualmente el Scenario 6 de `integration-test-instructions.md`.
+
+### Próximas pantallas
+Pendientes de que el usuario las describa una a una (a petición explícita: "vamos a ir 1 a 1").
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.
+- Ciclo 2 (mejora de usabilidad): el usuario actúa como experto en usabilidad/flujos de usuario y describe el rediseño pantalla a pantalla; cada pantalla se trata como una unidad incremental (Unidad 5+) con su propio ciclo Functional Design → Code Generation, sin reabrir las unidades 1-4.

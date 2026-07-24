@@ -49,8 +49,9 @@ Ya cubierto por los tests unitarios/PBT ejecutados en Build:
 
 ## 4. Control de acceso por household (SECURITY-08)
 
-- **Diseño**: RLS permisivo + obscuridad del UUID (documentado y aceptado explícitamente en `aidlc-docs/construction/unidad-1/nfr-requirements/nfr-requirements.md`).
-- **Verificación manual recomendada** (tras desplegar): confirmar que las tablas `households`/`products` tienen RLS **habilitado** en el dashboard de Supabase (Authentication → Policies), y que existen las 4 políticas por tabla definidas en `schema.sql`.
+- **Diseño (Unidades 1-4)**: RLS permisivo + obscuridad del UUID (documentado y aceptado explícitamente en `aidlc-docs/construction/unidad-1/nfr-requirements/nfr-requirements.md`).
+- **Ampliación de la excepción (Unidad 5)**: la pantalla de inicio elimina, en la práctica, incluso la obscuridad del UUID como salvaguarda — ahora **todas** las listas de **todos** los hogares son visibles (título, icono, participantes) desde la URL raíz, sin necesidad de conocer ningún UUID. Es una decisión de producto explícita y temporal del usuario (ver `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` BR-34 y `requirements.md` NFR-2 del Ciclo 2), con intención declarada de sustituirla por credenciales reales en un ciclo futuro. No requiere ninguna acción de corrección en esta iteración.
+- **Verificación manual recomendada** (tras desplegar): confirmar que las tablas `households`/`products` tienen RLS **habilitado** en el dashboard de Supabase (Authentication → Policies), y que existen las 4 políticas por tabla definidas en `schema.sql` (sin cambios respecto a Unidad 1 — las políticas permisivas ya cubren las columnas nuevas `title`/`image_icon`).
 
 ## Resumen de cumplimiento SECURITY-*
 | Regla | Estado |

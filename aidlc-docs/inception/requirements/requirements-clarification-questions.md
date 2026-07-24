@@ -1,105 +1,99 @@
-# Clarificación — Extensión de Resiliencia
+# Clarificación — Pantalla 1: Listado de listas de la compra activas
 
-En la ronda anterior activaste la **extensión de Resiliencia** (Question 8 = A). Esa extensión obliga a hacer una serie de preguntas más (RTO/RPO, gestión de cambios, CI/CD, rollback, topología multi-región, respuesta a incidentes) porque está pensada para cargas de trabajo de negocio críticas.
+Detecté una contradicción y varios vacíos funcionales antes de poder especificar esta pantalla con precisión.
 
-Tu proyecto es una app personal para 2 personas, en capa gratuita de Supabase/Vercel, sin SLA. Antes de aplicarte reglas de nivel empresarial (multi-región, runbooks de DR, alertas de seguridad de incidentes...), quiero confirmar contigo si eso tiene sentido aquí.
+## Contradicción 1: "Solo UI/UX" vs. concepto nuevo de "múltiples listas"
+En la ronda anterior (Q5) dijiste: **A) No cambiar el modelo de datos ni las reglas de negocio ya implementadas, solo UI/UX**.
 
-## Question 0 — Reconsiderar la extensión de Resiliencia
-¿Mantenemos activada la extensión de Resiliencia con todo su alcance (multi-región, DR, runbooks, gestión de cambios formal, etc.) para esta app personal?
+Pero lo que describes ahora es un cambio funcional real, no solo visual:
+- Hoy el modelo es: 1 `household` = 1 lista de la compra, accedida directamente vía QR (URL con UUID). No existe ningún concepto de "varias listas" ni una pantalla de inicio que las enumere.
+- Lo que pides — una pantalla de inicio con **varias** listas activas, cada una con título e **imagen** (campos que no existen hoy en la tabla `households`) — requiere: (a) nuevas columnas en la base de datos, (b) una forma de saber qué listas mostrar en esa pantalla de inicio, y (c) lógica nueva de eliminar/crear listas desde una pantalla índice en vez de vía QR directo.
 
-A) No, desactivar la extensión de Resiliencia — es una app personal en capa gratuita, sobra el aparato de resiliencia empresarial (recomendado para este caso)
+Esto es más que "solo UI/UX": es una funcionalidad nueva sobre el modelo de datos.
 
-B) Sí, mantenerla activa pero solo en su nivel mínimo (single-region, backups automáticos de Supabase, sin runbooks formales ni multi-región) — respondería el resto de preguntas de esta extensión con las opciones de menor coste
+### Clarification Question 1
+¿Cómo quieres resolver esto?
 
-C) Sí, mantenerla activa con todo el rigor tal cual está definida la extensión (multi-región, DR, runbooks, procesos de cambio formales)
+A) Ampliamos el alcance: sí quiero esta función de "múltiples listas" aunque implique cambios de modelo de datos y lógica de negocio (no solo UI/UX)
 
-X) Other (please describe after [Answer]: tag below)
+B) Prefiero mantenerme en solo-UI/UX por ahora: en vez de una pantalla de inicio con varias listas, rediseñamos solo la pantalla de la lista actual (la única que existe por household) con mejor UI, y dejamos "múltiples listas" para un ciclo futuro
+
+C) Other (please describe after [Answer]: tag below)
 
 [Answer]: A
 
 ---
 
-**Si eliges B o C**, responde también estas preguntas obligatorias de la extensión (si eliges A, puedes dejarlas en blanco, se marcarán como N/A):
+## Ambigüedad 1: ¿De dónde salen las "listas activas" a mostrar?
+Hoy no hay login ni cuentas. El acceso a una lista es solo por conocer su URL con UUID (seguridad por oscuridad). Si esta pantalla de inicio muestra "listas activas", necesito saber de dónde vienen esas listas para ese dispositivo/navegador concreto — si viene de una consulta abierta a la base de datos, cualquiera vería **todas** las listas de **todos los hogares**, lo cual sería una fuga de privacidad grave.
 
-## Question 1 — RTO/RPO y estrategia de Disaster Recovery
-A) Horas — Backup & Restore, coste mínimo, adecuado para cargas no críticas (recomendado para este proyecto)
+### Clarification Question 2
+¿De dónde deben salir las listas mostradas en esta pantalla de inicio?
 
-B) Decenas de minutos — Pilot Light
+A) De un historial local del dispositivo (`localStorage`): solo se listan las listas que ese navegador ha creado o visitado antes (vía QR o creación)
 
-C) Minutos — Warm Standby
+B) De una cuenta de usuario real (esto implicaría añadir autenticación, fuera del alcance actual)
 
-D) Casi tiempo real — Multi-site Active/Active
+C) Other (please describe after [Answer]: tag below)
 
-E) N/A — despliegue single-region es aceptable, sin DR cross-region
+[Answer]: Que se muestren todas las listas para todos por ahora, luego lo arreglo dandome credenciales para esa pagina
 
-X) Other (please describe after [Answer]: tag below)
+---
 
-[Answer]: 
+## Ambigüedad 2: Campo "imagen" de la lista
+No existe hoy ningún campo de imagen en el modelo. Necesito saber cómo se define.
 
-## Question 2 — Gestión de cambios
-A) Usar un proceso organizativo existente (indícalo)
+### Clarification Question 3
+¿Cómo se elige la imagen de una lista?
 
-B) No existe proceso formal — proponer uno ligero (registro de cambio + aprobación + nota de rollback)
+A) El usuario sube una foto/imagen propia (requiere almacenamiento de archivos, ej. Supabase Storage)
 
-C) N/A — exento de gestión de cambios formal (proyecto personal) (recomendado para este proyecto)
+B) Se elige entre un set cerrado de iconos/emojis predefinidos (sin subida de archivos, más simple)
 
-X) Other (please describe after [Answer]: tag below)
+C) Es una URL de imagen que el usuario pega a mano
 
-[Answer]: 
+D) Other (please describe after [Answer]: tag below)
 
-## Question 3 — CI/CD y despliegue
-A) Usar pipeline existente (indícalo)
+[Answer]: B
 
-B) No existe pipeline — proponer uno apropiado (ej. GitHub Actions + deploy automático a Vercel/Netlify) (recomendado para este proyecto)
+---
 
-X) Other (please describe after [Answer]: tag below)
+## Ambigüedad 3: "Participantes que han añadido algo"
+### Clarification Question 4
+¿A qué participantes te refieres exactamente?
 
-[Answer]: 
+A) Todas las personas (nombres locales) que han añadido al menos un producto pendiente actualmente en esa lista
 
-## Question 4 — Mecanismo de rollback
-A) Redeploy de la versión anterior (rollback por versión) (recomendado para este proyecto)
+B) Todas las personas que han interactuado alguna vez con esa lista (añadido o comprado, histórico completo)
 
-B) Blue/green swap
+C) Other (please describe after [Answer]: tag below)
 
-C) Canary con auto-rollback
+[Answer]: B
 
-D) Rollback consciente de base de datos (migraciones)
+---
 
-E) Usar procedimiento organizativo existente
+## Ambigüedad 4: Navegación desde el QR
+### Clarification Question 5
+Hoy el QR lleva directo a la lista (household). Con esta nueva pantalla de inicio, ¿qué pasa cuando alguien escanea un QR?
 
-X) Other (please describe after [Answer]: tag below)
+A) El QR sigue llevando directo a esa lista concreta (se salta la pantalla de inicio); la pantalla de inicio es solo para navegar entre listas ya conocidas por ese dispositivo
 
-[Answer]: 
+B) El QR ahora es solo para "unirse"/registrar esa lista en el dispositivo, y siempre se pasa primero por la pantalla de inicio
 
-## Question 5 — Estilo de despliegue
-A) Directo / in-place (coste mínimo, aceptable para carga no crítica) (recomendado para este proyecto)
+C) Other (please describe after [Answer]: tag below)
 
-B) Rolling
+[Answer]: A
 
-C) Blue/green
+---
 
-D) Canary
+## Ambigüedad 5: Eliminar una lista
+### Clarification Question 6
+Al eliminar una lista desde el menú de 3 puntos, ¿qué ocurre con sus productos/historial?
 
-X) Other (please describe after [Answer]: tag below)
+A) Se borra todo en cascada (productos pendientes, comprados e historial de esa lista desaparecen para siempre)
 
-[Answer]: 
+B) Solo se borra de "mis listas" en ese dispositivo (deja de aparecer en el índice local), pero los datos siguen existiendo en la base de datos por si otro dispositivo aún la tiene
 
-## Question 6 — Topología regional
-A) Single-region, multi-zona (recomendado para este proyecto)
+C) Other (please describe after [Answer]: tag below)
 
-B) Multi-región activo-pasivo
-
-C) Multi-región activo-activo
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: 
-
-## Question 7 — Respuesta a incidentes
-A) Usar proceso organizativo existente (indícalo)
-
-B) No existe proceso formal — proponer uno ligero (ej. simplemente revisar logs de Supabase/Vercel si algo falla) (recomendado para este proyecto)
-
-X) Other (please describe after [Answer]: tag below)
-
-[Answer]: 
+[Answer]: A

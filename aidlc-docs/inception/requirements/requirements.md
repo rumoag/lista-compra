@@ -110,3 +110,64 @@ tabla: products
 - Concurrencia: last-write-wins, sin lógica adicional.
 - Alta de hogar: vía botón "Crear nueva lista" en pantalla inicial.
 - Extensiones AI-DLC: Seguridad ACTIVADA (bloqueante), Resiliencia DESACTIVADA, PBT en modo PARCIAL.
+
+---
+
+# Ciclo 2 — Mejora de Usabilidad: Pantalla 1 (Listado de listas activas)
+
+**Fecha**: 2026-07-24
+
+## Intent Analysis Summary
+- **User Request**: Rediseño de la pantalla inicial para mostrar un listado de listas de la compra activas (título, imagen, participantes, menú de 3 puntos con eliminar/editar/QR en modales), con botón "Crear nueva lista" que abre un modal compartido con "Editar".
+- **Request Type**: Enhancement — extiende el modelo existente: household pasa de ser un concepto implícito "1 QR = 1 lista" a una entidad "Lista" con título e imagen, navegable desde una pantalla índice.
+- **Scope Estimate**: Multiple Components (nueva pantalla de inicio, sistema de modales reutilizable, cambio de esquema en `households`, nueva navegación).
+- **Complexity Estimate**: Moderate.
+- **Nota de alcance**: este apartado cubre **solo la Pantalla 1**. El resto de pantallas del rediseño se especificarán en documentos/ciclos posteriores, a petición explícita del usuario ("vamos a ir 1 a 1").
+- **Nota importante**: esta funcionalidad amplía el alcance original ("Fuera de alcance" del brief decía "Compartir con más de 2 personas / múltiples hogares" refiriéndose a *compartir un mismo hogar entre más gente*; esto es distinto — es "un dispositivo puede ver/crear varias listas/hogares"). Se documenta el cambio de alcance explícitamente, decidido por el usuario en la clarificación de esta pantalla.
+
+## Decisiones tomadas (rondas de clarificación)
+| Tema | Decisión |
+|---|---|
+| Alcance | Se amplía más allá de "solo UI/UX": esta pantalla requiere cambios de modelo de datos y navegación, no solo visuales |
+| Origen de las listas mostradas | **Todas** las listas de la tabla `households`, visibles para cualquiera (sin filtro por dispositivo/usuario) |
+| Imagen de la lista | Set cerrado de iconos/emojis predefinidos (sin subida de archivos) |
+| Participantes mostrados | Histórico completo: cualquiera que haya añadido o comprado algo alguna vez en esa lista |
+| QR | Sigue llevando directo a la lista concreta (comportamiento sin cambios); la pantalla de inicio es un índice adicional, no sustituye el acceso directo |
+| Eliminar lista | Borrado en cascada real (la lista y todos sus productos/historial desaparecen permanentemente) |
+
+## Functional Requirements
+
+**FR-1 — Listado de listas activas**
+La pantalla inicial (`/` o ruta raíz sin UUID de household) muestra todas las listas existentes como tarjetas, cada una con:
+- Título de la lista
+- Imagen (icono/emoji del set predefinido)
+- Listado de participantes (nombres locales de quienes han añadido o comprado algo alguna vez en esa lista)
+- Botón de "3 puntos" con menú: Eliminar, Editar, Ver QR
+
+**FR-2 — Crear nueva lista**
+Botón "Crear nueva lista" visible en la parte superior del listado. Abre un modal para introducir título e imagen. Al confirmar, crea una nueva fila en `households` y la nueva tarjeta aparece en el listado.
+
+**FR-3 — Editar lista**
+Desde el menú de 3 puntos, "Editar" abre el **mismo modal** que "Crear nueva lista" (mismo componente, distinto modo/valores iniciales), permitiendo modificar título e imagen de una lista existente.
+
+**FR-4 — Ver QR**
+Desde el menú de 3 puntos, "Acceder al QR" abre un modal mostrando el QR de acceso directo a esa lista (reutiliza la generación de QR ya existente de la Unidad 4).
+
+**FR-5 — Eliminar lista (acción restrictiva)**
+Desde el menú de 3 puntos, "Eliminar" requiere una confirmación explícita del usuario (modal/diálogo de confirmación) antes de borrar. Al confirmar, se elimina la lista (`household`) y, en cascada, todos sus productos e historial asociados, de forma permanente.
+
+**FR-6 — Modales**
+Todos los modales (crear/editar, QR, confirmación de borrado) se cierran mediante un botón "X" en la esquina superior derecha del modal.
+
+## Non-Functional Requirements
+
+**NFR-1 — Cambio de esquema**: la tabla `households` necesita nuevas columnas `title` (text) e `image_icon` (text, referencia a un valor del set cerrado de iconos). Se define un valor por defecto para listas creadas antes de este cambio.
+
+**NFR-2 (Excepción de seguridad aceptada)**: esta pantalla consulta y muestra **todas** las filas de `households` sin ningún filtro por dispositivo o identidad. Esto es una decisión explícita y temporal del usuario — hoy el modelo ya tiene RLS permisivo (`select using (true)`) sobre `households`, por lo que esto no introduce una vulnerabilidad nueva a nivel de base de datos, pero sí cambia el impacto práctico: antes hacía falta conocer la URL con UUID para ver una lista, ahora **cualquier visitante de la app ve título, imagen y participantes de todas las listas de todos los hogares** desde la pantalla de inicio. Se documenta como excepción aceptada, con la intención declarada del usuario de sustituirla por un sistema de credenciales en un ciclo futuro.
+
+**NFR-3**: el set de iconos/emojis para las listas debe ser cerrado y predefinido en el frontend (sin subida de archivos ni Supabase Storage).
+
+**NFR-4**: reutilizar el enfoque ya existente del proyecto: vanilla JS/CSS, sin librerías de UI externas, mismo patrón de componentes que Unidades 1-4.
+
+## Alcance de esta iteración
+Se procede directamente a Functional Design y Code Generation para esta pantalla, sin pasar por User Stories (justificación: el propio usuario ya describió el comportamiento con precisión funcional suficiente, sin ambigüedad de personas/journeys que una historia de usuario resolvería mejor que esta especificación directa).
