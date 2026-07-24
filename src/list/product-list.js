@@ -89,12 +89,15 @@ export async function renderProductList(container, { householdId }) {
 
   // BR-48: scroll infinito — un IntersectionObserver dispara la siguiente página
   // cuando el centinela final entra en el viewport, en vez de un botón "Cargar más".
+  // No se empieza a observar hasta que la primera página ya está cargada (ver el
+  // final de esta función): si se observara antes, el centinela está visible desde
+  // el primer instante (la lista aún está vacía) y el observer dispara una carga en
+  // paralelo con loadFirstPage(), duplicando la primera página de productos.
   const observer = new IntersectionObserver((entries) => {
     if (entries.some((entry) => entry.isIntersecting)) {
       return loadNextPageIfAny();
     }
   });
-  observer.observe(sentinel);
 
   async function loadNextPageIfAny() {
     if (!hasMore || isLoadingMore) return;
@@ -108,9 +111,12 @@ export async function renderProductList(container, { householdId }) {
   }
 
   async function loadFirstPage() {
+    isLoadingMore = true;
     await paginator.loadNextPage(fetchPage);
     if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
+    isLoadingMore = false;
     renderList();
+    observer.observe(sentinel);
   }
 
   function handleToggleSelect(id) {

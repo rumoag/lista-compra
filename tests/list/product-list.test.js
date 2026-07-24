@@ -1,11 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// El IntersectionObserver real invoca su callback casi inmediatamente al llamar a
+// observe(), informando del estado de intersección actual del elemento — incluido
+// "true" si el elemento ya es visible en ese momento (ej. una lista vacía, sin scroll
+// posible). Este fake replica ese comportamiento para poder detectar condiciones de
+// carrera como la de BR-48 (ver "no duplica la primera página" más abajo).
 let observedCallback;
 class FakeIntersectionObserver {
   constructor(callback) {
     observedCallback = callback;
   }
-  observe() {}
+  observe() {
+    Promise.resolve().then(() => observedCallback([{ isIntersecting: true }]));
+  }
   disconnect() {}
 }
 global.IntersectionObserver = FakeIntersectionObserver;
@@ -197,34 +204,69 @@ describe('renderProductList (Unidad 6)', () => {
     );
   });
 
-  it('scroll infinito: el centinela visible carga la siguiente página (BR-48)', async () => {
-    const firstPage = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `p${i}` }));
+  it('carga la primera página una sola vez, sin duplicarla (regresión: el observer se activa nada más observar el centinela, antes de que loadFirstPage() termine)', async () => {
+    const firstPage = Array.from({ length: 5 }, (_, i) => makeProduct({ id: `p${i}` }));
     queueResponse({ data: firstPage, error: null });
     const container = mount();
-    await renderProductList(container, { householdId: 'h1' });
 
-    expect(container.querySelector('[data-testid="product-item-p-extra"]')).toBeNull();
+    await renderProductList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(container.querySelectorAll('[data-testid^="product-item-p"]')).toHaveLength(5);
+  });
+
+  it('scroll infinito: el centinela visible carga la siguiente página automáticamente en cuanto termina la primera (BR-48)', async () => {
+    const firstPage = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `p${i}` }));
+    const secondPage = [makeProduct({ id: 'p-extra' })];
+    queueResponse({ data: firstPage, error: null });
+    queueResponse({ data: secondPage, error: null });
+    const container = mount();
+
+    await renderProductList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(container.querySelector('[data-testid="product-item-p-extra"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-testid^="product-item-p"]')).toHaveLength(21);
+  });
+
+  it('scroll infinito manual (simulando un scroll real posterior) carga páginas adicionales sin duplicar', async () => {
+    const page1 = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `p${i}` }));
+    const page2 = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `q${i}` })); // consumida por el auto-disparo tras la primera carga
+    queueResponse({ data: page1, error: null });
+    queueResponse({ data: page2, error: null });
+    const container = mount();
+    await renderProductList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
 
     queueResponse({ data: [makeProduct({ id: 'p-extra' })], error: null });
     await observedCallback([{ isIntersecting: true }]);
 
     expect(container.querySelector('[data-testid="product-item-p-extra"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="product-list-items"]').children).toHaveLength(41);
   });
 
   it('seleccionar todos fuerza cargar todas las páginas restantes antes de seleccionar (BR-43)', async () => {
-    const firstPage = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `p${i}` }));
-    queueResponse({ data: firstPage, error: null });
+    const page1 = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `p${i}` }));
+    const page2 = Array.from({ length: 20 }, (_, i) => makeProduct({ id: `q${i}` }));
+    const page3 = [makeProduct({ id: 'p-last' })];
+    queueResponse({ data: page1, error: null });
+    queueResponse({ data: page2, error: null }); // consumida por el auto-disparo tras la primera carga
     const container = mount();
     await renderProductList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
 
     container.querySelector('[data-testid="product-item-p0"] [data-testid="product-item-body"]').click();
 
-    queueResponse({ data: [makeProduct({ id: 'p-last' })], error: null });
+    queueResponse({ data: page3, error: null });
     container.querySelector('[data-testid="selection-bar-toggle-all-button"]').click();
     await new Promise((r) => setTimeout(r, 0));
     await new Promise((r) => setTimeout(r, 0));
 
     expect(container.querySelector('[data-testid="product-item-p-last"]')).not.toBeNull();
-    expect(container.querySelector('[data-testid="selection-bar-count"]').textContent).toContain('21');
+    expect(container.querySelector('[data-testid="selection-bar-count"]').textContent).toContain('41');
   });
 });
