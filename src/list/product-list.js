@@ -374,6 +374,7 @@ export async function renderProductList(container, { householdId }) {
   function cleanup() {
     realtime.unsubscribe();
     observer.disconnect();
+    window.removeEventListener('pagehide', cleanup);
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 

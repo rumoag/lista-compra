@@ -42,4 +42,31 @@ describe('renderTabs (BR-47)', () => {
     expect(nav.querySelector('[data-testid="tabs-history-button"]').getAttribute('aria-current')).toBe('true');
     expect(nav.querySelector('[data-testid="tabs-list-button"]').getAttribute('aria-current')).toBeNull();
   });
+
+  it('llama a la función de limpieza devuelta por la vista anterior al cambiar de tab (regresión: Realtime/IntersectionObserver quedaban huérfanos, bloqueando la recarga posterior de "Lista")', async () => {
+    const cleanupList = vi.fn();
+    const views = {
+      list: { label: 'Lista', render: vi.fn().mockResolvedValue(cleanupList) },
+      history: { label: 'Historial', render: vi.fn() },
+    };
+    const nav = document.createElement('div');
+    const view = document.createElement('div');
+    renderTabs(nav, view, { views, householdId: 'h1', initialView: 'list' });
+    await new Promise((r) => setTimeout(r, 0));
+
+    nav.querySelector('[data-testid="tabs-history-button"]').click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(cleanupList).toHaveBeenCalledOnce();
+  });
+
+  it('no falla si la vista activa no devuelve función de limpieza', async () => {
+    const views = makeViews();
+    const nav = document.createElement('div');
+    const view = document.createElement('div');
+    renderTabs(nav, view, { views, householdId: 'h1', initialView: 'list' });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(() => nav.querySelector('[data-testid="tabs-history-button"]').click()).not.toThrow();
+  });
 });
