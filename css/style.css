@@ -150,6 +150,12 @@ button.secondary {
   overflow: hidden;
 }
 
+/* El atributo [hidden] debe ganar siempre a "display: flex" de arriba,
+   si no, el dropdown queda visible permanentemente pese a toggle-arse en JS. */
+.list-actions-menu-dropdown[hidden] {
+  display: none;
+}
+
 .list-actions-menu-dropdown button {
   background: transparent;
   color: inherit;
