@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderProductItem } from '../../src/list/product-item.js';
 
 function makeProduct(overrides = {}) {
@@ -17,9 +17,9 @@ function mount(el) {
   return el;
 }
 
-describe('renderProductItem (Unidad 6)', () => {
+describe('renderProductItem (revisado: sin menú de 3 puntos por item)', () => {
   it('muestra nombre, cantidad+unidad, categoría e icono de categoría', () => {
-    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete: vi.fn() }));
+    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn() }));
 
     expect(el.querySelector('[data-testid="product-item-name"]').textContent).toBe('Leche');
     expect(el.querySelector('[data-testid="product-item-meta"]').textContent).toContain('2 litros');
@@ -28,62 +28,75 @@ describe('renderProductItem (Unidad 6)', () => {
   });
 
   it('sin categoría muestra el icono genérico y "Sin categoría"', () => {
-    const el = mount(renderProductItem(makeProduct({ category: null }), { onEdit: vi.fn(), onDelete: vi.fn() }));
+    const el = mount(renderProductItem(makeProduct({ category: null }), { onEdit: vi.fn() }));
 
     expect(el.querySelector('[data-testid="product-item-category-icon"]').textContent).toBe('📦');
     expect(el.querySelector('[data-testid="product-item-meta"]').textContent).toContain('Sin categoría');
   });
 
-  it('llama a onEdit con el producto completo desde el menú de 3 puntos', () => {
-    const onEdit = vi.fn();
-    const product = makeProduct();
-    const el = mount(renderProductItem(product, { onEdit, onDelete: vi.fn() }));
-
-    el.querySelector('[data-testid="dropdown-menu-toggle"]').click();
-    el.querySelector('[data-testid="dropdown-menu-edit"]').click();
-
-    expect(onEdit).toHaveBeenCalledWith(product);
-  });
-
-  it('llama a onDelete con el id desde el menú de 3 puntos', () => {
-    const onDelete = vi.fn();
-    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete }));
-
-    el.querySelector('[data-testid="dropdown-menu-toggle"]').click();
-    el.querySelector('[data-testid="dropdown-menu-delete"]').click();
-
-    expect(onDelete).toHaveBeenCalledWith('p1');
-  });
-
   it('no muestra checkbox si no se pasa onToggleSelect', () => {
-    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete: vi.fn() }));
+    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn() }));
 
     expect(el.querySelector('[data-testid="product-item-select-checkbox"]')).toBeNull();
   });
 
   it('click en el cuerpo del item llama a onToggleSelect (BR-41)', () => {
     const onToggleSelect = vi.fn();
-    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete: vi.fn(), onToggleSelect }));
+    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onToggleSelect }));
 
     el.querySelector('[data-testid="product-item-body"]').click();
 
     expect(onToggleSelect).toHaveBeenCalledWith('p1');
   });
 
-  it('click en el menú de 3 puntos NO alterna la selección (BR-41)', () => {
-    const onToggleSelect = vi.fn();
-    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete: vi.fn(), onToggleSelect }));
-
-    el.querySelector('[data-testid="dropdown-menu-toggle"]').click();
-
-    expect(onToggleSelect).not.toHaveBeenCalled();
-  });
-
-  it('refleja el prop selected en el estado inicial del checkbox', () => {
+  it('refleja el prop selected en el estado inicial del checkbox y en el fondo', () => {
     const el = mount(
-      renderProductItem(makeProduct(), { onEdit: vi.fn(), onDelete: vi.fn(), onToggleSelect: vi.fn(), selected: true })
+      renderProductItem(makeProduct(), { onEdit: vi.fn(), onToggleSelect: vi.fn(), selected: true })
     );
 
     expect(el.querySelector('[data-testid="product-item-select-checkbox"]').checked).toBe(true);
+    expect(el.classList.contains('selected')).toBe(true);
+  });
+
+  it('sin selected no tiene la clase "selected"', () => {
+    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn(), onToggleSelect: vi.fn() }));
+
+    expect(el.classList.contains('selected')).toBe(false);
+  });
+
+  describe('mantener pulsado abre edición', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('mantener pulsado 500ms llama a onEdit con el producto, sin alternar selección', () => {
+      const onEdit = vi.fn();
+      const onToggleSelect = vi.fn();
+      const product = makeProduct();
+      const el = mount(renderProductItem(product, { onEdit, onToggleSelect }));
+      const body = el.querySelector('[data-testid="product-item-body"]');
+
+      body.dispatchEvent(new MouseEvent('mousedown'));
+      vi.advanceTimersByTime(500);
+      body.dispatchEvent(new MouseEvent('mouseup'));
+      body.click();
+
+      expect(onEdit).toHaveBeenCalledWith(product);
+      expect(onToggleSelect).not.toHaveBeenCalled();
+    });
+
+    it('soltar antes de 500ms es un tap normal: alterna selección, no llama a onEdit', () => {
+      const onEdit = vi.fn();
+      const onToggleSelect = vi.fn();
+      const el = mount(renderProductItem(makeProduct(), { onEdit, onToggleSelect }));
+      const body = el.querySelector('[data-testid="product-item-body"]');
+
+      body.dispatchEvent(new MouseEvent('mousedown'));
+      vi.advanceTimersByTime(200);
+      body.dispatchEvent(new MouseEvent('mouseup'));
+      body.click();
+
+      expect(onEdit).not.toHaveBeenCalled();
+      expect(onToggleSelect).toHaveBeenCalledWith('p1');
+    });
   });
 });

@@ -1,11 +1,14 @@
-// Renderiza un producto pendiente (Unidad 6): icono de categoría, menú de 3 puntos
-// (Editar/Eliminar, BR-40) en vez de botones inline, y selección por click en el cuerpo (BR-41).
-import { renderDropdownMenu } from '../common/dropdown-menu.js';
+// Renderiza un producto pendiente (Unidad 6, revisado): sin menú de 3 puntos por item —
+// editar/eliminar ya no tienen sentido individualmente, se hacen desde el header fijo de
+// selección. Tap alterna selección (BR-41, con fondo resaltado); mantener pulsado abre
+// edición directamente.
 import { getCategoryIcon } from './categories.js';
 
-export function renderProductItem(product, { onEdit, onDelete, onToggleSelect, selected = false }) {
+const LONG_PRESS_MS = 500;
+
+export function renderProductItem(product, { onEdit, onToggleSelect, selected = false }) {
   const el = document.createElement('div');
-  el.className = 'product-item';
+  el.className = `product-item${selected ? ' selected' : ''}`;
   el.dataset.testid = `product-item-${product.id}`;
   el.dataset.productId = product.id;
 
@@ -26,21 +29,41 @@ export function renderProductItem(product, { onEdit, onDelete, onToggleSelect, s
         </div>
       </div>
     </div>
-    <div data-testid="product-item-menu-container"></div>
   `;
 
-  // BR-41: click en cualquier parte del cuerpo (incluido el propio checkbox, que
-  // burbujea hasta aquí) alterna la selección. El re-render posterior del padre con
-  // el `selected` actualizado es lo que refleja el nuevo estado del checkbox.
-  el.querySelector('[data-testid="product-item-body"]').addEventListener('click', () => {
-    if (onToggleSelect) onToggleSelect(product.id);
-  });
+  const body = el.querySelector('[data-testid="product-item-body"]');
 
-  renderDropdownMenu(el.querySelector('[data-testid="product-item-menu-container"]'), {
-    actions: [
-      { testid: 'edit', label: 'Editar', onClick: () => onEdit(product) },
-      { testid: 'delete', label: 'Eliminar', onClick: () => onDelete(product.id) },
-    ],
+  let pressTimer = null;
+  let longPressTriggered = false;
+
+  function startPress() {
+    longPressTriggered = false;
+    pressTimer = setTimeout(() => {
+      longPressTriggered = true;
+      if (onEdit) onEdit(product);
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelPress() {
+    clearTimeout(pressTimer);
+  }
+
+  body.addEventListener('mousedown', startPress);
+  body.addEventListener('touchstart', startPress, { passive: true });
+  body.addEventListener('mouseup', cancelPress);
+  body.addEventListener('mouseleave', cancelPress);
+  body.addEventListener('touchend', cancelPress);
+  body.addEventListener('touchcancel', cancelPress);
+
+  // BR-41: click en cualquier parte del cuerpo (incluido el propio checkbox, que
+  // burbujea hasta aquí) alterna la selección — salvo que el click sea el resultado
+  // de un long-press, que ya disparó la edición en su lugar.
+  body.addEventListener('click', () => {
+    if (longPressTriggered) {
+      longPressTriggered = false;
+      return;
+    }
+    if (onToggleSelect) onToggleSelect(product.id);
   });
 
   return el;

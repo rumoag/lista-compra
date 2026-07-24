@@ -46,7 +46,7 @@ async function start() {
   appMain.innerHTML = `
     <div id="greeting-container"></div>
     <div id="list-header-container"></div>
-    <nav id="app-tabs" data-testid="app-tabs" style="display:flex; gap:0.5rem; flex-wrap:wrap;"></nav>
+    <nav id="app-tabs" class="tabs-nav" data-testid="app-tabs"></nav>
     <div id="app-view"></div>
   `;
 
@@ -56,11 +56,13 @@ async function start() {
   const viewContainer = appMain.querySelector('#app-view');
 
   function handleChangeName() {
-    openChangeNameModal({ onSaved: () => renderGreeting(greetingContainer, { onChangeName: handleChangeName }) });
+    openChangeNameModal({
+      onSaved: () => renderGreeting(greetingContainer, { household, onChangeName: handleChangeName }),
+    });
   }
 
-  renderListHeader(headerContainer, { household, onChangeName: handleChangeName });
-  renderGreeting(greetingContainer, { onChangeName: handleChangeName });
+  renderListHeader(headerContainer, { household });
+  renderGreeting(greetingContainer, { household, onChangeName: handleChangeName });
   renderTabs(tabsNav, viewContainer, { views: VIEWS, householdId, initialView: 'list' });
 }
 

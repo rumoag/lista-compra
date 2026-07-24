@@ -1,10 +1,13 @@
 // Header de selección en lote (US-2.1, US-2.2; rediseñado a header fijo superpuesto sobre
 // la cabecera de la lista). X para deseleccionar todos, contador, y a la derecha: eliminar
-// (icono con tooltip en desktop), marcar como comprados (icono+texto) y "Seleccionar todos"
-// dentro de un menú de 3 puntos.
+// (icono con tooltip en desktop), marcar como comprados (icono+texto) y un menú de 3 puntos
+// con "Seleccionar todos" y, si hay exactamente 1 producto seleccionado, "Editar".
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
 
-export function renderSelectionBar(container, { selectedCount, onDeselectAll, onMarkAsBought, onDeleteSelected, onSelectAll }) {
+export function renderSelectionBar(
+  container,
+  { selectedCount, onDeselectAll, onMarkAsBought, onDeleteSelected, onSelectAll, onEditSelected }
+) {
   document.body.classList.toggle('has-selection', selectedCount > 0);
 
   if (selectedCount === 0) {
@@ -46,7 +49,10 @@ export function renderSelectionBar(container, { selectedCount, onDeselectAll, on
     .querySelector('[data-testid="selection-bar-delete-button"]')
     .addEventListener('click', onDeleteSelected);
 
-  renderDropdownMenu(container.querySelector('[data-testid="selection-bar-menu-container"]'), {
-    actions: [{ testid: 'select-all', label: 'Seleccionar todos', onClick: onSelectAll }],
-  });
+  const actions = [{ testid: 'select-all', label: 'Seleccionar todos', onClick: onSelectAll }];
+  if (onEditSelected) {
+    actions.push({ testid: 'edit', label: 'Editar', onClick: onEditSelected });
+  }
+
+  renderDropdownMenu(container.querySelector('[data-testid="selection-bar-menu-container"]'), { actions });
 }

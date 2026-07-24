@@ -1,48 +1,23 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('../../src/common/qr-modal.js', () => ({
-  openQrModal: vi.fn(),
-}));
-
-const { openQrModal } = await import('../../src/common/qr-modal.js');
-const { renderListHeader } = await import('../../src/list/list-header.js');
+import { describe, it, expect } from 'vitest';
+import { renderListHeader } from '../../src/list/list-header.js';
 
 function makeHousehold(overrides = {}) {
   return { id: 'h1', title: 'Casa', image_icon: '🛒', ...overrides };
 }
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  document.body.innerHTML = '';
-});
-
-describe('renderListHeader (BR-46)', () => {
+describe('renderListHeader (solo título; el menú vive ahora en greeting.js)', () => {
   it('muestra el icono y el título de la lista', () => {
     const container = document.createElement('div');
-    renderListHeader(container, { household: makeHousehold(), onChangeName: vi.fn() });
+    renderListHeader(container, { household: makeHousehold() });
 
     expect(container.querySelector('[data-testid="list-header-icon"]').textContent).toBe('🛒');
     expect(container.querySelector('[data-testid="list-header-title"]').textContent).toContain('Casa');
   });
 
-  it('el menú de 3 puntos llama a onChangeName', () => {
-    const onChangeName = vi.fn();
+  it('no incluye ningún menú de 3 puntos', () => {
     const container = document.createElement('div');
-    renderListHeader(container, { household: makeHousehold(), onChangeName });
+    renderListHeader(container, { household: makeHousehold() });
 
-    container.querySelector('[data-testid="dropdown-menu-toggle"]').click();
-    container.querySelector('[data-testid="dropdown-menu-change-name"]').click();
-
-    expect(onChangeName).toHaveBeenCalled();
-  });
-
-  it('el menú de 3 puntos abre el QR con el householdId', () => {
-    const container = document.createElement('div');
-    renderListHeader(container, { household: makeHousehold({ id: 'h9' }), onChangeName: vi.fn() });
-
-    container.querySelector('[data-testid="dropdown-menu-toggle"]').click();
-    container.querySelector('[data-testid="dropdown-menu-qr"]').click();
-
-    expect(openQrModal).toHaveBeenCalledWith({ householdId: 'h9' });
+    expect(container.querySelector('[data-testid="dropdown-menu-toggle"]')).toBeNull();
   });
 });

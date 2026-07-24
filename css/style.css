@@ -276,10 +276,25 @@ button.secondary {
 
 /* Unidad 6 — cabecera, saludo, tabs, FAB, icono de categoría, stepper de cantidad */
 
+/* .list-topbar (saludo + menú) y .selection-header comparten el mismo padding/altura
+   a propósito: al activar la selección, uno sustituye al otro sin que el layout salte. */
+.list-topbar,
+.selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem var(--spacing);
+}
+
+.list-topbar {
+  border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+  margin: 0 calc(var(--spacing) * -1);
+}
+
 .list-header {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin: 1rem 0;
 }
 
 .list-header-title {
@@ -297,13 +312,16 @@ button.secondary {
   color: inherit;
   border: none;
   padding: 0;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: var(--spacing);
-  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tabs-nav {
+  display: flex;
 }
 
 .tab {
+  flex: 1;
+  text-align: center;
   background: transparent;
   color: inherit;
   border: none;
@@ -327,6 +345,11 @@ button.secondary {
 
 .product-item-category-icon {
   font-size: 1.3rem;
+}
+
+.product-item.selected {
+  background: rgba(37, 99, 235, 0.12);
+  border-radius: 8px;
 }
 
 .fab {
@@ -424,7 +447,8 @@ body.has-selection {
   padding-top: 3.25rem;
 }
 
-body.has-selection [data-testid="list-header"],
-body.has-selection [data-testid="greeting"] {
+/* El título de la lista NO se oculta al activar la selección — solo el topbar
+   (saludo + menú), que el header fijo sustituye en el mismo hueco. */
+body.has-selection [data-testid="list-topbar"] {
   display: none;
 }

@@ -154,14 +154,39 @@ describe('renderProductList (Unidad 6)', () => {
     expect(container.querySelector('[data-testid="product-item-server-id"]')).not.toBeNull();
   });
 
-  it('editar un item abre el wizard en modo edit con el producto', async () => {
+  it('mantener pulsado un item abre el wizard en modo edit con el producto', async () => {
+    vi.useFakeTimers();
+    const product = makeProduct({ id: 'p1' });
+    queueResponse({ data: [product], error: null });
+    const container = mount();
+    await renderProductList(container, { householdId: 'h1' });
+    await vi.advanceTimersByTimeAsync(0); // deja resolver el auto-disparo del observer
+
+    const body = container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]');
+    body.dispatchEvent(new MouseEvent('mousedown'));
+    await vi.advanceTimersByTimeAsync(500);
+    body.dispatchEvent(new MouseEvent('mouseup'));
+    vi.useRealTimers();
+    await Promise.resolve(); // fetchSuggestedProducts (mock) resuelve tras el long-press
+
+    expect(openProductWizardModal).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'edit', product, onSave: expect.any(Function) })
+    );
+  });
+
+  it('seleccionar 1 item y pulsar "Editar" en el menú del header fijo abre el wizard (exactamente 1 seleccionado)', async () => {
     const product = makeProduct({ id: 'p1' });
     queueResponse({ data: [product], error: null });
     const container = mount();
     await renderProductList(container, { householdId: 'h1' });
 
-    container.querySelector('[data-testid="product-item-p1"] [data-testid="dropdown-menu-toggle"]').click();
-    container.querySelector('[data-testid="product-item-p1"] [data-testid="dropdown-menu-edit"]').click();
+    container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-edit"]')
+      .click();
     await new Promise((r) => setTimeout(r, 0));
 
     expect(openProductWizardModal).toHaveBeenCalledWith(
@@ -169,23 +194,39 @@ describe('renderProductList (Unidad 6)', () => {
     );
   });
 
-  it('eliminar un item abre confirmación (BR-42) y borra al confirmar', async () => {
-    queueResponse({ data: [makeProduct({ id: 'p1' })], error: null }); // primera página
-    queueResponse({ error: null }); // delete().eq()
+  it('con 2 seleccionados, el menú del header fijo no ofrece "Editar"', async () => {
+    queueResponse({ data: [makeProduct({ id: 'p1' }), makeProduct({ id: 'p2' })], error: null });
     const container = mount();
     await renderProductList(container, { householdId: 'h1' });
 
-    container.querySelector('[data-testid="product-item-p1"] [data-testid="dropdown-menu-toggle"]').click();
-    container.querySelector('[data-testid="product-item-p1"] [data-testid="dropdown-menu-delete"]').click();
+    container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
+    container.querySelector('[data-testid="product-item-p2"] [data-testid="product-item-body"]').click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+
+    expect(
+      container.querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-edit"]')
+    ).toBeNull();
+  });
+
+  it('eliminar un único producto seleccionado abre confirmación (BR-42) y borra al confirmar', async () => {
+    queueResponse({ data: [makeProduct({ id: 'p1' })], error: null }); // primera página
+    queueResponse({ error: null }); // delete().in()
+    const container = mount();
+    await renderProductList(container, { householdId: 'h1' });
+
+    container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
+    container.querySelector('[data-testid="selection-bar-delete-button"]').click();
 
     expect(openConfirmModal).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Eliminar producto', onConfirm: expect.any(Function) })
+      expect.objectContaining({ title: 'Eliminar productos', message: '¿Eliminar este producto?' })
     );
 
     await openConfirmModal.mock.calls[0][0].onConfirm();
 
     const deleteBuilder = createdBuilders.find((b) => b.delete.mock.calls.length > 0);
-    expect(deleteBuilder.eq).toHaveBeenCalledWith('id', 'p1');
+    expect(deleteBuilder.in).toHaveBeenCalledWith('id', ['p1']);
     expect(container.querySelector('[data-testid="product-item-p1"]')).toBeNull();
   });
 

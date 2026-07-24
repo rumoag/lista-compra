@@ -88,4 +88,32 @@ describe('renderSelectionBar', () => {
 
     expect(onSelectAll).toHaveBeenCalledOnce();
   });
+
+  it('sin onEditSelected, el menú no incluye "Editar"', () => {
+    const container = document.createElement('div');
+    render(container, { onEditSelected: null });
+
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+
+    expect(
+      container.querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-edit"]')
+    ).toBeNull();
+  });
+
+  it('con onEditSelected (exactamente 1 seleccionado), el menú incluye "Editar" y lo llama', () => {
+    const container = document.createElement('div');
+    const onEditSelected = vi.fn();
+    render(container, { selectedCount: 1, onEditSelected });
+
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-toggle"]')
+      .click();
+    container
+      .querySelector('[data-testid="selection-bar-menu-container"] [data-testid="dropdown-menu-edit"]')
+      .click();
+
+    expect(onEditSelected).toHaveBeenCalledOnce();
+  });
 });

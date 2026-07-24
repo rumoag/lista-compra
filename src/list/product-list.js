@@ -1,6 +1,8 @@
 // Orquesta la lista de pendientes (Unidad 6): scroll infinito (BR-48), wizard de 3 pasos
-// para crear/editar (BR-44), confirmación de borrado individual/lote (BR-42), selección
-// ampliada con seleccionar/deseleccionar todos (BR-43) y eliminar seleccionados.
+// para crear/editar (BR-44, accesible por long-press en el item o desde el header fijo
+// con exactamente 1 seleccionado), confirmación de borrado en lote (BR-42, cubre también
+// 1 solo producto — ya no hay borrado individual por item) y selección ampliada con
+// seleccionar/deseleccionar todos (BR-43).
 import { supabase } from '../common/supabase-client.js';
 import { createPaginator } from '../common/pagination.js';
 import { applyOptimistic } from '../common/optimistic.js';
@@ -68,19 +70,22 @@ export async function renderProductList(container, { householdId }) {
       itemsContainer.appendChild(
         renderProductItem(product, {
           onEdit: handleEditRequest,
-          onDelete: confirmAndDeleteOne,
           onToggleSelect: handleToggleSelect,
           selected: selection.isSelected(product.id),
         })
       );
     });
 
+    const selectedCount = selection.getSelection().size;
+
     renderSelectionBar(selectionBarContainer, {
-      selectedCount: selection.getSelection().size,
+      selectedCount,
       onMarkAsBought: handleMarkAsBought,
       onDeselectAll: handleDeselectAll,
       onSelectAll: handleSelectAll,
       onDeleteSelected: handleDeleteSelected,
+      // Editar solo tiene sentido con exactamente 1 producto seleccionado.
+      onEditSelected: selectedCount === 1 ? handleEditSelected : null,
     });
   }
 
@@ -228,43 +233,18 @@ export async function renderProductList(container, { householdId }) {
     }).catch(() => {});
   }
 
-  function confirmAndDeleteOne(id) {
-    openConfirmModal({
-      title: 'Eliminar producto',
-      message: '¿Eliminar este producto?',
-      confirmLabel: 'Eliminar',
-      onConfirm: () => handleDelete(id),
-    });
-  }
-
-  async function handleDelete(id) {
-    const previous = paginator.getItems();
-    selection.removeFromSelection(id);
-
-    await applyOptimistic({
-      apply: () => {
-        paginator.removeItem(id);
-        renderList();
-      },
-      revert: () => {
-        previous.forEach((item) => {
-          if (!paginator.getItems().some((i) => i.id === item.id)) {
-            paginator.prependItem(item);
-          }
-        });
-        renderList();
-      },
-      remoteOperation: async () => {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-      },
-      onError: () => {
-        showGlobalError('No se pudo eliminar el producto. Inténtalo de nuevo.');
-      },
-    }).catch(() => {});
+  // Editar ya no se ofrece por item (menú de 3 puntos retirado, BR-40 obsoleta): se
+  // accede manteniendo pulsado un item (product-item.js) o, con exactamente 1
+  // seleccionado, desde el menú de 3 puntos del header fijo de selección.
+  function handleEditSelected() {
+    const ids = [...selection.getSelection()];
+    if (ids.length !== 1) return;
+    const product = paginator.getItems().find((item) => item.id === ids[0]);
+    if (product) handleEditRequest(product);
   }
 
   // BR-42: confirmación también en el borrado en lote, con el conteo en el mensaje.
+  // Cubre también el borrado de un único producto (ya no hay ruta de borrado individual).
   function handleDeleteSelected() {
     const ids = [...selection.getSelection()];
     if (ids.length === 0) return;
