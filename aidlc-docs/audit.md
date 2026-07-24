@@ -952,3 +952,133 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **User Input**: "Approve & Continue"
 **AI Response**: "Build and Test de la Unidad 5 marcado como completo. Pantalla 1 (Listado de listas activas) del Ciclo 2 de mejora de usabilidad queda completa de extremo a extremo (Requirements → Code Generation → Build and Test). Procediendo a OPERATIONS PHASE (placeholder) para esta unidad; despliegue real y verificación manual de integration-test-instructions.md quedan como próximos pasos del usuario. Se invita al usuario a describir la Pantalla 2."
 **Context**: Construction Phase - Unidad 5 completa; Build and Test approval gate passed; CICLO 2 Pantalla 1 completa
+
+---
+
+## Fixes post-merge de la Unidad 5 (fuera de fases, a petición directa del usuario)
+**Timestamp**: 2026-07-24T02:00:00Z
+**User Input**: Serie de peticiones puntuales tras mergear el PR de la Unidad 5: (1) error 42710 al reejecutar schema.sql completo sobre un proyecto ya desplegado — se corrigió la documentación para indicar reejecutar solo el bloque final; (2) el dropdown de 3 puntos se quedaba visualmente abierto siempre — bug real de CSS (`display:flex` anulaba `[hidden]`), corregido con regla `[hidden] { display: none }`; (3) falta de labels visibles y estética pobre en el input del modal crear/editar lista — añadidos labels y clase `.text-input` con foco estilizado.
+**AI Response**: "Los 3 fixes se aplicaron directamente (sin ronda completa de Requirements/Functional Design, por ser correcciones acotadas de UI/bug ya identificado con causa raíz clara) y se subieron como commits adicionales al mismo PR #1 a petición del usuario."
+**Context**: Fuera del flujo AI-DLC formal — correcciones directas post-implementación, ya mergeadas
+
+---
+
+## Pantalla 2 descrita: Vista de lista de la compra (rediseño completo)
+**Timestamp**: 2026-07-24T02:10:00Z
+**User Input**: Especificación extensa de la Pantalla 2 cubriendo: (1) título reemplazado por emoji+título de la lista; (2) menú de 3 puntos en el título con cambiar nombre/QR/volver al listado; (3) saludo "Hola, (Nombre)" clicable que abre modal de edición de nombre; (4) tabs Lista/Historial/Estadísticas debajo del saludo; (5) en tab Lista: quitar "cargar más", editar/eliminar vía menú de 3 puntos por item; (6) botón flotante inferior centrado que abre modal de pantalla completa con asistente de 3 pasos (producto vía chips de los 5 más repetidos + "Otros", cantidad con stepper +/- y teclado numérico, categoría vía chips) — mismo modal para crear y editar; (7) confirmación modal para eliminar; (8) estado vacío de la cesta; (9) eliminar todos los marcados (bulk delete); (10) seleccionar/deseleccionar todos junto a marcar como comprados; (11) categorías con icono, reflejado también en cada item listado; (12) click en item (fuera del menú) marca el checkbox.
+**AI Response**: "Alcance identificado como Enhancement complejo (rediseño de navegación + selección múltiple + wizard de creación con cambio de tipo de dato en 'cantidad'). Detectadas 8 ambigüedades/decisiones de diseño que afectan el modelo de datos y reglas de negocio existentes (BR-2 cantidad como texto libre). Se crea requirements-clarification-questions.md antes de proceder a Functional Design."
+**Context**: Requirements Analysis (UX cycle) - Pantalla 2, Step 5 Thorough Completeness Analysis
+
+---
+
+## Clarificación Pantalla 2 respondida
+**Timestamp**: 2026-07-24T02:20:00Z
+**User Input**: "Continue" (tras rellenar con CQ1=B stepper numérico + campo de unidad opcional, CQ2=A mínimo 1 sin máximo explícito, CQ3=B 5 más repetidos excluyendo pendientes actuales, CQ4=A set de iconos por categoría propuesto, CQ5=B scroll infinito, CQ6=A ambos accesos a cambiar nombre mantenidos, CQ7=A confirmación también en borrado en lote, CQ8=A wizard con botón Atrás)"
+**AI Response**: "Respuestas sin contradicciones. Añadida sección 'Ciclo 2 — Pantalla 2' a requirements.md con FR-7 a FR-17 y NFR-5 a NFR-8, incluyendo el reemplazo de BR-2 (quantity texto libre → quantity_number + quantity_unit). Presentando para aprobación del usuario."
+**Context**: Requirements Analysis (UX cycle) - Pantalla 2, Step 7 documento generado; pendiente de aprobación
+
+---
+
+## Requirements Approval (Ciclo 2 — Pantalla 2)
+**Timestamp**: 2026-07-24T02:30:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Requirements de la Pantalla 2 (Ciclo 2) aprobados. Se crea la Unidad 6 (Vista de lista de la compra) y se procede a Functional Design. Generado unidad-6-functional-design-plan.md con 3 preguntas: estrategia de migración de quantity existente, confirmación al cerrar el wizard con progreso avanzado, alcance de 'Seleccionar todos' con scroll infinito. Esperando respuestas."
+**Context**: Requirements Analysis (UX cycle) approval gate passed; Construction Phase - Unidad 6 - Functional Design, Steps 1-4
+
+---
+
+## Functional Design Plan Approval (Unidad 6)
+**Timestamp**: 2026-07-24T02:40:00Z
+**User Input**: "Continue" (tras rellenar con Q1=A migración best-effort de quantity, Q2=A cerrar wizard sin confirmación, Q3=B seleccionar todos fuerza carga completa)
+**AI Response**: "Respuestas sin ambigüedades. Procediendo a generar los artefactos de diseño funcional de la Unidad 6."
+**Context**: Construction Phase - Unidad 6 - Functional Design, Steps 5-6
+
+---
+
+## Functional Design Artifacts Generated (Unidad 6)
+**Timestamp**: 2026-07-24T02:55:00Z
+**User Input**: N/A (automated step)
+**AI Response**: "Generados domain-entities.md (Product extendido con quantity_number/quantity_unit, mapa de iconos de categoría, productos sugeridos), business-rules.md (BR-35 a BR-49), business-logic-model.md (9 flujos + Testable Properties), frontend-components.md (generalización de 3 componentes de Unidad 5 a common/: dropdown-menu.js, confirm-modal.js, qr-modal.js; componentes nuevos de cabecera/saludo/tabs/wizard/categorías/sugeridos; reescritura de product-item.js y product-list.js; extensión de selection-bar.js). Presentando para revisión del usuario."
+**Context**: Construction Phase - Unidad 6 - Functional Design, Step 7
+
+---
+
+## Functional Design Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:00:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Functional Design de la Unidad 6 marcado como completo. Procediendo a NFR Requirements (Unidad 6). Generado unidad-6-nfr-requirements-plan.md con 2 preguntas: seguridad de la migración destructiva de quantity (drop vs renombrar a legacy) dado el incidente real de la Unidad 5, y límite defensivo para el cálculo de productos sugeridos. Esperando respuestas."
+**Context**: Construction Phase - Unidad 6 - Functional Design, Steps 8-9 approval gate passed; NFR Requirements Steps 2-4
+
+---
+
+## NFR Requirements Plan Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:05:00Z
+**User Input**: "Continue" (tras rellenar con Q1=A eliminar quantity directamente asumiendo el riesgo, Q2=A mismo límite de 2000 filas que Unidad 3)
+**AI Response**: "Respuestas sin ambigüedades. Generados nfr-requirements.md y tech-stack-decisions.md. Sin dependencias nuevas: teclado numérico e IntersectionObserver nativos del navegador."
+**Context**: Construction Phase - Unidad 6 - NFR Requirements, Steps 5-7
+
+---
+
+## NFR Requirements Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "NFR Requirements de la Unidad 6 marcado como completo. Procediendo a NFR Design (Unidad 6). Todas las decisiones ya resueltas; generados nfr-design-patterns.md y logical-components.md directamente sin ronda de preguntas, mismo criterio que unidades anteriores."
+**Context**: Construction Phase - Unidad 6 - NFR Requirements, Steps 8-9 approval gate passed; NFR Design
+
+---
+
+## NFR Design Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:15:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "NFR Design de la Unidad 6 marcado como completo. Procediendo a Infrastructure Design (Unidad 6). Sin cambios de infraestructura reales; único cambio es la migración de esquema aditiva-y-destructiva sobre products, con nota explícita de ejecutar solo el bloque nuevo (aprendizaje de la Unidad 5). Generados infrastructure-design.md y deployment-architecture.md directamente."
+**Context**: Construction Phase - Unidad 6 - NFR Design, approval gate passed; Infrastructure Design
+
+---
+
+## Infrastructure Design Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:20:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Infrastructure Design de la Unidad 6 marcado como completo. Procediendo a Code Generation (Unidad 6). Generado unidad-6-code-generation-plan.md con 19 pasos (migración de esquema, generalización de 3 componentes de Unidad 5 a common/, validación de cantidad, categorías/sugeridos, modal de cambiar nombre, cabecera/saludo/tabs, wizard de 3 pasos, reescritura de product-item/product-list, extensión de selection-bar, eliminación de product-form.js, integración en main.js, CSS, documentación). Presentando resumen para aprobación."
+**Context**: Construction Phase - Unidad 6 - Infrastructure Design, approval gate passed; Code Generation Part 1 Planning
+
+---
+
+## Code Generation Plan Approval (Unidad 6)
+**Timestamp**: 2026-07-24T03:25:00Z
+**User Input**: "Continue"
+**AI Response**: "Plan aprobado. Procediendo a Parte 2 - Generación, ejecutando los 19 pasos en orden."
+**Context**: Construction Phase - Unidad 6 - Code Generation, Steps 6-9 approval gate passed
+
+---
+
+## Code Generation Complete + Tests Verified (Unidad 6)
+**Timestamp**: 2026-07-24T04:30:00Z
+**User Input**: N/A (automated generation + verification step)
+**AI Response**: "Generado código de la Unidad 6: migración de esquema (quantity → quantity_number/quantity_unit, destructiva), generalización de 3 componentes de Unidad 5 a common/ (dropdown-menu.js, confirm-modal.js, qr-modal.js), categorías con icono, productos sugeridos, modal de cambiar nombre, cabecera/saludo/tabs, wizard de 3 pasos, reescritura de product-item.js/product-list.js (scroll infinito, selección ampliada), extensión de selection-bar.js, eliminación de product-form.js, integración en main.js, CSS, documentación. Durante la generación se detectaron y corrigieron 2 bugs reales: (1) getCategoryIcon con objeto plano devolvía Object.prototype.valueOf para la categoría 'valueOf' (encontrado por PBT con fast-check), corregido usando Map; (2) handleAdd en product-list.js no re-renderizaba tras sustituir el item optimista por el real del servidor (patrón heredado de Unidad 1), corregido añadiendo el renderList() que faltaba. Ejecutado 'npm test': 174/174 tests pasan (48 nuevos). Ejecutado 'npm run build': éxito."
+**Context**: Construction Phase - Unidad 6 - Code Generation, Part 2 completa + verificación
+
+---
+
+## Code Generation Approval (Unidad 6) — Unidad 6 COMPLETA
+**Timestamp**: 2026-07-24T04:35:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Unidad 6 (Pantalla 2 — Vista de lista de la compra) completa: Functional Design, NFR Requirements, NFR Design, Infrastructure Design y Code Generation, todos aprobados, con 174/174 tests verificados. Procediendo a Build and Test (incremental)."
+**Context**: Construction Phase - Unidad 6 completa; transición a Build and Test
+
+---
+
+## Build and Test Stage (Unidad 6, incremental)
+**Timestamp**: 2026-07-24T04:40:00Z
+**Build Status**: Success
+**Test Status**: Pass (174/174 unit tests)
+**Files Updated**: unit-test-instructions.md, integration-test-instructions.md (Scenario 7 nuevo), security-test-instructions.md (nota de migración destructiva), build-and-test-summary.md
+**AI Response**: "Ejecutado npm test (174/174) y npm audit (sin dependencias nuevas). Actualizados incrementalmente los artefactos de Build and Test existentes para incorporar la Unidad 6, incluyendo advertencia explícita sobre la migración destructiva de quantity."
+**Context**: Construction Phase - Unidad 6 - Build and Test incremental
+
+---
+
+## Build and Test Approval (Unidad 6) — CICLO 2 / Pantalla 2 COMPLETA
+**Timestamp**: 2026-07-24T04:45:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Build and Test de la Unidad 6 marcado como completo. Pantalla 2 (Vista de lista de la compra) del Ciclo 2 de mejora de usabilidad queda completa de extremo a extremo. Procediendo a OPERATIONS PHASE (placeholder) para esta unidad; despliegue real (incluyendo reejecutar el bloque de migración destructivo) y verificación manual del Scenario 7 quedan como próximos pasos del usuario. Se invita al usuario a describir la Pantalla 3."
+**Context**: Construction Phase - Unidad 6 completa; Build and Test approval gate passed; CICLO 2 Pantalla 2 completa

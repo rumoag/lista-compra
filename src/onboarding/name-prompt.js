@@ -1,6 +1,6 @@
-// Identidad local (US-5.1). ensureLocalName es el flujo de primer uso (Unidad 1);
-// renderChangeNameButton (Unidad 4, BR-20/BR-21) reutiliza la misma clave de localStorage
-// para permitir cambiar el nombre en cualquier momento, sin duplicar lógica.
+// Identidad local (US-5.1). ensureLocalName es el flujo de primer uso (Unidad 1).
+// renderNameForm se exporta (Unidad 6, BR-45) para que list/change-name-modal.js lo reutilice
+// dentro de un modal en vez del botón "Cambiar nombre" inline de la Unidad 4 (ya retirado).
 const LOCAL_NAME_KEY = 'localName';
 
 export function getLocalName() {
@@ -11,7 +11,7 @@ export function setLocalName(name) {
   localStorage.setItem(LOCAL_NAME_KEY, name);
 }
 
-function renderNameForm(container, { currentName = '', onSave }) {
+export function renderNameForm(container, { currentName = '', onSave }) {
   container.innerHTML = `
     <div class="card" data-testid="name-prompt">
       <p>¿Cómo te llamas? (ej. "Yo", "Mi pareja")</p>
@@ -50,24 +50,6 @@ export function ensureLocalName(container) {
   return new Promise((resolve) => {
     renderNameForm(container, { onSave: resolve });
   });
-}
-
-/**
- * Renderiza un botón "Cambiar nombre" (BR-20) que, al pulsarlo, muestra el mismo
- * formulario de captura pre-relleno con el nombre actual.
- */
-export function renderChangeNameButton(container) {
-  function showButton() {
-    container.innerHTML = `<button type="button" class="secondary" data-testid="change-name-button">Cambiar nombre</button>`;
-    container.querySelector('[data-testid="change-name-button"]').addEventListener('click', () => {
-      renderNameForm(container, {
-        currentName: getLocalName() ?? '',
-        onSave: () => showButton(),
-      });
-    });
-  }
-
-  showButton();
 }
 
 function escapeAttr(value) {

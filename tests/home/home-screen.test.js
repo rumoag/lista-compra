@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../src/home/households-api.js', () => ({
   fetchAllHouseholdsWithParticipants: vi.fn(),
+  deleteHousehold: vi.fn(),
   formatParticipants: (participants) => participants.join(', '),
 }));
 
@@ -9,16 +10,17 @@ vi.mock('../../src/home/list-form-modal.js', () => ({
   openListFormModal: vi.fn(),
 }));
 
-vi.mock('../../src/home/qr-modal.js', () => ({
+vi.mock('../../src/common/qr-modal.js', () => ({
   openQrModal: vi.fn(),
 }));
 
-vi.mock('../../src/home/delete-confirm-modal.js', () => ({
-  openDeleteConfirmModal: vi.fn(),
+vi.mock('../../src/common/confirm-modal.js', () => ({
+  openConfirmModal: vi.fn(),
 }));
 
-const { fetchAllHouseholdsWithParticipants } = await import('../../src/home/households-api.js');
+const { fetchAllHouseholdsWithParticipants, deleteHousehold } = await import('../../src/home/households-api.js');
 const { openListFormModal } = await import('../../src/home/list-form-modal.js');
+const { openConfirmModal } = await import('../../src/common/confirm-modal.js');
 const { renderHomeScreen } = await import('../../src/home/home-screen.js');
 
 function mount() {
@@ -76,5 +78,24 @@ describe('renderHomeScreen', () => {
     await renderHomeScreen(container);
 
     expect(container.querySelector('[data-testid="home-load-error"]').hidden).toBe(false);
+  });
+
+  it('eliminar una lista abre el modal de confirmación genérico y borra al confirmar', async () => {
+    fetchAllHouseholdsWithParticipants.mockResolvedValue([
+      { id: 'h1', title: 'Casa', image_icon: '🛒', participants: [] },
+    ]);
+    deleteHousehold.mockResolvedValue(undefined);
+    const container = mount();
+    await renderHomeScreen(container);
+
+    container.querySelector('[data-testid="dropdown-menu-toggle"]').click();
+    container.querySelector('[data-testid="dropdown-menu-delete"]').click();
+
+    expect(openConfirmModal).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Eliminar lista', onConfirm: expect.any(Function) })
+    );
+
+    await openConfirmModal.mock.calls[0][0].onConfirm();
+    expect(deleteHousehold).toHaveBeenCalledWith('h1');
   });
 });

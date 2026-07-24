@@ -23,6 +23,7 @@ vi.mock('../../src/common/supabase-client.js', () => ({
 const { supabase } = await import('../../src/common/supabase-client.js');
 const {
   fetchAllHouseholdsWithParticipants,
+  fetchHousehold,
   createHousehold,
   updateHousehold,
   deleteHousehold,
@@ -83,6 +84,33 @@ describe('fetchAllHouseholdsWithParticipants (BR-29, sin filtro por BR-34)', () 
     mockProductsQuery.select = vi.fn().mockResolvedValue({ data: [], error: null });
 
     await expect(fetchAllHouseholdsWithParticipants()).rejects.toThrow('boom');
+  });
+});
+
+describe('fetchHousehold (Unidad 6, cabecera de la lista)', () => {
+  beforeEach(() => {
+    supabase.from.mockClear();
+  });
+
+  it('trae un único household por id', async () => {
+    resetChain(mockHouseholdsQuery, {
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { id: 'h1', title: 'Casa', image_icon: '🛒' }, error: null }),
+      }),
+    });
+
+    const result = await fetchHousehold('h1');
+
+    expect(mockHouseholdsQuery.eq).toHaveBeenCalledWith('id', 'h1');
+    expect(result).toEqual({ id: 'h1', title: 'Casa', image_icon: '🛒' });
+  });
+
+  it('propaga el error si falla la consulta', async () => {
+    resetChain(mockHouseholdsQuery, {
+      eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: null, error: new Error('boom') }) }),
+    });
+
+    await expect(fetchHousehold('h1')).rejects.toThrow('boom');
   });
 });
 

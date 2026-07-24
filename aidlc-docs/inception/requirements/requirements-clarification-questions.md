@@ -1,98 +1,104 @@
-# Clarificación — Pantalla 1: Listado de listas de la compra activas
+# Clarificación — Pantalla 2: Vista de lista de la compra (rediseño)
 
-Detecté una contradicción y varios vacíos funcionales antes de poder especificar esta pantalla con precisión.
+Es una pantalla mucho más grande que la 1: toca navegación, selección múltiple, y sobre todo cambia cómo se captura la "cantidad" de un producto. Antes de diseñar necesito resolver 8 puntos.
 
-## Contradicción 1: "Solo UI/UX" vs. concepto nuevo de "múltiples listas"
-En la ronda anterior (Q5) dijiste: **A) No cambiar el modelo de datos ni las reglas de negocio ya implementadas, solo UI/UX**.
-
-Pero lo que describes ahora es un cambio funcional real, no solo visual:
-- Hoy el modelo es: 1 `household` = 1 lista de la compra, accedida directamente vía QR (URL con UUID). No existe ningún concepto de "varias listas" ni una pantalla de inicio que las enumere.
-- Lo que pides — una pantalla de inicio con **varias** listas activas, cada una con título e **imagen** (campos que no existen hoy en la tabla `households`) — requiere: (a) nuevas columnas en la base de datos, (b) una forma de saber qué listas mostrar en esa pantalla de inicio, y (c) lógica nueva de eliminar/crear listas desde una pantalla índice en vez de vía QR directo.
-
-Esto es más que "solo UI/UX": es una funcionalidad nueva sobre el modelo de datos.
+## 1. Cambio de tipo de dato: "cantidad" pasa de texto libre a número (afecta BR-2 ya implementada)
+Hoy `quantity` es texto libre (ej. "2 litros", "1 paquete", hasta 50 caracteres). Tu wizard describe un stepper `+`/`-` con un número en el medio (y teclado numérico al tocarlo), lo cual es un campo **numérico puro**, no texto libre con unidades.
 
 ### Clarification Question 1
-¿Cómo quieres resolver esto?
+¿Cómo debe quedar el campo cantidad?
 
-A) Ampliamos el alcance: sí quiero esta función de "múltiples listas" aunque implique cambios de modelo de datos y lógica de negocio (no solo UI/UX)
+A) Pasa a ser un número entero puro (ej. "3"), sin unidades — se pierde la posibilidad de escribir "2 litros" o "1 paquete" tal como existe hoy
 
-B) Prefiero mantenerme en solo-UI/UX por ahora: en vez de una pantalla de inicio con varias listas, rediseñamos solo la pantalla de la lista actual (la única que existe por household) con mejor UI, y dejamos "múltiples listas" para un ciclo futuro
+B) El stepper controla solo la parte numérica, pero se mantiene un campo de texto aparte (opcional) para la unidad (ej. "3" + "litros")
 
 C) Other (please describe after [Answer]: tag below)
 
-[Answer]: A
+[Answer]: B
 
----
-
-## Ambigüedad 1: ¿De dónde salen las "listas activas" a mostrar?
-Hoy no hay login ni cuentas. El acceso a una lista es solo por conocer su URL con UUID (seguridad por oscuridad). Si esta pantalla de inicio muestra "listas activas", necesito saber de dónde vienen esas listas para ese dispositivo/navegador concreto — si viene de una consulta abierta a la base de datos, cualquiera vería **todas** las listas de **todos los hogares**, lo cual sería una fuga de privacidad grave.
-
+## 2. Límites del stepper de cantidad
 ### Clarification Question 2
-¿De dónde deben salir las listas mostradas en esta pantalla de inicio?
+¿Qué valores mínimo/máximo y valor inicial debe tener el stepper?
 
-A) De un historial local del dispositivo (`localStorage`): solo se listan las listas que ese navegador ha creado o visitado antes (vía QR o creación)
+A) Mínimo 1, sin máximo explícito (o un máximo alto tipo 999), valor inicial 1
 
-B) De una cuenta de usuario real (esto implicaría añadir autenticación, fuera del alcance actual)
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: Que se muestren todas las listas para todos por ahora, luego lo arreglo dandome credenciales para esa pagina
-
----
-
-## Ambigüedad 2: Campo "imagen" de la lista
-No existe hoy ningún campo de imagen en el modelo. Necesito saber cómo se define.
-
-### Clarification Question 3
-¿Cómo se elige la imagen de una lista?
-
-A) El usuario sube una foto/imagen propia (requiere almacenamiento de archivos, ej. Supabase Storage)
-
-B) Se elige entre un set cerrado de iconos/emojis predefinidos (sin subida de archivos, más simple)
-
-C) Es una URL de imagen que el usuario pega a mano
-
-D) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
----
-
-## Ambigüedad 3: "Participantes que han añadido algo"
-### Clarification Question 4
-¿A qué participantes te refieres exactamente?
-
-A) Todas las personas (nombres locales) que han añadido al menos un producto pendiente actualmente en esa lista
-
-B) Todas las personas que han interactuado alguna vez con esa lista (añadido o comprado, histórico completo)
-
-C) Other (please describe after [Answer]: tag below)
-
-[Answer]: B
-
----
-
-## Ambigüedad 4: Navegación desde el QR
-### Clarification Question 5
-Hoy el QR lleva directo a la lista (household). Con esta nueva pantalla de inicio, ¿qué pasa cuando alguien escanea un QR?
-
-A) El QR sigue llevando directo a esa lista concreta (se salta la pantalla de inicio); la pantalla de inicio es solo para navegar entre listas ya conocidas por ese dispositivo
-
-B) El QR ahora es solo para "unirse"/registrar esa lista en el dispositivo, y siempre se pasa primero por la pantalla de inicio
+B) Mínimo 0 (permite "sin cantidad especificada"), valor inicial 1
 
 C) Other (please describe after [Answer]: tag below)
 
 [Answer]: A
 
----
+## 3. "5 productos más repetidos" para las chips del paso 1
+### Clarification Question 3
+¿De dónde sale el ranking de los 5 productos sugeridos?
 
-## Ambigüedad 5: Eliminar una lista
+A) Los 5 nombres de producto más frecuentes en **todo el histórico** de esa lista (pendientes + comprados alguna vez), sin importar si ya están pendientes ahora mismo
+
+B) Igual que A, pero **excluyendo** los que ya están actualmente pendientes (para no sugerir duplicados)
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: B
+
+## 4. Icono por categoría
+Hoy las categorías frecuentes son texto plano: Lácteos, Limpieza, Fruta, Verdura, Panadería (+ "Otra…" de texto libre). Quieres que cada categoría tenga icono y que el item listado se represente con ese icono.
+
+### Clarification Question 4
+¿Cómo se asigna el icono?
+
+A) Icono fijo por cada una de las 5 categorías frecuentes (propongo 🥛 Lácteos, 🧴 Limpieza, 🍎 Fruta, 🥦 Verdura, 🍞 Panadería) + un icono genérico fijo (📦) para categorías personalizadas escritas a mano o sin categoría
+
+B) Quiero definir yo los iconos exactos por categoría (indícalo en Other)
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: A
+
+## 5. Quitar "Cargar más" — ¿qué lo sustituye?
+### Clarification Question 5
+Al quitar el botón de paginar la lista de pendientes, ¿qué comportamiento quieres?
+
+A) Cargar **todos** los productos pendientes de una vez al entrar a la pantalla (sin paginación) — razonable porque una lista de la compra activa no debería tener cientos de pendientes
+
+B) Scroll infinito: seguir cargando páginas automáticamente al hacer scroll, sin botón visible
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: B
+
+## 6. Redundancia entre "Cambiar nombre" (menú 3 puntos) y "Hola, (Nombre)" clicable
+Pides que el menú de 3 puntos del título tenga "cambiar nombre" **y** que tocar el saludo "Hola, (Nombre)" también abra la edición de nombre. Son dos accesos distintos a la misma acción.
+
 ### Clarification Question 6
-Al eliminar una lista desde el menú de 3 puntos, ¿qué ocurre con sus productos/historial?
+¿Confirmas que quieres ambos accesos (redundantes a propósito, por comodidad), o prefieres quitar "cambiar nombre" del menú de 3 puntos ya que el saludo cumple esa función?
 
-A) Se borra todo en cascada (productos pendientes, comprados e historial de esa lista desaparecen para siempre)
+A) Sí, quiero ambos — el menú de 3 puntos y el saludo abren el mismo modal de cambiar nombre
 
-B) Solo se borra de "mis listas" en ese dispositivo (deja de aparecer en el índice local), pero los datos siguen existiendo en la base de datos por si otro dispositivo aún la tiene
+B) Quitar "cambiar nombre" del menú de 3 puntos (queda solo QR y volver al listado); el saludo es el único acceso a cambiar nombre
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: A
+
+## 7. Confirmación al eliminar en lote (BR-31 aplicado a selección múltiple)
+### Clarification Question 7
+Al pulsar "Eliminar todos los marcados" con varios productos seleccionados, ¿pides confirmación como en el borrado individual?
+
+A) Sí, mismo modal de confirmación que el borrado individual ("¿Estás seguro de que quieres eliminar?"), indicando cuántos productos se van a borrar
+
+B) No, se borran directamente sin confirmación (ya hay un paso previo de selección explícita que actúa como confirmación)
+
+C) Other (please describe after [Answer]: tag below)
+
+[Answer]: A
+
+## 8. Navegación dentro del wizard de 3 pasos
+### Clarification Question 8
+Dentro del modal de pantalla completa (Producto → Cantidad → Categoría), ¿se puede volver al paso anterior?
+
+A) Sí, cada paso (2 y 3) tiene un botón "Atrás" además de "Siguiente"/"Guardar"
+
+B) No, solo se avanza; para corregir algo hay que cerrar el modal (X) y empezar de nuevo
 
 C) Other (please describe after [Answer]: tag below)
 

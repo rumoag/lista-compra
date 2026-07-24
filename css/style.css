@@ -132,11 +132,11 @@ button.secondary {
   font-weight: 600;
 }
 
-.list-actions-menu {
+.dropdown-menu {
   position: relative;
 }
 
-.list-actions-menu-dropdown {
+.dropdown-menu-list {
   position: absolute;
   right: 0;
   top: 100%;
@@ -146,17 +146,17 @@ button.secondary {
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  min-width: 140px;
+  min-width: 160px;
   overflow: hidden;
 }
 
 /* El atributo [hidden] debe ganar siempre a "display: flex" de arriba,
    si no, el dropdown queda visible permanentemente pese a toggle-arse en JS. */
-.list-actions-menu-dropdown[hidden] {
+.dropdown-menu-list[hidden] {
   display: none;
 }
 
-.list-actions-menu-dropdown button {
+.dropdown-menu-list button {
   background: transparent;
   color: inherit;
   border: none;
@@ -252,9 +252,129 @@ button.secondary {
   background: rgba(37, 99, 235, 0.15);
 }
 
-.delete-confirm-actions {
+.confirm-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: var(--spacing);
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+.modal-panel--fullscreen {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-panel--fullscreen .modal-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Unidad 6 — cabecera, saludo, tabs, FAB, icono de categoría, stepper de cantidad */
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.list-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.greeting {
+  background: transparent;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: var(--spacing);
+  text-align: left;
+}
+
+.tab {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.5rem 0.25rem;
+}
+
+.tab[aria-current="true"] {
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}
+
+.product-item-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.product-item-category-icon {
+  font-size: 1.3rem;
+}
+
+.fab {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: var(--spacing);
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.quantity-stepper button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  padding: 0;
+}
+
+.quantity-stepper input {
+  flex: 1;
+  text-align: center;
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  background: canvas;
+  color: inherit;
 }

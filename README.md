@@ -2,11 +2,11 @@
 
 App web móvil para que una pareja gestione una lista de la compra compartida, con acceso por QR, tiempo real, historial y estadísticas. Ver el contexto completo de diseño en [aidlc-docs/](aidlc-docs/).
 
-**Estado actual**: MVP completo (Unidades 1-4) + Unidad 5 (ciclo de mejora de usabilidad, pantalla 1) — CRUD de productos pendientes, tiempo real, selección múltiple/marcar en lote, historial con filtros/corrección, estadísticas, onboarding de nombre local, generación de QR, PWA instalable (sin icono personalizado todavía, ver más abajo), y una nueva pantalla de inicio con el listado de todas las listas activas (crear/editar/eliminar/ver QR).
+**Estado actual**: MVP completo (Unidades 1-4) + ciclo de mejora de usabilidad (Unidad 5: pantalla de inicio con listado de listas; Unidad 6: pantalla de lista de la compra rediseñada) — CRUD de productos pendientes vía asistente de 3 pasos, tiempo real, selección múltiple/marcar en lote/eliminar en lote, historial con filtros/corrección, estadísticas, onboarding de nombre local, generación de QR, PWA instalable (sin icono personalizado todavía, ver más abajo).
 
 ⚠️ **Nota de seguridad/privacidad (Unidad 5, temporal y aceptada)**: la pantalla de inicio muestra **todas** las listas de **todos** los hogares a cualquiera que abra la app, sin ningún filtro por dispositivo ni login. Es una decisión de producto explícita, no un descuido — ver `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` (BR-34). Está previsto sustituirla por un sistema de credenciales en un ciclo futuro.
 
-⚠️ **Nota de migración (Unidad 5)**: si tu proyecto Supabase ya estaba desplegado antes de esta unidad, **no reejecutes `supabase/schema.sql` completo** (falla porque las políticas RLS de Unidad 1/2 ya existen y `create policy` no soporta `IF NOT EXISTS`). Ejecuta solo el bloque final del archivo, a partir del comentario `-- Unidad 5 — título e icono de lista`.
+⚠️ **Nota de migración (Unidades 5 y 6)**: si tu proyecto Supabase ya estaba desplegado antes de estas unidades, **no reejecutes `supabase/schema.sql` completo** (falla porque las políticas RLS de Unidad 1/2 ya existen y `create policy` no soporta `IF NOT EXISTS`). Ejecuta solo los bloques nuevos del archivo: el que empieza en `-- Unidad 5 — título e icono de lista` y, tras ese, el que empieza en `-- Unidad 6 — cantidad numérica en productos`. Este último es **destructivo** (elimina la columna `quantity`) — revisa el bloque antes de ejecutarlo si tienes datos reales.
 
 ## Stack
 - Frontend: vanilla JS/HTML (sin bundler), `@supabase/supabase-js` y `qrcode` importados directamente por URL desde esm.sh (`import ... from 'https://esm.sh/...'`) — sin import map, sin instalar estos paquetes vía npm
@@ -41,7 +41,7 @@ Incluye tests de ejemplo y property-based testing (fast-check) para las funcione
 
 También incluye PBT para el cálculo de estadísticas (`src/stats/calculations.js`) y los filtros de historial (`src/history/filters.js`), bloqueantes bajo PBT-03 en esta unidad.
 
-Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5}/code/frontend-summary.md`.
+Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5,6}/code/frontend-summary.md`.
 
 ## Despliegue (Vercel)
 
@@ -54,13 +54,15 @@ Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5}/c
 ```
 index.html
 src/
-  common/         # cliente Supabase, validación, optimistic update, paginación, modal genérico
-  list/           # formulario y lista de productos pendientes
+  common/         # cliente Supabase, validación, optimistic update, paginación, modal genérico,
+                  # menú de 3 puntos y modal de confirmación genéricos (Unidad 6), modal de QR
+  list/           # Unidad 6: cabecera, saludo, tabs, lista de pendientes (scroll infinito),
+                  # asistente de 3 pasos crear/editar producto, categorías con icono, sugeridos
   bulk-actions/   # selección múltiple, barra de acción en lote, suscripción Realtime
   history/        # filtros, lista de historial, corrección
   stats/          # cálculo y visualización de estadísticas
-  onboarding/     # identidad local, vista de QR
-  home/           # Unidad 5: pantalla de inicio, tarjetas de lista, modales crear/editar/QR/eliminar
+  onboarding/     # identidad local (name-prompt), vista de QR
+  home/           # Unidad 5: pantalla de inicio, tarjetas de lista, modal crear/editar
 css/
 manifest.json     # PWA (sin icono todavía)
 supabase/

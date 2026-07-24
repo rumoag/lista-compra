@@ -1,41 +1,45 @@
-// Orquesta la lista de pendientes: carga paginada, alta/edición/borrado optimistas (Unidad 1),
-// tiempo real y selección múltiple/marcar en lote (Unidad 2, US-1.2 completa, US-2.1, US-2.2).
+// Orquesta la lista de pendientes (Unidad 6): scroll infinito (BR-48), wizard de 3 pasos
+// para crear/editar (BR-44), confirmación de borrado individual/lote (BR-42), selección
+// ampliada con seleccionar/deseleccionar todos (BR-43) y eliminar seleccionados.
 import { supabase } from '../common/supabase-client.js';
 import { createPaginator } from '../common/pagination.js';
 import { applyOptimistic } from '../common/optimistic.js';
-import { renderProductForm } from './product-form.js';
 import { renderProductItem } from './product-item.js';
+import { openProductWizardModal } from './product-wizard-modal.js';
+import { fetchSuggestedProducts } from './suggested-products.js';
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { createSelectionState } from '../bulk-actions/selection-state.js';
 import { renderSelectionBar } from '../bulk-actions/selection-bar.js';
 import { createRealtimeSubscription } from '../bulk-actions/realtime-subscription.js';
+import { openConfirmModal } from '../common/confirm-modal.js';
 
 const PAGE_SIZE = 20;
 
 export async function renderProductList(container, { householdId }) {
   container.innerHTML = `
-    <div id="product-form-container"></div>
     <div id="selection-bar-container" hidden></div>
     <div class="card">
       <div id="product-list-items" data-testid="product-list-items"></div>
       <div id="product-list-empty" class="empty-state" data-testid="product-list-empty" hidden>
-        No hay productos pendientes.
+        No hay nada en tu cesta de la compra todavía. ¿Te gustaría añadir el primero?
       </div>
-      <button type="button" class="secondary" data-testid="product-list-load-more-button" hidden>
-        Cargar más
-      </button>
+      <div id="product-list-sentinel" data-testid="product-list-sentinel"></div>
     </div>
+    <button type="button" class="fab" data-testid="product-list-fab-button" aria-label="Añadir producto">+</button>
   `;
 
-  const formContainer = container.querySelector('#product-form-container');
   const selectionBarContainer = container.querySelector('#selection-bar-container');
   const itemsContainer = container.querySelector('#product-list-items');
   const emptyState = container.querySelector('#product-list-empty');
-  const loadMoreButton = container.querySelector('[data-testid="product-list-load-more-button"]');
+  const sentinel = container.querySelector('#product-list-sentinel');
+  const fabButton = container.querySelector('[data-testid="product-list-fab-button"]');
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const selection = createSelectionState();
   const realtime = createRealtimeSubscription({ householdId });
+
+  let hasMore = true;
+  let isLoadingMore = false;
 
   async function fetchPage({ before, limit }) {
     let query = supabase
@@ -63,42 +67,104 @@ export async function renderProductList(container, { householdId }) {
     items.forEach((product) => {
       itemsContainer.appendChild(
         renderProductItem(product, {
-          onEdit: handleEdit,
-          onDelete: handleDelete,
+          onEdit: handleEditRequest,
+          onDelete: confirmAndDeleteOne,
           onToggleSelect: handleToggleSelect,
           selected: selection.isSelected(product.id),
         })
       );
     });
 
+    const selectedCount = selection.getSelection().size;
+    const allSelected = !hasMore && items.length > 0 && selectedCount === items.length;
+
     renderSelectionBar(selectionBarContainer, {
-      selectedCount: selection.getSelection().size,
+      selectedCount,
+      allSelected,
       onMarkAsBought: handleMarkAsBought,
+      onToggleSelectAll: handleToggleSelectAll,
+      onDeleteSelected: handleDeleteSelected,
     });
+  }
+
+  // BR-48: scroll infinito — un IntersectionObserver dispara la siguiente página
+  // cuando el centinela final entra en el viewport, en vez de un botón "Cargar más".
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      return loadNextPageIfAny();
+    }
+  });
+  observer.observe(sentinel);
+
+  async function loadNextPageIfAny() {
+    if (!hasMore || isLoadingMore) return;
+    isLoadingMore = true;
+    const before = paginator.getItems().length;
+    await paginator.loadNextPage(fetchPage);
+    const loaded = paginator.getItems().length - before;
+    if (loaded < PAGE_SIZE) hasMore = false;
+    isLoadingMore = false;
+    renderList();
   }
 
   async function loadFirstPage() {
     await paginator.loadNextPage(fetchPage);
+    if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
     renderList();
-    loadMoreButton.hidden = false;
   }
-
-  loadMoreButton.addEventListener('click', async () => {
-    await paginator.loadNextPage(fetchPage);
-    renderList();
-  });
 
   function handleToggleSelect(id) {
     selection.toggleSelection(id);
     renderList();
   }
 
-  async function handleAdd({ name, quantity, category }) {
+  // BR-43: "Seleccionar todos" fuerza la carga de todas las páginas restantes antes
+  // de seleccionar, para que "todos" sea realmente todos los pendientes.
+  async function handleToggleSelectAll() {
+    const items = paginator.getItems();
+    const currentlyAllSelected = !hasMore && items.length > 0 && selection.getSelection().size === items.length;
+
+    if (currentlyAllSelected) {
+      selection.clearSelection();
+      renderList();
+      return;
+    }
+
+    while (hasMore) {
+      await loadNextPageIfAny();
+    }
+    selection.selectAll(paginator.getItems().map((item) => item.id));
+    renderList();
+  }
+
+  async function openWizard(mode, product) {
+    let suggestedProducts = [];
+    try {
+      suggestedProducts = await fetchSuggestedProducts(householdId);
+    } catch (err) {
+      // Sin sugerencias si falla la consulta — el wizard sigue funcionando con "Otros".
+    }
+
+    openProductWizardModal({
+      mode,
+      product,
+      suggestedProducts,
+      onSave: mode === 'edit' ? (values) => handleEditProduct(product.id, values) : handleAdd,
+    });
+  }
+
+  fabButton.addEventListener('click', () => openWizard('create'));
+  function handleEditRequest(product) {
+    openWizard('edit', product);
+  }
+
+  async function handleAdd({ name, quantity_number, quantity_unit, category }) {
     const optimisticProduct = {
       id: `optimistic-${crypto.randomUUID()}`,
       household_id: householdId,
       name,
-      quantity,
+      quantity_number,
+      quantity_unit,
       category,
       status: 'pending',
       added_by: getLocalName(),
@@ -122,7 +188,8 @@ export async function renderProductList(container, { householdId }) {
           .insert({
             household_id: householdId,
             name,
-            quantity,
+            quantity_number,
+            quantity_unit,
             category,
             status: 'pending',
             added_by: getLocalName(),
@@ -132,6 +199,7 @@ export async function renderProductList(container, { householdId }) {
         if (error) throw error;
         paginator.removeItem(optimisticProduct.id);
         paginator.prependItem(data);
+        renderList();
       },
       onError: () => {
         showGlobalError('No se pudo añadir el producto. Inténtalo de nuevo.');
@@ -139,7 +207,7 @@ export async function renderProductList(container, { householdId }) {
     }).catch(() => {});
   }
 
-  async function handleEdit(id, changes) {
+  async function handleEditProduct(id, changes) {
     const previous = paginator.getItems().find((item) => item.id === id);
 
     await applyOptimistic({
@@ -159,6 +227,15 @@ export async function renderProductList(container, { householdId }) {
         showGlobalError('No se pudo guardar el cambio. Inténtalo de nuevo.');
       },
     }).catch(() => {});
+  }
+
+  function confirmAndDeleteOne(id) {
+    openConfirmModal({
+      title: 'Eliminar producto',
+      message: '¿Eliminar este producto?',
+      confirmLabel: 'Eliminar',
+      onConfirm: () => handleDelete(id),
+    });
   }
 
   async function handleDelete(id) {
@@ -186,6 +263,41 @@ export async function renderProductList(container, { householdId }) {
         showGlobalError('No se pudo eliminar el producto. Inténtalo de nuevo.');
       },
     }).catch(() => {});
+  }
+
+  // BR-42: confirmación también en el borrado en lote, con el conteo en el mensaje.
+  function handleDeleteSelected() {
+    const ids = [...selection.getSelection()];
+    if (ids.length === 0) return;
+
+    openConfirmModal({
+      title: 'Eliminar productos',
+      message: ids.length === 1 ? '¿Eliminar este producto?' : `¿Eliminar ${ids.length} productos?`,
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        const removedItems = paginator.getItems().filter((item) => ids.includes(item.id));
+
+        await applyOptimistic({
+          apply: () => {
+            ids.forEach((id) => paginator.removeItem(id));
+            selection.clearSelection();
+            renderList();
+          },
+          revert: () => {
+            removedItems.forEach((item) => paginator.prependItem(item));
+            selection.selectAll(ids);
+            renderList();
+          },
+          remoteOperation: async () => {
+            const { error } = await supabase.from('products').delete().in('id', ids);
+            if (error) throw error;
+          },
+          onError: () => {
+            showGlobalError('No se pudieron eliminar los productos. Inténtalo de nuevo.');
+          },
+        }).catch(() => {});
+      },
+    });
   }
 
   // BR-11: marcar en lote como una única transacción lógica (revert total ante cualquier fallo).
@@ -255,10 +367,10 @@ export async function renderProductList(container, { householdId }) {
 
   function cleanup() {
     realtime.unsubscribe();
+    observer.disconnect();
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 
-  renderProductForm(formContainer, { onSubmit: handleAdd });
   await loadFirstPage();
 
   return cleanup;

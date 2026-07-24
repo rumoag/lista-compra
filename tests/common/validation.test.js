@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import {
   validateProductName,
-  validateQuantity,
   validateCategory,
+  validateQuantityNumber,
+  validateQuantityUnit,
   normalizeWhitespace,
 } from '../../src/common/validation.js';
 
@@ -96,19 +97,54 @@ describe('validateProductName — casos límite (example-based, PBT-10)', () => 
   });
 });
 
-describe('validateQuantity', () => {
+describe('validateQuantityNumber (BR-35)', () => {
+  it('acepta enteros entre 1 y 999', () => {
+    expect(validateQuantityNumber(1).valid).toBe(true);
+    expect(validateQuantityNumber(999).valid).toBe(true);
+    expect(validateQuantityNumber(42).valid).toBe(true);
+  });
+
+  it('rechaza 0 y valores negativos', () => {
+    expect(validateQuantityNumber(0).valid).toBe(false);
+    expect(validateQuantityNumber(-1).valid).toBe(false);
+  });
+
+  it('rechaza valores mayores a 999', () => {
+    expect(validateQuantityNumber(1000).valid).toBe(false);
+  });
+
+  it('rechaza no enteros y no numéricos', () => {
+    expect(validateQuantityNumber(1.5).valid).toBe(false);
+    expect(validateQuantityNumber('abc').valid).toBe(false);
+    expect(validateQuantityNumber(null).valid).toBe(false);
+  });
+
+  it('acepta strings numéricas (input type=number del wizard)', () => {
+    expect(validateQuantityNumber('3').valid).toBe(true);
+  });
+
+  it('es determinista', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: -10, max: 1010 }), (n) => {
+        expect(validateQuantityNumber(n)).toEqual(validateQuantityNumber(n));
+      })
+    );
+  });
+});
+
+describe('validateQuantityUnit (BR-36)', () => {
   it('acepta valores vacíos/nulos como opcionales', () => {
-    expect(validateQuantity(null).valid).toBe(true);
-    expect(validateQuantity(undefined).valid).toBe(true);
-    expect(validateQuantity('').valid).toBe(true);
+    expect(validateQuantityUnit(null).valid).toBe(true);
+    expect(validateQuantityUnit(undefined).valid).toBe(true);
+    expect(validateQuantityUnit('').valid).toBe(true);
   });
 
-  it('acepta hasta 50 caracteres', () => {
-    expect(validateQuantity('a'.repeat(50)).valid).toBe(true);
+  it('acepta hasta 20 caracteres', () => {
+    expect(validateQuantityUnit('a'.repeat(20)).valid).toBe(true);
   });
 
-  it('rechaza más de 50 caracteres', () => {
-    expect(validateQuantity('a'.repeat(51)).valid).toBe(false);
+  it('rechaza más de 20 caracteres', () => {
+    expect(validateQuantityUnit('a'.repeat(21)).valid).toBe(false);
   });
 });
 

@@ -39,8 +39,8 @@ describe('renderListCard', () => {
     const household = makeHousehold();
     const el = mount(renderListCard(household, { onEdit, onDelete: vi.fn(), onViewQr: vi.fn(), onOpen: vi.fn() }));
 
-    el.querySelector('[data-testid="list-actions-menu-toggle"]').click();
-    el.querySelector('[data-testid="list-actions-menu-edit"]').click();
+    el.querySelector('[data-testid="dropdown-menu-toggle"]').click();
+    el.querySelector('[data-testid="dropdown-menu-edit"]').click();
 
     expect(onEdit).toHaveBeenCalledWith(household);
   });

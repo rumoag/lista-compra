@@ -171,3 +171,79 @@ Todos los modales (crear/editar, QR, confirmación de borrado) se cierran median
 
 ## Alcance de esta iteración
 Se procede directamente a Functional Design y Code Generation para esta pantalla, sin pasar por User Stories (justificación: el propio usuario ya describió el comportamiento con precisión funcional suficiente, sin ambigüedad de personas/journeys que una historia de usuario resolvería mejor que esta especificación directa).
+
+---
+
+# Ciclo 2 — Mejora de Usabilidad: Pantalla 2 (Vista de lista de la compra)
+
+**Fecha**: 2026-07-24
+
+## Intent Analysis Summary
+- **User Request**: Rediseño completo de la pantalla de lista de la compra (antes "Lista" dentro de la navegación): cabecera con emoji+título+menú de 3 puntos, saludo con nombre local editable, tabs Lista/Historial/Estadísticas, eliminación de la paginación por botón, edición/borrado por menú de 3 puntos por item, creación/edición de producto mediante un asistente de 3 pasos en modal de pantalla completa, categorías con icono, selección múltiple ampliada (seleccionar/deseleccionar todos, eliminar en lote) y selección por click en el item.
+- **Request Type**: Enhancement — cambia una regla de negocio ya implementada (BR-2, tipo de `quantity`) y añade funcionalidad nueva (sugerencias de producto por frecuencia, selección/deselección global, borrado en lote).
+- **Scope Estimate**: Multiple Components (navegación, formulario de producto rehecho como wizard, selección múltiple, categorías, esquema de datos).
+- **Complexity Estimate**: Complex (la pantalla con más superficie de cambio del ciclo hasta ahora).
+
+## Decisiones tomadas (ronda de clarificación)
+| Tema | Decisión |
+|---|---|
+| Cantidad | El stepper numérico controla un campo `quantity_number` (entero); se añade un campo de texto opcional `quantity_unit` para la unidad (ej. "litros") — **BR-2 se reemplaza**, `quantity` (texto libre único) queda obsoleto |
+| Límites del stepper | Mínimo 1, sin máximo explícito (tope técnico alto, ej. 999), valor inicial 1 |
+| Productos sugeridos (chips paso 1) | Los 5 nombres más frecuentes en todo el histórico de la lista, **excluyendo** los que ya están pendientes actualmente |
+| Icono por categoría | Set fijo: 🥛 Lácteos, 🧴 Limpieza, 🍎 Fruta, 🥦 Verdura, 🍞 Panadería, 📦 (genérico, para categorías personalizadas o sin categoría) |
+| Paginación de pendientes | Se sustituye por scroll infinito (sin botón "Cargar más") |
+| "Cambiar nombre" | Accesible tanto desde el menú de 3 puntos como desde el saludo "Hola, (Nombre)" — redundancia intencional |
+| Confirmación de borrado en lote | Mismo modal de confirmación que el borrado individual, indicando cuántos productos se eliminarán |
+| Navegación del wizard | Pasos 2 y 3 tienen botón "Atrás"; cerrar con "X" en cualquier paso descarta el progreso (igual que el resto de modales del proyecto) |
+
+## Functional Requirements
+
+**FR-7 — Cabecera de la lista**
+Sustituye el `<h1>` fijo "🛒 Lista de la Compra" por el icono + título de la lista actual (`households.image_icon` + `households.title`). A la derecha, un menú de 3 puntos con: Cambiar nombre, Ver QR, Volver al listado de listas.
+
+**FR-8 — Saludo editable**
+Debajo de la cabecera, "Hola, {nombre local}". Al pulsarlo, abre el mismo modal de cambiar nombre que la opción del menú de 3 puntos (FR-7).
+
+**FR-9 — Tabs de navegación**
+Debajo del saludo: tabs "Lista", "Historial", "Estadísticas" (sustituyen la barra de navegación de botones actual; el QR deja de ser un tab y pasa al menú de 3 puntos, FR-7).
+
+**FR-10 — Lista de pendientes sin paginación por botón**
+El tab "Lista" carga productos pendientes con scroll infinito (siguiente página se carga automáticamente al acercarse al final, sin botón "Cargar más").
+
+**FR-11 — Menú de 3 puntos por item**
+Cada producto pendiente muestra un icono de 3 puntos (en vez de los botones "Editar"/"Eliminar" visibles hoy) con un dropdown: Editar, Eliminar.
+
+**FR-12 — Selección por click en el item**
+Al pulsar sobre el cuerpo de un item (fuera del menú de 3 puntos), se alterna su checkbox de selección (equivalente a pulsar el checkbox directamente).
+
+**FR-13 — Asistente de 3 pasos para crear/editar producto**
+Botón flotante (FAB) centrado en la parte inferior de la pantalla abre un modal de pantalla completa, título "Añadir producto" (o "Editar producto" en modo edición), con 3 pasos:
+1. **Producto**: label "Selecciona tu producto" + chips de los 5 productos más repetidos históricamente en esta lista que no estén ya pendientes (Question 3 = B), más un chip "Otros" que revela un input de texto libre (validación igual que hoy, BR-1). Botón "Siguiente".
+2. **Cantidad**: stepper `-` / número / `+`; pulsar el número abre el teclado numérico del dispositivo para edición manual directa. Límites: mínimo 1, sin máximo explícito, valor inicial 1 (Question 2 = A). Campo de texto opcional para la unidad. Botones "Atrás" / "Siguiente".
+3. **Categoría**: chips de las 5 categorías frecuentes (con icono, ver FR-15) + "Otra…" de texto libre (igual que hoy, BR-2 heredado solo para categoría). Botones "Atrás" / "Guardar".
+El mismo modal/componente se usa para crear y para editar (precargado con los valores actuales del producto en modo edición, empezando en el paso 1).
+
+**FR-14 — Confirmación de borrado (individual y en lote)**
+Eliminar un producto (individual o selección múltiple) requiere confirmar en un modal ("¿Estás seguro de que quieres eliminar?"), indicando cuántos productos se eliminarán si es más de uno.
+
+**FR-15 — Categorías con icono**
+Cada categoría frecuente tiene un icono fijo (tabla de decisiones); las categorías personalizadas o ausentes usan un icono genérico. Cada item de la lista muestra el icono de su categoría.
+
+**FR-16 — Estado vacío de la cesta**
+Si no hay productos pendientes, se muestra un mensaje del tipo "No hay nada en tu cesta de la compra todavía. ¿Te gustaría añadir el primero?" en vez del genérico actual.
+
+**FR-17 — Selección múltiple ampliada**
+La barra de selección (visible solo cuando hay ≥1 producto seleccionado) añade: botón "Seleccionar todos" / "Deseleccionar todos" (alterna según el estado), y botón "Eliminar seleccionados" (con confirmación, FR-14) junto al ya existente "Marcar como comprados". Al deseleccionar todos (o quedar la selección vacía), la barra completa desaparece (comportamiento ya existente, reutilizado).
+
+## Non-Functional Requirements
+
+**NFR-5 (cambio de esquema, sustituye conceptualmente el uso de BR-2)**: la tabla `products` sustituye `quantity` (texto libre único) por `quantity_number` (integer, nullable) y `quantity_unit` (text, nullable, máx. 20 caracteres). Se migra el dato existente de `quantity` a estas nuevas columnas de forma best-effort (ver Functional Design) o se acepta período de convivencia — a definir en Functional Design.
+
+**NFR-6**: el ranking de "5 productos más repetidos" se calcula sobre el histórico completo de `products` de ese household (pendientes + comprados), agrupando por nombre exacto (mismo criterio de agrupación ya usado en estadísticas, Unidad 3).
+
+**NFR-7**: scroll infinito reutiliza `common/pagination.js` ya existente (mismo cursor por `created_at`), cambiando el disparador de "click en botón" a "IntersectionObserver cerca del final de la lista".
+
+**NFR-8**: reutilización de patrones ya establecidos: fail-fast sin reintentos, mensajes de error genéricos, vanilla JS/CSS sin librerías de UI externas, modal genérico (`common/modal.js`) para el asistente de 3 pasos (con variante "pantalla completa").
+
+## Alcance de esta iteración
+Se procede directamente a Functional Design (definir el detalle de migración de `quantity`, jerarquía de componentes del wizard, y reglas de negocio de sugerencias/categorías con icono) sin pasar por User Stories, por el mismo criterio que la Pantalla 1.

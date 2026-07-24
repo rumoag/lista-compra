@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  ensureLocalName,
-  getLocalName,
-  setLocalName,
-  renderChangeNameButton,
-} from '../../src/onboarding/name-prompt.js';
+import { ensureLocalName, getLocalName, setLocalName, renderNameForm } from '../../src/onboarding/name-prompt.js';
 
 describe('name-prompt (stopgap identidad local)', () => {
   beforeEach(() => {
@@ -46,38 +41,27 @@ describe('name-prompt (stopgap identidad local)', () => {
   });
 });
 
-describe('renderChangeNameButton (BR-20)', () => {
+describe('renderNameForm (BR-45, reutilizado en list/change-name-modal.js)', () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
-  it('muestra un botón "Cambiar nombre"', () => {
+  it('precarga el nombre actual cuando se pasa currentName', () => {
     const container = document.createElement('div');
-    renderChangeNameButton(container);
-
-    expect(container.querySelector('[data-testid="change-name-button"]')).not.toBeNull();
-  });
-
-  it('al pulsarlo, muestra el formulario pre-rellenado con el nombre actual', () => {
-    setLocalName('Yo');
-    const container = document.createElement('div');
-    renderChangeNameButton(container);
-
-    container.querySelector('[data-testid="change-name-button"]').click();
+    renderNameForm(container, { currentName: 'Yo', onSave: () => {} });
 
     expect(container.querySelector('[data-testid="name-prompt-input"]').value).toBe('Yo');
   });
 
-  it('guardar un nuevo nombre actualiza localStorage y vuelve a mostrar el botón', () => {
-    setLocalName('Yo');
+  it('guardar actualiza localStorage y llama a onSave con el nombre', () => {
     const container = document.createElement('div');
-    renderChangeNameButton(container);
+    let saved;
+    renderNameForm(container, { onSave: (name) => (saved = name) });
 
-    container.querySelector('[data-testid="change-name-button"]').click();
     container.querySelector('[data-testid="name-prompt-input"]').value = 'Mi pareja';
     container.querySelector('[data-testid="name-prompt-save-button"]').click();
 
     expect(getLocalName()).toBe('Mi pareja');
-    expect(container.querySelector('[data-testid="change-name-button"]')).not.toBeNull();
+    expect(saved).toBe('Mi pareja');
   });
 });

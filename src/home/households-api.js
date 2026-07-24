@@ -24,6 +24,14 @@ export async function fetchAllHouseholdsWithParticipants() {
   }));
 }
 
+// Unidad 6 — cabecera de la lista (list-header.js) necesita el título/icono de UNA lista,
+// no el listado completo de fetchAllHouseholdsWithParticipants.
+export async function fetchHousehold(id) {
+  const { data, error } = await supabase.from('households').select('*').eq('id', id).single();
+  if (error) throw error;
+  return data;
+}
+
 export async function createHousehold({ title, image_icon }) {
   const { data, error } = await supabase
     .from('households')

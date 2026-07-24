@@ -85,3 +85,39 @@ alter table households add constraint households_title_length check (char_length
 -- BR-25: icono debe pertenecer al set cerrado definido en domain-entities.md
 alter table households add constraint households_image_icon_valid
   check (image_icon in ('🛒', '🥦', '🧴', '🍞', '🥛', '🧻', '🍎', '🧀', '🍗', '🧃', '🏠', '📦'));
+
+-- ---------------------------------------------------------------------------
+-- Unidad 6 — cantidad numérica en productos (products.quantity, texto libre,
+-- se sustituye por quantity_number + quantity_unit, ver BR-35/BR-36/BR-37).
+-- ⚠️ Migración destructiva: si ya tienes datos en producción, ejecuta SOLO este
+-- bloque (no el archivo completo) en el SQL Editor de Supabase.
+-- ---------------------------------------------------------------------------
+alter table products add column if not exists quantity_number integer;
+alter table products add column if not exists quantity_unit text;
+
+-- BR-37: migración best-effort del texto libre existente en quantity.
+-- Si empieza por dígitos, se extraen como quantity_number (tope 999) y el resto
+-- de texto (recortado) pasa a quantity_unit; si no, quantity_number = 1 y todo
+-- el texto original pasa a quantity_unit.
+update products
+set
+  quantity_number = least(
+    coalesce(nullif(substring(trim(quantity) from '^[0-9]+'), '')::integer, 1),
+    999
+  ),
+  quantity_unit = nullif(trim(substring(trim(quantity) from '^[0-9]*\s*(.*)$')), '')
+where quantity_number is null;
+
+update products set quantity_number = 1 where quantity_number is null;
+
+alter table products alter column quantity_number set default 1;
+alter table products alter column quantity_number set not null;
+
+-- BR-35: cantidad entre 1 y 999
+alter table products add constraint products_quantity_number_range check (quantity_number between 1 and 999);
+
+-- BR-36: unidad opcional, máx 20 caracteres
+alter table products add constraint products_quantity_unit_length check (quantity_unit is null or char_length(quantity_unit) <= 20);
+
+-- Elimina la columna y el constraint de longitud de la Unidad 1 asociado a ella
+alter table products drop column quantity;
