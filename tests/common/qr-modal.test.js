@@ -5,7 +5,7 @@ vi.mock('../../src/onboarding/qr-view.js', () => ({
 }));
 
 const { renderQrView } = await import('../../src/onboarding/qr-view.js');
-const { openQrModal } = await import('../../src/home/qr-modal.js');
+const { openQrModal } = await import('../../src/common/qr-modal.js');
 
 beforeEach(() => {
   vi.clearAllMocks();

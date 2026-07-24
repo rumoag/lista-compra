@@ -1,41 +1,47 @@
-// Orquesta la lista de pendientes: carga paginada, alta/edición/borrado optimistas (Unidad 1),
-// tiempo real y selección múltiple/marcar en lote (Unidad 2, US-1.2 completa, US-2.1, US-2.2).
+// Orquesta la lista de pendientes (Unidad 6): scroll infinito (BR-48), wizard de 3 pasos
+// para crear/editar (BR-44, accesible por long-press en el item o desde el header fijo
+// con exactamente 1 seleccionado), confirmación de borrado en lote (BR-42, cubre también
+// 1 solo producto — ya no hay borrado individual por item) y selección ampliada con
+// seleccionar/deseleccionar todos (BR-43).
 import { supabase } from '../common/supabase-client.js';
 import { createPaginator } from '../common/pagination.js';
 import { applyOptimistic } from '../common/optimistic.js';
-import { renderProductForm } from './product-form.js';
 import { renderProductItem } from './product-item.js';
+import { openProductWizardModal } from './product-wizard-modal.js';
+import { fetchSuggestedProducts } from './suggested-products.js';
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { createSelectionState } from '../bulk-actions/selection-state.js';
 import { renderSelectionBar } from '../bulk-actions/selection-bar.js';
 import { createRealtimeSubscription } from '../bulk-actions/realtime-subscription.js';
+import { openConfirmModal } from '../common/confirm-modal.js';
 
 const PAGE_SIZE = 20;
 
 export async function renderProductList(container, { householdId }) {
   container.innerHTML = `
-    <div id="product-form-container"></div>
     <div id="selection-bar-container" hidden></div>
-    <div class="card">
+    <div class="card card--flush">
       <div id="product-list-items" data-testid="product-list-items"></div>
       <div id="product-list-empty" class="empty-state" data-testid="product-list-empty" hidden>
-        No hay productos pendientes.
+        No hay nada en tu cesta de la compra todavía. ¿Te gustaría añadir el primero?
       </div>
-      <button type="button" class="secondary" data-testid="product-list-load-more-button" hidden>
-        Cargar más
-      </button>
+      <div id="product-list-sentinel" data-testid="product-list-sentinel"></div>
     </div>
+    <button type="button" class="fab" data-testid="product-list-fab-button" aria-label="Añadir producto">+</button>
   `;
 
-  const formContainer = container.querySelector('#product-form-container');
   const selectionBarContainer = container.querySelector('#selection-bar-container');
   const itemsContainer = container.querySelector('#product-list-items');
   const emptyState = container.querySelector('#product-list-empty');
-  const loadMoreButton = container.querySelector('[data-testid="product-list-load-more-button"]');
+  const sentinel = container.querySelector('#product-list-sentinel');
+  const fabButton = container.querySelector('[data-testid="product-list-fab-button"]');
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const selection = createSelectionState();
   const realtime = createRealtimeSubscription({ householdId });
+
+  let hasMore = true;
+  let isLoadingMore = false;
 
   async function fetchPage({ before, limit }) {
     let query = supabase
@@ -63,42 +69,106 @@ export async function renderProductList(container, { householdId }) {
     items.forEach((product) => {
       itemsContainer.appendChild(
         renderProductItem(product, {
-          onEdit: handleEdit,
-          onDelete: handleDelete,
+          onEdit: handleEditRequest,
           onToggleSelect: handleToggleSelect,
           selected: selection.isSelected(product.id),
         })
       );
     });
 
+    const selectedCount = selection.getSelection().size;
+
     renderSelectionBar(selectionBarContainer, {
-      selectedCount: selection.getSelection().size,
+      selectedCount,
       onMarkAsBought: handleMarkAsBought,
+      onDeselectAll: handleDeselectAll,
+      onSelectAll: handleSelectAll,
+      onDeleteSelected: handleDeleteSelected,
+      // Editar solo tiene sentido con exactamente 1 producto seleccionado.
+      onEditSelected: selectedCount === 1 ? handleEditSelected : null,
     });
   }
 
-  async function loadFirstPage() {
+  // BR-48: scroll infinito — un IntersectionObserver dispara la siguiente página
+  // cuando el centinela final entra en el viewport, en vez de un botón "Cargar más".
+  // No se empieza a observar hasta que la primera página ya está cargada (ver el
+  // final de esta función): si se observara antes, el centinela está visible desde
+  // el primer instante (la lista aún está vacía) y el observer dispara una carga en
+  // paralelo con loadFirstPage(), duplicando la primera página de productos.
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      return loadNextPageIfAny();
+    }
+  });
+
+  async function loadNextPageIfAny() {
+    if (!hasMore || isLoadingMore) return;
+    isLoadingMore = true;
+    const before = paginator.getItems().length;
     await paginator.loadNextPage(fetchPage);
+    const loaded = paginator.getItems().length - before;
+    if (loaded < PAGE_SIZE) hasMore = false;
+    isLoadingMore = false;
     renderList();
-    loadMoreButton.hidden = false;
   }
 
-  loadMoreButton.addEventListener('click', async () => {
+  async function loadFirstPage() {
+    isLoadingMore = true;
     await paginator.loadNextPage(fetchPage);
+    if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
+    isLoadingMore = false;
     renderList();
-  });
+    observer.observe(sentinel);
+  }
 
   function handleToggleSelect(id) {
     selection.toggleSelection(id);
     renderList();
   }
 
-  async function handleAdd({ name, quantity, category }) {
+  // BR-43: "Seleccionar todos" fuerza la carga de todas las páginas restantes antes
+  // de seleccionar, para que "todos" sea realmente todos los pendientes.
+  async function handleSelectAll() {
+    while (hasMore) {
+      await loadNextPageIfAny();
+    }
+    selection.selectAll(paginator.getItems().map((item) => item.id));
+    renderList();
+  }
+
+  function handleDeselectAll() {
+    selection.clearSelection();
+    renderList();
+  }
+
+  async function openWizard(mode, product) {
+    let suggestedProducts = [];
+    try {
+      suggestedProducts = await fetchSuggestedProducts(householdId);
+    } catch (err) {
+      // Sin sugerencias si falla la consulta — el wizard sigue funcionando con "Otros".
+    }
+
+    openProductWizardModal({
+      mode,
+      product,
+      suggestedProducts,
+      onSave: mode === 'edit' ? (values) => handleEditProduct(product.id, values) : handleAdd,
+    });
+  }
+
+  fabButton.addEventListener('click', () => openWizard('create'));
+  function handleEditRequest(product) {
+    openWizard('edit', product);
+  }
+
+  async function handleAdd({ name, quantity_number, quantity_unit, category }) {
     const optimisticProduct = {
       id: `optimistic-${crypto.randomUUID()}`,
       household_id: householdId,
       name,
-      quantity,
+      quantity_number,
+      quantity_unit,
       category,
       status: 'pending',
       added_by: getLocalName(),
@@ -122,7 +192,8 @@ export async function renderProductList(container, { householdId }) {
           .insert({
             household_id: householdId,
             name,
-            quantity,
+            quantity_number,
+            quantity_unit,
             category,
             status: 'pending',
             added_by: getLocalName(),
@@ -132,6 +203,7 @@ export async function renderProductList(container, { householdId }) {
         if (error) throw error;
         paginator.removeItem(optimisticProduct.id);
         paginator.prependItem(data);
+        renderList();
       },
       onError: () => {
         showGlobalError('No se pudo añadir el producto. Inténtalo de nuevo.');
@@ -139,7 +211,7 @@ export async function renderProductList(container, { householdId }) {
     }).catch(() => {});
   }
 
-  async function handleEdit(id, changes) {
+  async function handleEditProduct(id, changes) {
     const previous = paginator.getItems().find((item) => item.id === id);
 
     await applyOptimistic({
@@ -161,31 +233,50 @@ export async function renderProductList(container, { householdId }) {
     }).catch(() => {});
   }
 
-  async function handleDelete(id) {
-    const previous = paginator.getItems();
-    selection.removeFromSelection(id);
+  // Editar ya no se ofrece por item (menú de 3 puntos retirado, BR-40 obsoleta): se
+  // accede manteniendo pulsado un item (product-item.js) o, con exactamente 1
+  // seleccionado, desde el menú de 3 puntos del header fijo de selección.
+  function handleEditSelected() {
+    const ids = [...selection.getSelection()];
+    if (ids.length !== 1) return;
+    const product = paginator.getItems().find((item) => item.id === ids[0]);
+    if (product) handleEditRequest(product);
+  }
 
-    await applyOptimistic({
-      apply: () => {
-        paginator.removeItem(id);
-        renderList();
+  // BR-42: confirmación también en el borrado en lote, con el conteo en el mensaje.
+  // Cubre también el borrado de un único producto (ya no hay ruta de borrado individual).
+  function handleDeleteSelected() {
+    const ids = [...selection.getSelection()];
+    if (ids.length === 0) return;
+
+    openConfirmModal({
+      title: 'Eliminar productos',
+      message: ids.length === 1 ? '¿Eliminar este producto?' : `¿Eliminar ${ids.length} productos?`,
+      confirmLabel: 'Eliminar',
+      onConfirm: async () => {
+        const removedItems = paginator.getItems().filter((item) => ids.includes(item.id));
+
+        await applyOptimistic({
+          apply: () => {
+            ids.forEach((id) => paginator.removeItem(id));
+            selection.clearSelection();
+            renderList();
+          },
+          revert: () => {
+            removedItems.forEach((item) => paginator.prependItem(item));
+            selection.selectAll(ids);
+            renderList();
+          },
+          remoteOperation: async () => {
+            const { error } = await supabase.from('products').delete().in('id', ids);
+            if (error) throw error;
+          },
+          onError: () => {
+            showGlobalError('No se pudieron eliminar los productos. Inténtalo de nuevo.');
+          },
+        }).catch(() => {});
       },
-      revert: () => {
-        previous.forEach((item) => {
-          if (!paginator.getItems().some((i) => i.id === item.id)) {
-            paginator.prependItem(item);
-          }
-        });
-        renderList();
-      },
-      remoteOperation: async () => {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-      },
-      onError: () => {
-        showGlobalError('No se pudo eliminar el producto. Inténtalo de nuevo.');
-      },
-    }).catch(() => {});
+    });
   }
 
   // BR-11: marcar en lote como una única transacción lógica (revert total ante cualquier fallo).
@@ -255,10 +346,12 @@ export async function renderProductList(container, { householdId }) {
 
   function cleanup() {
     realtime.unsubscribe();
+    observer.disconnect();
+    window.removeEventListener('pagehide', cleanup);
+    document.body.classList.remove('has-selection');
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 
-  renderProductForm(formContainer, { onSubmit: handleAdd });
   await loadFirstPage();
 
   return cleanup;

@@ -2,7 +2,6 @@
 // Funciones puras: mismo input siempre produce el mismo resultado (ver Testable Properties en business-logic-model.md).
 
 const NAME_MAX_LENGTH = 50;
-const QUANTITY_MAX_LENGTH = 50;
 const CATEGORY_MAX_LENGTH = 40;
 
 // Letras (incluye acentos/ñ vía \p{L}), dígitos y espacios únicamente.
@@ -31,20 +30,6 @@ export function validateProductName(name) {
     return { valid: false, error: 'El nombre solo puede contener letras, números y espacios.' };
   }
   return { valid: true, value: normalized };
-}
-
-export function validateQuantity(quantity) {
-  if (quantity === null || quantity === undefined || quantity === '') {
-    return { valid: true, value: null };
-  }
-  if (typeof quantity !== 'string') {
-    return { valid: false, error: 'La cantidad no es válida.' };
-  }
-  const normalized = normalizeWhitespace(quantity);
-  if (normalized.length > QUANTITY_MAX_LENGTH) {
-    return { valid: false, error: `La cantidad no puede superar los ${QUANTITY_MAX_LENGTH} caracteres.` };
-  }
-  return { valid: true, value: normalized || null };
 }
 
 export function validateCategory(category) {
@@ -85,4 +70,34 @@ export function validateHouseholdIcon(icon) {
     return { valid: false, error: 'Elige un icono de la lista.' };
   }
   return { valid: true, value: icon };
+}
+
+// Unidad 6 — cantidad numérica de producto (BR-35/BR-36), sustituye validateQuantity
+const QUANTITY_NUMBER_MIN = 1;
+const QUANTITY_NUMBER_MAX = 999;
+const QUANTITY_UNIT_MAX_LENGTH = 20;
+
+export function validateQuantityNumber(value) {
+  const number = typeof value === 'string' ? Number(value) : value;
+  if (typeof number !== 'number' || !Number.isInteger(number)) {
+    return { valid: false, error: 'La cantidad debe ser un número entero.' };
+  }
+  if (number < QUANTITY_NUMBER_MIN || number > QUANTITY_NUMBER_MAX) {
+    return { valid: false, error: `La cantidad debe estar entre ${QUANTITY_NUMBER_MIN} y ${QUANTITY_NUMBER_MAX}.` };
+  }
+  return { valid: true, value: number };
+}
+
+export function validateQuantityUnit(unit) {
+  if (unit === null || unit === undefined || unit === '') {
+    return { valid: true, value: null };
+  }
+  if (typeof unit !== 'string') {
+    return { valid: false, error: 'La unidad no es válida.' };
+  }
+  const normalized = normalizeWhitespace(unit);
+  if (normalized.length > QUANTITY_UNIT_MAX_LENGTH) {
+    return { valid: false, error: `La unidad no puede superar los ${QUANTITY_UNIT_MAX_LENGTH} caracteres.` };
+  }
+  return { valid: true, value: normalized || null };
 }

@@ -1,9 +1,9 @@
 // Pantalla de inicio (FR-1, FR-2, BR-30) — listado de listas activas + "Crear nueva lista".
-import { fetchAllHouseholdsWithParticipants } from './households-api.js';
+import { fetchAllHouseholdsWithParticipants, deleteHousehold } from './households-api.js';
 import { renderListCard } from './list-card.js';
 import { openListFormModal } from './list-form-modal.js';
-import { openQrModal } from './qr-modal.js';
-import { openDeleteConfirmModal } from './delete-confirm-modal.js';
+import { openQrModal } from '../common/qr-modal.js';
+import { openConfirmModal } from '../common/confirm-modal.js';
 
 export async function renderHomeScreen(container) {
   container.innerHTML = `
@@ -47,7 +47,16 @@ export async function renderHomeScreen(container) {
           },
           onEdit: (h) => openListFormModal({ mode: 'edit', household: h, onSaved: refresh }),
           onViewQr: (h) => openQrModal({ householdId: h.id }),
-          onDelete: (h) => openDeleteConfirmModal({ household: h, onConfirmed: refresh }),
+          onDelete: (h) =>
+            openConfirmModal({
+              title: 'Eliminar lista',
+              message: '¿Eliminar esta lista? Se borrarán todos sus productos e historial.',
+              confirmLabel: 'Eliminar',
+              onConfirm: async () => {
+                await deleteHousehold(h.id);
+                await refresh();
+              },
+            }),
         })
       );
     });

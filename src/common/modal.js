@@ -1,13 +1,13 @@
 // Modal genérico reutilizable (BR-33, Unidad 5) — overlay + panel + botón "X" en esquina
 // superior derecha. El llamante monta su propio contenido en el nodo devuelto por openModal().
 
-export function openModal({ title, onClose } = {}) {
+export function openModal({ title, onClose, fullScreen = false } = {}) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
   overlay.dataset.testid = 'modal-overlay';
 
   overlay.innerHTML = `
-    <div class="modal-panel" data-testid="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-panel ${fullScreen ? 'modal-panel--fullscreen' : ''}" data-testid="modal-panel" role="dialog" aria-modal="true">
       <div class="modal-header">
         <h2 data-testid="modal-title">${escapeHtml(title ?? '')}</h2>
         <button type="button" class="modal-close-button" data-testid="modal-close-button" aria-label="Cerrar">✕</button>

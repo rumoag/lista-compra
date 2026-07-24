@@ -1,15 +1,21 @@
-// Punto de entrada — enrutado mínimo por household_id en la URL (US-5.2, US-5.3)
-// + navegación entre Lista / Historial / Estadísticas / QR (Unidad 3-4) + botón "Cambiar nombre" (Unidad 4).
-// Unidad 5: sin householdId en la URL se muestra el listado de listas activas (home-screen.js),
-// que sustituye a la pantalla de creación directa de la Unidad 1/4.
+// Punto de entrada — enrutado mínimo por household_id en la URL (US-5.2, US-5.3).
+// Sin householdId: pantalla de inicio con el listado de listas activas (Unidad 5).
+// Con householdId: cabecera (icono+título+menú) + saludo + tabs Lista/Historial/Estadísticas
+// (Unidad 6 — sustituye la barra de navegación de botones y el botón "Cambiar nombre" sueltos
+// de las Unidades 1-4; el QR se movió al menú de la cabecera).
 import { renderHomeScreen } from './home/home-screen.js';
-import { ensureLocalName, renderChangeNameButton } from './onboarding/name-prompt.js';
-import { renderQrView } from './onboarding/qr-view.js';
+import { fetchHousehold } from './home/households-api.js';
+import { ensureLocalName } from './onboarding/name-prompt.js';
+import { renderListHeader } from './list/list-header.js';
+import { renderGreeting } from './list/greeting.js';
+import { openChangeNameModal } from './list/change-name-modal.js';
+import { renderTabs } from './list/tabs.js';
 import { renderProductList } from './list/product-list.js';
 import { renderHistoryList } from './history/history-list.js';
 import { renderStatsPage } from './stats/stats-page.js';
 
 const appMain = document.getElementById('app-main');
+const appHeader = document.querySelector('[data-testid="app-header"]');
 
 function getHouseholdIdFromPath() {
   const segment = window.location.pathname.replace(/^\/+/, '').split('/')[0];
@@ -20,30 +26,7 @@ const VIEWS = {
   list: { label: 'Lista', render: renderProductList },
   history: { label: 'Historial', render: renderHistoryList },
   stats: { label: 'Estadísticas', render: renderStatsPage },
-  qr: { label: 'QR', render: renderQrView },
 };
-
-function renderNav(navContainer, householdId, activeView, viewContainer) {
-  navContainer.innerHTML = Object.entries(VIEWS)
-    .map(
-      ([key, view]) =>
-        `<button type="button" class="secondary" data-testid="nav-${key}-button" ${
-          key === activeView ? 'aria-current="true"' : ''
-        }>${view.label}</button>`
-    )
-    .join('');
-
-  Object.keys(VIEWS).forEach((key) => {
-    navContainer.querySelector(`[data-testid="nav-${key}-button"]`).addEventListener('click', () => {
-      renderActiveView(navContainer, householdId, key, viewContainer);
-    });
-  });
-}
-
-function renderActiveView(navContainer, householdId, viewKey, viewContainer) {
-  renderNav(navContainer, householdId, viewKey, viewContainer);
-  VIEWS[viewKey].render(viewContainer, { householdId });
-}
 
 async function start() {
   const householdId = getHouseholdIdFromPath();
@@ -53,22 +36,34 @@ async function start() {
     return;
   }
 
+  // La cabecera estática solo tiene sentido en la pantalla de inicio (listado de
+  // listas); dentro de una lista concreta, list-header.js ya muestra su icono+título.
+  if (appHeader) appHeader.hidden = true;
+
   await ensureLocalName(appMain);
+  const household = await fetchHousehold(householdId);
 
   appMain.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-      <nav id="app-nav" data-testid="app-nav" style="display:flex; gap:0.5rem; flex-wrap:wrap;"></nav>
-      <div id="change-name-container"></div>
-    </div>
+    <div id="greeting-container"></div>
+    <div id="list-header-container"></div>
+    <nav id="app-tabs" class="tabs-nav" data-testid="app-tabs"></nav>
     <div id="app-view"></div>
   `;
 
-  const navContainer = appMain.querySelector('#app-nav');
+  const headerContainer = appMain.querySelector('#list-header-container');
+  const greetingContainer = appMain.querySelector('#greeting-container');
+  const tabsNav = appMain.querySelector('#app-tabs');
   const viewContainer = appMain.querySelector('#app-view');
-  const changeNameContainer = appMain.querySelector('#change-name-container');
 
-  renderChangeNameButton(changeNameContainer);
-  renderActiveView(navContainer, householdId, 'list', viewContainer);
+  function handleChangeName() {
+    openChangeNameModal({
+      onSaved: () => renderGreeting(greetingContainer, { household, onChangeName: handleChangeName }),
+    });
+  }
+
+  renderListHeader(headerContainer, { household });
+  renderGreeting(greetingContainer, { household, onChangeName: handleChangeName });
+  renderTabs(tabsNav, viewContainer, { views: VIEWS, householdId, initialView: 'list' });
 }
 
 start();

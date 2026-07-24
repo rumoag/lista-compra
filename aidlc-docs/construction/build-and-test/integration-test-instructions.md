@@ -9,7 +9,7 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 
 ### Scenario 1: Alta de producto → visible en tiempo real en otro dispositivo
 - **Setup**: abrir la misma URL de household en dos pestañas/dispositivos distintos, cada uno con un nombre local distinto.
-- **Test Steps**: añadir un producto desde la pestaña A.
+- **Test Steps**: en la pestaña A, pulsar el botón flotante (+) y completar el asistente de 3 pasos (producto, cantidad, categoría).
 - **Expected Results**: el producto aparece en la pestaña B en segundos, sin recargar (US-1.1, US-1.2).
 - **Cleanup**: eliminar el producto de prueba.
 
@@ -47,15 +47,32 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - **⚠️ Nota de privacidad esperada (comportamiento intencional, BR-34)**: en este escenario, la pantalla de inicio debe mostrar **todas** las listas existentes en el proyecto Supabase, no solo las creadas/visitadas desde este dispositivo — esto es el comportamiento diseñado, no un bug.
 - **Cleanup**: eliminar la lista de prueba creada en el paso 2 si no se eliminó ya en el paso 5.
 
+### Scenario 7 (Unidad 6): Vista de lista de la compra rediseñada
+- **Setup**: entrar a una lista con al menos 25 productos pendientes (para forzar scroll infinito con `PAGE_SIZE = 20`) y localStorage con un nombre local ya guardado.
+- **Test Steps**:
+  1. Verificar que la cabecera muestra el icono+título de la lista (no el `<h1>` genérico) y que el saludo "Hola, {nombre}" aparece debajo.
+  2. Pulsar el saludo → se abre el modal de cambiar nombre, precargado; guardar un nombre nuevo → el saludo se actualiza.
+  3. Abrir el menú de 3 puntos de la cabecera → verificar "Cambiar nombre" (misma acción que el paso 2), "Ver QR" (abre modal con el QR correcto) y "Volver al listado de listas" (navega a `/`).
+  4. En el tab "Lista", hacer scroll hasta el final → se cargan automáticamente más productos sin pulsar ningún botón (BR-48).
+  5. Pulsar el botón flotante (+) → completar los 3 pasos (elegir un chip sugerido en el paso 1, ajustar el stepper de cantidad tocando el número para abrir el teclado numérico en el paso 2, elegir una categoría con icono en el paso 3) → Guardar → el producto aparece con su icono de categoría.
+  6. Repetir la creación de un producto con nombre nuevo vía "Otros" y categoría vía "Otra…" → validar que también funciona.
+  7. Click sobre el cuerpo de un item (no el menú) → se marca su checkbox; aparece la barra de selección con "Seleccionar todos", "Marcar como comprados" y "Eliminar seleccionados".
+  8. Pulsar "Seleccionar todos" → deben seleccionarse **todos** los pendientes, incluso los que no se habían cargado aún por scroll infinito (BR-43) → el botón cambia a "Deseleccionar todos".
+  9. Pulsar "Eliminar seleccionados" → aparece el modal de confirmación con el conteo correcto → confirmar → todos desaparecen.
+  10. Abrir el menú de 3 puntos de un item individual → "Editar" abre el wizard precargado con sus valores → "Eliminar" pide confirmación individual antes de borrar.
+  11. Vaciar la lista por completo → verificar el nuevo mensaje de estado vacío ("No hay nada en tu cesta de la compra todavía...").
+- **Expected Results**: todos los pasos funcionan sin errores; el wizard nunca deja avanzar sin un producto/categoría válidos; cerrar el wizard con la "X" en cualquier paso descarta el progreso sin pedir confirmación (BR-44).
+- **Cleanup**: eliminar los productos de prueba creados.
+
 ## Setup Integration Test Environment
 
 ### 1. Requisitos
-- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidad 5)**: si el proyecto Supabase ya existía de un despliegue anterior a la Unidad 5, **NO reejecutes el archivo completo** — falla porque `create policy` no soporta `IF NOT EXISTS` en Postgres y las políticas de Unidad 1/2 ya existen. Ejecuta **solo** el bloque final del archivo, desde el comentario `-- Unidad 5 — título e icono de lista` hasta el final (columnas `title`/`image_icon` + backfill + constraints), que sí es seguro de ejecutar una vez sobre una base ya desplegada.
+- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidades 5 y 6)**: si el proyecto Supabase ya existía de un despliegue anterior, **NO reejecutes el archivo completo** — falla porque `create policy` no soporta `IF NOT EXISTS` en Postgres y las políticas de Unidad 1/2 ya existen. Ejecuta únicamente, en orden, el bloque `-- Unidad 5 — título e icono de lista` (si no lo hiciste ya) y después el bloque `-- Unidad 6 — cantidad numérica en productos`. **Este último elimina la columna `quantity`** — es irreversible, revísalo antes de ejecutarlo si tienes datos reales que te importen.
 - Variables de entorno configuradas (`SUPABASE_URL`, `SUPABASE_ANON_KEY`).
 - Sitio desplegado en Vercel (o servido localmente con `npx serve .` tras `npm run build`).
 
 ### 2. Ejecución
-Seguir manualmente los 6 escenarios anteriores, usando dos pestañas/dispositivos.
+Seguir manualmente los 7 escenarios anteriores, usando dos pestañas/dispositivos.
 
 ## Limitación en este entorno de trabajo
 No se dispone de un proyecto Supabase real conectado en este entorno para ejecutar estos escenarios automáticamente. **Quedan pendientes de verificación manual por el usuario** tras el despliegue.

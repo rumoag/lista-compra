@@ -44,14 +44,17 @@ La respuesta debe incluir (configuradas en `vercel.json`):
 ## 3. Validación de inputs (SECURITY-05)
 
 Ya cubierto por los tests unitarios/PBT ejecutados en Build:
-- `validateProductName`, `validateQuantity`, `validateCategory` (Unidad 1) — 17 tests, incluyendo casos de puntuación no permitida y longitud límite.
-- Constraints `CHECK` a nivel de Postgres en `schema.sql` como defensa en profundidad.
+- `validateProductName`, `validateCategory` (Unidad 1) y `validateQuantityNumber`/`validateQuantityUnit` (Unidad 6, sustituyen a `validateQuantity`) — 23 tests en total, incluyendo casos de puntuación no permitida, longitud límite y rango numérico.
+- Constraints `CHECK` a nivel de Postgres en `schema.sql` como defensa en profundidad, incluidos los nuevos `products_quantity_number_range` y `products_quantity_unit_length` de la Unidad 6.
 
 ## 4. Control de acceso por household (SECURITY-08)
 
 - **Diseño (Unidades 1-4)**: RLS permisivo + obscuridad del UUID (documentado y aceptado explícitamente en `aidlc-docs/construction/unidad-1/nfr-requirements/nfr-requirements.md`).
 - **Ampliación de la excepción (Unidad 5)**: la pantalla de inicio elimina, en la práctica, incluso la obscuridad del UUID como salvaguarda — ahora **todas** las listas de **todos** los hogares son visibles (título, icono, participantes) desde la URL raíz, sin necesidad de conocer ningún UUID. Es una decisión de producto explícita y temporal del usuario (ver `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` BR-34 y `requirements.md` NFR-2 del Ciclo 2), con intención declarada de sustituirla por credenciales reales en un ciclo futuro. No requiere ninguna acción de corrección en esta iteración.
-- **Verificación manual recomendada** (tras desplegar): confirmar que las tablas `households`/`products` tienen RLS **habilitado** en el dashboard de Supabase (Authentication → Policies), y que existen las 4 políticas por tabla definidas en `schema.sql` (sin cambios respecto a Unidad 1 — las políticas permisivas ya cubren las columnas nuevas `title`/`image_icon`).
+- **Verificación manual recomendada** (tras desplegar): confirmar que las tablas `households`/`products` tienen RLS **habilitado** en el dashboard de Supabase (Authentication → Policies), y que existen las 4 políticas por tabla definidas en `schema.sql` (sin cambios respecto a Unidad 1 — las políticas permisivas ya cubren las columnas nuevas `title`/`image_icon` de Unidad 5 y `quantity_number`/`quantity_unit` de Unidad 6).
+
+## 5. Nota de la Unidad 6: migración destructiva de `quantity`
+No es una regla SECURITY-* directamente, pero es relevante para SECURITY-13 (integridad de datos): la migración `drop column quantity` es irreversible sobre datos reales. El usuario asumió explícitamente este riesgo (ver `aidlc-docs/construction/unidad-6/nfr-requirements/nfr-requirements.md`, Question 1 = A) tras ser informado de la alternativa más segura (renombrar en vez de eliminar). Documentado también como advertencia en `README.md` e `integration-test-instructions.md`.
 
 ## Resumen de cumplimiento SECURITY-*
 | Regla | Estado |

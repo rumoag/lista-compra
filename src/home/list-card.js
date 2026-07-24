@@ -1,5 +1,5 @@
 // Tarjeta de una lista activa (FR-1) — icono, título, participantes truncados, menú de 3 puntos.
-import { renderListActionsMenu } from './list-actions-menu.js';
+import { renderDropdownMenu } from '../common/dropdown-menu.js';
 import { formatParticipants } from './participants.js';
 
 export function renderListCard(household, { onEdit, onDelete, onViewQr, onOpen }) {
@@ -20,10 +20,12 @@ export function renderListCard(household, { onEdit, onDelete, onViewQr, onOpen }
 
   el.querySelector('[data-testid="list-card-open-area"]').addEventListener('click', () => onOpen(household.id));
 
-  renderListActionsMenu(el.querySelector('[data-testid="list-card-menu-container"]'), {
-    onEdit: () => onEdit(household),
-    onDelete: () => onDelete(household),
-    onViewQr: () => onViewQr(household),
+  renderDropdownMenu(el.querySelector('[data-testid="list-card-menu-container"]'), {
+    actions: [
+      { testid: 'edit', label: 'Editar', onClick: () => onEdit(household) },
+      { testid: 'qr', label: 'Ver QR', onClick: () => onViewQr(household) },
+      { testid: 'delete', label: 'Eliminar', onClick: () => onDelete(household) },
+    ],
   });
 
   return el;

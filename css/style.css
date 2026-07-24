@@ -28,6 +28,12 @@ body {
   margin-bottom: var(--spacing);
 }
 
+/* Lista de productos: sin stroke, ni en la tarjeta contenedora ni entre items. */
+.card--flush {
+  border: none;
+  padding: 0;
+}
+
 .product-form input[type="text"],
 .product-form select {
   width: 100%;
@@ -87,7 +93,6 @@ button.secondary {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(127, 127, 127, 0.15);
 }
 
 .product-item .meta {
@@ -132,31 +137,31 @@ button.secondary {
   font-weight: 600;
 }
 
-.list-actions-menu {
+.dropdown-menu {
   position: relative;
 }
 
-.list-actions-menu-dropdown {
+.dropdown-menu-list {
   position: absolute;
   right: 0;
   top: 100%;
   z-index: 10;
   background: canvas;
-  border: 1px solid rgba(127, 127, 127, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  min-width: 140px;
+  min-width: 160px;
   overflow: hidden;
 }
 
 /* El atributo [hidden] debe ganar siempre a "display: flex" de arriba,
    si no, el dropdown queda visible permanentemente pese a toggle-arse en JS. */
-.list-actions-menu-dropdown[hidden] {
+.dropdown-menu-list[hidden] {
   display: none;
 }
 
-.list-actions-menu-dropdown button {
+.dropdown-menu-list button {
   background: transparent;
   color: inherit;
   border: none;
@@ -252,9 +257,200 @@ button.secondary {
   background: rgba(37, 99, 235, 0.15);
 }
 
-.delete-confirm-actions {
+.confirm-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: var(--spacing);
+}
+
+.modal-panel--fullscreen {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-panel--fullscreen .modal-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Unidad 6 — cabecera, saludo, tabs, FAB, icono de categoría, stepper de cantidad */
+
+/* .list-topbar (saludo + menú) y .selection-header comparten el mismo padding/altura
+   a propósito: al activar la selección, uno sustituye al otro sin que el layout salte. */
+.list-topbar,
+.selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem var(--spacing);
+}
+
+.list-topbar {
+  margin: 0 calc(var(--spacing) * -1);
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.list-header-title {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.greeting {
+  background: transparent;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.tabs-nav {
+  display: flex;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.5rem 0.25rem;
+}
+
+.tab[aria-current="true"] {
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}
+
+.product-item-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.product-item-category-icon {
+  font-size: 1.3rem;
+}
+
+.product-item.selected {
+  background: rgba(37, 99, 235, 0.12);
+  border-radius: 8px;
+}
+
+.fab {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: var(--spacing);
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.quantity-stepper button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  padding: 0;
+}
+
+.quantity-stepper input {
+  flex: 1;
+  text-align: center;
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  background: canvas;
+  color: inherit;
+}
+
+/* Header de selección múltiple: fijo al viewport, se superpone a la cabecera normal
+   (oculta vía body.has-selection) mientras haya al menos un producto seleccionado. */
+.selection-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  z-index: 60;
+  background: canvas;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+  padding: 0.6rem var(--spacing);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selection-header-left,
+.selection-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.icon-button {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.35rem;
+}
+
+.icon-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.7rem;
+}
+
+/* El título de la lista NO se oculta al activar la selección — solo el topbar
+   (saludo + menú), que el header fijo sustituye visualmente. visibility (no display)
+   para que el topbar siga reservando su espacio en el flujo: así nada del resto de
+   la página se desplaza al activar/desactivar la selección. */
+body.has-selection [data-testid="list-topbar"] {
+  visibility: hidden;
 }

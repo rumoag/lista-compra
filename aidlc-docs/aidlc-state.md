@@ -102,6 +102,17 @@
 
 **UNIDAD 5 (Pantalla 1): COMPLETA** — próximo paso del usuario: reejecutar `supabase/schema.sql` en el proyecto Supabase ya desplegado y verificar manualmente el Scenario 6 de `integration-test-instructions.md`.
 
+### Pantalla 2 — Vista de lista de la compra (Unidad 6)
+- [x] Requirements Analysis — 8 dudas resueltas (cambio de tipo de dato de quantity, sugeridos, iconos de categoría, scroll infinito, redundancia de cambiar nombre, confirmación en lote, navegación del wizard); requirements.md ampliado con sección "Pantalla 2"; aprobado
+- [x] Functional Design — domain-entities, business-rules (BR-35 a BR-49), business-logic-model (9 flujos + Testable Properties), frontend-components (generaliza 3 componentes de Unidad 5 a common/); aprobado
+- [x] NFR Requirements — migración destructiva de quantity asumida explícitamente, límite de 2000 filas para sugeridos; aprobado
+- [x] NFR Design — patrones de rendimiento/seguridad/fiabilidad/mantenibilidad, componentes lógicos; aprobado
+- [x] Infrastructure Design — sin cambios reales, migración de esquema aditiva-y-destructiva; aprobado
+- [x] Code Generation — código y tests generados; 174/174 tests verificados (npm test); 2 bugs reales detectados y corregidos (getCategoryIcon con objeto plano, falta de re-render en handleAdd); aprobado
+- [x] Build and Test (incremental) — build success, integration-test-instructions.md/security-test-instructions.md/build-and-test-summary.md actualizados con el Scenario 7
+
+**UNIDAD 6 (Pantalla 2): COMPLETA Y APROBADA** — próximo paso del usuario: reejecutar el bloque de migración de la Unidad 6 en `supabase/schema.sql` (destructivo, revisar antes) y verificar manualmente el Scenario 7 de `integration-test-instructions.md`.
+
 ### Próximas pantallas
 Pendientes de que el usuario las describa una a una (a petición explícita: "vamos a ir 1 a 1").
 
