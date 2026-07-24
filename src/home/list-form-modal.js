@@ -11,16 +11,20 @@ export function openListFormModal({ mode, household, onSaved }) {
 
   body.innerHTML = `
     <form data-testid="list-form">
+      <label class="form-label" for="list-form-title-input">Nombre de la lista de la compra</label>
       <input
         type="text"
-        placeholder="Título de la lista"
+        id="list-form-title-input"
+        class="text-input"
+        placeholder="Ej. Compra semanal"
         data-testid="list-form-title-input"
         maxlength="50"
         value="${isEdit ? escapeAttr(household.title) : ''}"
       />
       <div class="error-message" data-testid="list-form-title-error" hidden></div>
 
-      <div class="icon-picker" data-testid="list-form-icon-picker">
+      <label class="form-label" for="list-form-icon-picker">Selecciona un icono para tu lista de la compra</label>
+      <div class="icon-picker" id="list-form-icon-picker" data-testid="list-form-icon-picker">
         ${HOUSEHOLD_ICON_SET.map(
           (icon) =>
             `<button type="button" class="icon-picker-option" data-testid="list-form-icon-${icon}" data-icon="${icon}" aria-pressed="${icon === selectedIcon}">${icon}</button>`

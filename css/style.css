@@ -207,6 +207,31 @@ button.secondary {
   padding: 0.25rem 0.5rem;
 }
 
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  background: canvas;
+  color: inherit;
+  font-size: 1rem;
+  transition: border-color 0.15s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 .icon-picker {
   display: flex;
   flex-wrap: wrap;
