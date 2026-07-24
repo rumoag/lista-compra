@@ -6,6 +6,8 @@ App web móvil para que una pareja gestione una lista de la compra compartida, c
 
 ⚠️ **Nota de seguridad/privacidad (Unidad 5, temporal y aceptada)**: la pantalla de inicio muestra **todas** las listas de **todos** los hogares a cualquiera que abra la app, sin ningún filtro por dispositivo ni login. Es una decisión de producto explícita, no un descuido — ver `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` (BR-34). Está previsto sustituirla por un sistema de credenciales en un ciclo futuro.
 
+⚠️ **Nota de migración (Unidad 5)**: si tu proyecto Supabase ya estaba desplegado antes de esta unidad, **no reejecutes `supabase/schema.sql` completo** (falla porque las políticas RLS de Unidad 1/2 ya existen y `create policy` no soporta `IF NOT EXISTS`). Ejecuta solo el bloque final del archivo, a partir del comentario `-- Unidad 5 — título e icono de lista`.
+
 ## Stack
 - Frontend: vanilla JS/HTML (sin bundler), `@supabase/supabase-js` y `qrcode` importados directamente por URL desde esm.sh (`import ... from 'https://esm.sh/...'`) — sin import map, sin instalar estos paquetes vía npm
 - Backend/datos: [Supabase](https://supabase.com) (Postgres + RLS + API autogenerada)

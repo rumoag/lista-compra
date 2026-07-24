@@ -50,7 +50,7 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 ## Setup Integration Test Environment
 
 ### 1. Requisitos
-- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidad 5)**: si el proyecto Supabase ya existía de un despliegue anterior a la Unidad 5, hay que volver a ejecutar `supabase/schema.sql` (o al menos el bloque final de migración de `households`) para aplicar las columnas `title`/`image_icon` — no es un esquema nuevo, es aditivo sobre el existente.
+- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidad 5)**: si el proyecto Supabase ya existía de un despliegue anterior a la Unidad 5, **NO reejecutes el archivo completo** — falla porque `create policy` no soporta `IF NOT EXISTS` en Postgres y las políticas de Unidad 1/2 ya existen. Ejecuta **solo** el bloque final del archivo, desde el comentario `-- Unidad 5 — título e icono de lista` hasta el final (columnas `title`/`image_icon` + backfill + constraints), que sí es seguro de ejecutar una vez sobre una base ya desplegada.
 - Variables de entorno configuradas (`SUPABASE_URL`, `SUPABASE_ANON_KEY`).
 - Sitio desplegado en Vercel (o servido localmente con `npx serve .` tras `npm run build`).
 
