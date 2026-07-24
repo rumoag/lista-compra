@@ -442,12 +442,10 @@ button.secondary {
   padding: 0.45rem 0.7rem;
 }
 
-body.has-selection {
-  padding-top: 3.25rem;
-}
-
 /* El título de la lista NO se oculta al activar la selección — solo el topbar
-   (saludo + menú), que el header fijo sustituye en el mismo hueco. */
+   (saludo + menú), que el header fijo sustituye visualmente. visibility (no display)
+   para que el topbar siga reservando su espacio en el flujo: así nada del resto de
+   la página se desplaza al activar/desactivar la selección. */
 body.has-selection [data-testid="list-topbar"] {
-  display: none;
+  visibility: hidden;
 }
