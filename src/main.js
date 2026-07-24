@@ -15,6 +15,7 @@ import { renderHistoryList } from './history/history-list.js';
 import { renderStatsPage } from './stats/stats-page.js';
 
 const appMain = document.getElementById('app-main');
+const appHeader = document.querySelector('[data-testid="app-header"]');
 
 function getHouseholdIdFromPath() {
   const segment = window.location.pathname.replace(/^\/+/, '').split('/')[0];
@@ -34,6 +35,10 @@ async function start() {
     await renderHomeScreen(appMain);
     return;
   }
+
+  // La cabecera estática solo tiene sentido en la pantalla de inicio (listado de
+  // listas); dentro de una lista concreta, list-header.js ya muestra su icono+título.
+  if (appHeader) appHeader.hidden = true;
 
   await ensureLocalName(appMain);
   const household = await fetchHousehold(householdId);
