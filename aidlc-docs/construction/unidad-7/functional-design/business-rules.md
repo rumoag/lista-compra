@@ -35,6 +35,10 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-63: Fila del historial — icono, fecha corta y sin borde propio (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: cada fila de la lista de historial (BR-55) muestra un icono de ticket (🧾) delante del texto, y la fecha se presenta en formato corto "Sáb, 18 jul 2024" (día de semana y mes abreviados, `Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })`, con la primera letra en mayúscula) en vez de fecha y hora completas. La hora completa sigue disponible en el encabezado del modal de detalle del ticket.
+- **Alcance**: la fila deja de tener su propio borde (`.card`) — se apoya únicamente en el borde del contenedor de la lista, evitando el doble borde visual (contenedor + fila).
+
 ## BR-62: Estética de ticket físico en el modal (petición de seguimiento del usuario, post-aprobación)
 - **Regla**: el cuerpo del modal de ticket se presenta como un ticket de compra físico: papel (color fijo, no dependiente del tema claro/oscuro de la app — un ticket real es siempre papel claro), tipografía monoespaciada, cabecera centrada ("🧾 TICKET DE COMPRA" + fecha + quién compró), líneas discontinuas entre secciones, fila de "TOTAL" con el número de productos, mensaje "¡GRACIAS POR TU COMPRA!" y una barra decorativa tipo código de barras (puramente visual, `aria-hidden`). Bordes superior/inferior dentados simulando el corte de un ticket real.
 - **Alcance**: solo la presentación del modal — sin cambios de comportamiento, datos ni acciones (BR-51 a BR-54 sin cambios). Las acciones sobre el ticket completo ("Deshacer ticket"/"Eliminar ticket") quedan fuera del área de "papel", como controles de la aplicación.

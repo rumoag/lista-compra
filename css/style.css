@@ -458,8 +458,15 @@ body.has-selection [data-testid="list-topbar"] {
 /* Unidad 7 — historial en tickets */
 
 .ticket-row-open-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
   width: 100%;
+}
+
+.ticket-row-icon {
+  font-size: 1.6rem;
 }
 
 /* Unidad 7 (seguimiento) — el modal de ticket imita un ticket de compra físico */

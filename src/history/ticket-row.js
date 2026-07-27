@@ -1,23 +1,39 @@
-// Fila de la lista principal de historial (BR-55) — fecha/hora, quién compró y número
-// total de productos del ticket. Click abre el modal de detalle (Unidad 7).
+// Fila de la lista principal de historial (BR-55) — icono de ticket, fecha corta
+// ("Sáb, 18 jul 2024", BR-63) y número total de productos. Click abre el modal de
+// detalle (Unidad 7). Sin borde propio (BR-63) — se apoya en el contenedor de la lista.
 
 export function renderTicketRow(purchase, { onOpen }) {
   const el = document.createElement('div');
-  el.className = 'card product-item ticket-row';
+  el.className = 'product-item ticket-row';
   el.dataset.testid = `ticket-row-${purchase.id}`;
 
   el.innerHTML = `
     <div class="ticket-row-open-area" data-testid="ticket-row-open-area">
-      <div data-testid="ticket-row-date">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
-      <div class="meta" data-testid="ticket-row-meta">${escapeHtml(purchase.bought_by ?? '')} · ${
-        purchase.products.length
-      } producto${purchase.products.length === 1 ? '' : 's'}</div>
+      <div class="ticket-row-icon" aria-hidden="true">🧾</div>
+      <div>
+        <div data-testid="ticket-row-date">${formatShortDate(purchase.bought_at)}</div>
+        <div class="meta" data-testid="ticket-row-meta">${escapeHtml(purchase.bought_by ?? '')} · ${
+          purchase.products.length
+        } producto${purchase.products.length === 1 ? '' : 's'}</div>
+      </div>
     </div>
   `;
 
   el.querySelector('[data-testid="ticket-row-open-area"]').addEventListener('click', () => onOpen(purchase));
 
   return el;
+}
+
+// BR-63: "Sáb, 18 jul 2024" — día de la semana y mes abreviados, con la primera letra en
+// mayúscula (Intl los devuelve en minúsculas para es-ES).
+function formatShortDate(dateValue) {
+  const formatted = new Intl.DateTimeFormat('es-ES', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(dateValue));
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
 function escapeHtml(value) {

@@ -43,5 +43,10 @@
 - **Modificado**: `css/style.css` — nuevas clases `.receipt`/`.receipt-*` (color de papel fijo, independiente del tema claro/oscuro de la app, a propósito).
 - Verificado visualmente con una página de prueba temporal (Browser pane), luego eliminada.
 
+## Fila de historial: icono, fecha corta, sin borde propio (BR-63, seguimiento post-aprobación)
+- **Modificado**: `src/history/ticket-row.js` — icono 🧾, fecha corta ("Sáb, 18 jul 2024") vía `Intl.DateTimeFormat`, quita la clase `.card` (ya no tiene borde propio, solo el del contenedor de la lista).
+- **Modificado**: `css/style.css` — `.ticket-row-open-area` pasa a flex con el nuevo `.ticket-row-icon`.
+- Verificado visualmente con una página de prueba temporal (Browser pane, en móvil), luego eliminada.
+
 ## Verificación
 `npm test`: 216/216 tests pasan. `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).
