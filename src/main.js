@@ -23,9 +23,9 @@ function getHouseholdIdFromPath() {
 }
 
 const VIEWS = {
-  list: { label: 'Lista', render: renderProductList },
-  history: { label: 'Historial', render: renderHistoryList },
-  stats: { label: 'Estadísticas', render: renderStatsPage },
+  list: { label: 'Lista', icon: '📋', render: renderProductList },
+  history: { label: 'Historial', icon: '🕓', render: renderHistoryList },
+  stats: { label: 'Estadísticas', icon: '📊', render: renderStatsPage },
 };
 
 async function start() {

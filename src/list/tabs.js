@@ -1,16 +1,17 @@
 // Tabs de navegación (BR-47) — sustituye la barra de botones de navegación de las Unidades 1-4.
 // El QR ya no es un tab (se movió al menú de la cabecera, BR-46).
+// Floating toolbar estilo M3: flota junto al FAB; el icono solo se muestra en el tab activo.
 export function renderTabs(navContainer, viewContainer, { views, householdId, initialView }) {
   let currentCleanup = null;
 
   function renderNav(activeView) {
     navContainer.innerHTML = Object.entries(views)
-      .map(
-        ([key, view]) =>
-          `<button type="button" class="tab" data-testid="tabs-${key}-button" ${
-            key === activeView ? 'aria-current="true"' : ''
-          }>${view.label}</button>`
-      )
+      .map(([key, view]) => {
+        const active = key === activeView;
+        return `<button type="button" class="tab" data-testid="tabs-${key}-button" ${
+          active ? 'aria-current="true"' : ''
+        }>${active ? `<span class="tab-icon" aria-hidden="true">${view.icon}</span>` : ''}<span class="tab-label">${view.label}</span></button>`;
+      })
       .join('');
 
     Object.keys(views).forEach((key) => {
