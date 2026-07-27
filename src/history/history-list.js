@@ -1,10 +1,14 @@
-// Vista de historial (US-3.1, US-3.2, US-3.3): paginado por defecto; al aplicar filtros,
-// carga hasta 2000 compras y aplica los filtros puros (BR-16), sin paginación mientras el filtro esté activo.
+// Vista de historial (Unidad 7 — historial en tickets): paginado de tickets por defecto;
+// al aplicar filtros, carga hasta 2000 productos comprados y deriva los tickets a mostrar
+// (BR-56), sin paginación mientras el filtro esté activo. Historial en vivo (BR-59) solo
+// mientras el filtro está inactivo.
 import { supabase } from '../common/supabase-client.js';
 import { createPaginator } from '../common/pagination.js';
-import { applyOptimistic } from '../common/optimistic.js';
+import { createRealtimeSubscription } from '../common/realtime-subscription.js';
 import { renderHistoryFilters } from './history-filters.js';
 import { filterByDateRange, filterByName } from './filters.js';
+import { renderTicketRow } from './ticket-row.js';
+import { openTicketModal } from './ticket-modal.js';
 
 const PAGE_SIZE = 20;
 const FILTERED_FETCH_LIMIT = 2000;
@@ -25,19 +29,26 @@ export async function renderHistoryList(container, { householdId }) {
   const loadMoreButton = container.querySelector('[data-testid="history-load-more-button"]');
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
+  const realtime = createRealtimeSubscription({ householdId, table: 'purchases' });
   let activeFilters = { nameQuery: '', dateFrom: null, dateTo: null };
   let filteredResults = null; // null = modo paginado sin filtro activo
+  let openTicket = null; // { id, close } — ticket actualmente abierto en el modal, si lo hay
 
   function hasActiveFilters() {
     return Boolean(activeFilters.nameQuery || activeFilters.dateFrom || activeFilters.dateTo);
   }
 
+  // BR-57: alias local para reutilizar common/pagination.js (cursor hardcodeado a
+  // created_at) sin modificarlo — los tickets se ordenan por bought_at.
+  function toPaginatorItem(purchase) {
+    return { ...purchase, products: purchase.products ?? [], created_at: purchase.bought_at };
+  }
+
   async function fetchPage({ before, limit }) {
     let query = supabase
-      .from('products')
-      .select('*')
+      .from('purchases')
+      .select('*, products(*)')
       .eq('household_id', householdId)
-      .eq('status', 'bought')
       .order('bought_at', { ascending: false })
       .limit(limit);
 
@@ -47,10 +58,10 @@ export async function renderHistoryList(container, { householdId }) {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data;
+    return (data ?? []).map(toPaginatorItem);
   }
 
-  async function fetchForFiltering() {
+  async function fetchProductsForFiltering() {
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -59,30 +70,7 @@ export async function renderHistoryList(container, { householdId }) {
       .order('bought_at', { ascending: false })
       .limit(FILTERED_FETCH_LIMIT);
     if (error) throw error;
-    return data;
-  }
-
-  function renderEntry(product) {
-    const el = document.createElement('div');
-    el.className = 'product-item';
-    el.dataset.testid = `history-item-${product.id}`;
-    el.innerHTML = `
-      <div>
-        <div data-testid="history-item-name">${escapeHtml(product.name)}</div>
-        <div class="meta">${new Date(product.bought_at).toLocaleString('es-ES')} · ${escapeHtml(product.bought_by ?? '')}</div>
-      </div>
-      <div>
-        <button type="button" class="secondary" data-testid="history-item-unmark-button">Desmarcar</button>
-        <button type="button" class="secondary" data-testid="history-item-delete-button">Eliminar</button>
-      </div>
-    `;
-    el.querySelector('[data-testid="history-item-unmark-button"]').addEventListener('click', () =>
-      handleUnmark(product.id)
-    );
-    el.querySelector('[data-testid="history-item-delete-button"]').addEventListener('click', () =>
-      handleDeleteFromHistory(product.id)
-    );
-    return el;
+    return data ?? [];
   }
 
   function renderList() {
@@ -96,12 +84,14 @@ export async function renderHistoryList(container, { householdId }) {
         : 'Aún no hay compras registradas.';
     } else {
       emptyState.hidden = true;
-      items.forEach((product) => itemsContainer.appendChild(renderEntry(product)));
+      items.forEach((purchase) => itemsContainer.appendChild(renderTicketRow(purchase, { onOpen: handleOpenTicket })));
     }
 
     loadMoreButton.hidden = hasActiveFilters();
   }
 
+  // BR-56: filtra sobre productos (reutilizando filters.js sin cambios) y deriva los
+  // purchase_id a mostrar; cada ticket se muestra completo, con todos sus productos.
   async function applyFilters() {
     if (!hasActiveFilters()) {
       filteredResults = null;
@@ -109,10 +99,24 @@ export async function renderHistoryList(container, { householdId }) {
       return;
     }
 
-    const all = await fetchForFiltering();
-    let result = filterByName(all, activeFilters.nameQuery);
-    result = filterByDateRange(result, activeFilters.dateFrom, activeFilters.dateTo);
-    filteredResults = result;
+    const products = await fetchProductsForFiltering();
+    let matched = filterByName(products, activeFilters.nameQuery);
+    matched = filterByDateRange(matched, activeFilters.dateFrom, activeFilters.dateTo);
+
+    const purchaseIds = [...new Set(matched.map((product) => product.purchase_id).filter(Boolean))];
+    if (purchaseIds.length === 0) {
+      filteredResults = [];
+      renderList();
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('purchases')
+      .select('*, products(*)')
+      .in('id', purchaseIds)
+      .order('bought_at', { ascending: false });
+    if (error) throw error;
+    filteredResults = (data ?? []).map(toPaginatorItem);
     renderList();
   }
 
@@ -128,49 +132,24 @@ export async function renderHistoryList(container, { householdId }) {
     renderList();
   });
 
-  async function handleUnmark(id) {
-    const previous = paginator.getItems().find((item) => item.id === id) ?? filteredResults?.find((i) => i.id === id);
-
-    await applyOptimistic({
-      apply: () => {
-        paginator.removeItem(id);
-        if (filteredResults) filteredResults = filteredResults.filter((i) => i.id !== id);
+  function handleOpenTicket(purchase) {
+    const modal = openTicketModal(purchase, {
+      onTicketChanged: () => renderList(),
+      onTicketRemoved: (removed) => {
+        paginator.removeItem(removed.id);
+        if (filteredResults) filteredResults = filteredResults.filter((item) => item.id !== removed.id);
+        openTicket = null;
         renderList();
       },
-      revert: () => {
-        if (previous) paginator.prependItem(previous);
+      onTicketRestored: (restored) => {
+        paginator.prependItem(toPaginatorItem(restored));
+        if (filteredResults) filteredResults = [toPaginatorItem(restored), ...filteredResults];
+        openTicket = null;
         renderList();
+        showGlobalError('No se pudo completar la acción. Inténtalo de nuevo.');
       },
-      remoteOperation: async () => {
-        const { error } = await supabase
-          .from('products')
-          .update({ status: 'pending', bought_by: null, bought_at: null })
-          .eq('id', id);
-        if (error) throw error;
-      },
-      onError: () => showGlobalError('No se pudo desmarcar el producto. Inténtalo de nuevo.'),
-    }).catch(() => {});
-  }
-
-  async function handleDeleteFromHistory(id) {
-    const previous = paginator.getItems().find((item) => item.id === id) ?? filteredResults?.find((i) => i.id === id);
-
-    await applyOptimistic({
-      apply: () => {
-        paginator.removeItem(id);
-        if (filteredResults) filteredResults = filteredResults.filter((i) => i.id !== id);
-        renderList();
-      },
-      revert: () => {
-        if (previous) paginator.prependItem(previous);
-        renderList();
-      },
-      remoteOperation: async () => {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        if (error) throw error;
-      },
-      onError: () => showGlobalError('No se pudo eliminar la entrada del historial. Inténtalo de nuevo.'),
-    }).catch(() => {});
+    });
+    openTicket = { id: purchase.id, close: modal.close };
   }
 
   function showGlobalError(message) {
@@ -181,10 +160,36 @@ export async function renderHistoryList(container, { householdId }) {
     setTimeout(() => errorEl.remove(), 4000);
   }
 
+  // BR-59: historial en vivo — solo mientras el modo paginado (sin filtro) está activo.
+  realtime.subscribe({
+    onInsert: async (purchase) => {
+      if (hasActiveFilters()) return;
+      if (paginator.getItems().some((item) => item.id === purchase.id)) return;
+      const { data: products, error } = await supabase.from('products').select('*').eq('purchase_id', purchase.id);
+      if (error) return;
+      paginator.prependItem(toPaginatorItem({ ...purchase, products: products ?? [] }));
+      renderList();
+    },
+    onDelete: (purchase) => {
+      if (hasActiveFilters()) return;
+      paginator.removeItem(purchase.id);
+      if (openTicket && openTicket.id === purchase.id) {
+        openTicket.close();
+        openTicket = null;
+        showGlobalError('Esta compra fue modificada desde otro dispositivo.');
+      }
+      renderList();
+    },
+  });
+
+  function cleanup() {
+    realtime.unsubscribe();
+    window.removeEventListener('pagehide', cleanup);
+  }
+  window.addEventListener('pagehide', cleanup, { once: true });
+
   await paginator.loadNextPage(fetchPage);
   renderList();
-}
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  return cleanup;
 }

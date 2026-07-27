@@ -454,3 +454,14 @@ button.secondary {
 body.has-selection [data-testid="list-topbar"] {
   visibility: hidden;
 }
+
+/* Unidad 7 — historial en tickets */
+
+.ticket-row-open-area {
+  cursor: pointer;
+  width: 100%;
+}
+
+[data-testid="ticket-modal-products"] .product-item + .product-item {
+  border-top: 1px solid rgba(127, 127, 127, 0.2);
+}

@@ -64,15 +64,30 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - **Expected Results**: todos los pasos funcionan sin errores; el wizard nunca deja avanzar sin un producto/categoría válidos; cerrar el wizard con la "X" en cualquier paso descarta el progreso sin pedir confirmación (BR-44).
 - **Cleanup**: eliminar los productos de prueba creados.
 
+### Scenario 8 (Unidad 7): Historial en tickets — deshacer, eliminar y en vivo
+- **Setup**: entrar a una lista con al menos 3 productos pendientes; abrir la misma URL de household en dos pestañas/dispositivos distintos, cada uno con un nombre local distinto.
+- **Test Steps**:
+  1. En la pestaña A, seleccionar 3 productos y pulsar "Marcar como comprados".
+  2. Verificar que aparece un único ticket nuevo en la pestaña "Historial" de la pestaña A, con la fecha/hora, el nombre de quien compró y "3 productos".
+  3. Verificar que el mismo ticket aparece **en vivo** en la pestaña "Historial" de la pestaña B, sin recargar (BR-59).
+  4. Click en el ticket → se abre el modal con el detalle de los 3 productos, cada uno con "Desmarcar"/"Eliminar".
+  5. Pulsar "Desmarcar" en 1 de los 3 productos → desaparece del modal, y el ticket en la lista de fondo pasa a mostrar "2 productos"; el producto reaparece en el tab "Lista" como pendiente.
+  6. Pulsar "Eliminar" en los 2 productos restantes uno a uno → al eliminar el último, el modal se cierra automáticamente y el ticket desaparece de la lista de historial (limpieza de huérfano, BR-54).
+  7. Repetir el paso 1 (crear un ticket nuevo) y, esta vez, abrir su modal y pulsar "Deshacer ticket" → confirmar en el diálogo → los productos vuelven al tab "Lista" como pendientes y el ticket desaparece del historial, **en ambas pestañas** (BR-51, BR-59).
+  8. Repetir el paso 1 una vez más y, en su modal, pulsar "Eliminar ticket" → confirmar → los productos y el ticket se borran permanentemente, en ambas pestañas (BR-52, BR-59).
+  9. Con un filtro de nombre/fecha activo, verificar que los filtros siguen funcionando igual que antes (un ticket aparece si al menos uno de sus productos coincide) y que los cambios remotos NO se reflejan en vivo mientras el filtro está activo (BR-59).
+- **Expected Results**: todos los pasos anteriores funcionan sin errores; el historial en vivo sincroniza entre ambas pestañas solo en modo paginado (sin filtro).
+- **Cleanup**: eliminar cualquier producto/ticket de prueba restante.
+
 ## Setup Integration Test Environment
 
 ### 1. Requisitos
-- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidades 5 y 6)**: si el proyecto Supabase ya existía de un despliegue anterior, **NO reejecutes el archivo completo** — falla porque `create policy` no soporta `IF NOT EXISTS` en Postgres y las políticas de Unidad 1/2 ya existen. Ejecuta únicamente, en orden, el bloque `-- Unidad 5 — título e icono de lista` (si no lo hiciste ya) y después el bloque `-- Unidad 6 — cantidad numérica en productos`. **Este último elimina la columna `quantity`** — es irreversible, revísalo antes de ejecutarlo si tienes datos reales que te importen.
+- Proyecto Supabase real con `supabase/schema.sql` ejecutado. **Importante (Unidades 5, 6 y 7)**: si el proyecto Supabase ya existía de un despliegue anterior, **NO reejecutes el archivo completo** — falla porque `create policy` no soporta `IF NOT EXISTS` en Postgres y las políticas de Unidad 1/2 ya existen. Ejecuta únicamente, en orden, el bloque `-- Unidad 5 — título e icono de lista` (si no lo hiciste ya), el bloque `-- Unidad 6 — cantidad numérica en productos` (**elimina la columna `quantity`** — irreversible, revísalo antes de ejecutarlo si tienes datos reales) y, tras ese, el bloque `-- Unidad 7 — Historial en tickets` (puramente aditivo, sin riesgo de pérdida de datos).
 - Variables de entorno configuradas (`SUPABASE_URL`, `SUPABASE_ANON_KEY`).
 - Sitio desplegado en Vercel (o servido localmente con `npx serve .` tras `npm run build`).
 
 ### 2. Ejecución
-Seguir manualmente los 7 escenarios anteriores, usando dos pestañas/dispositivos.
+Seguir manualmente los 8 escenarios anteriores, usando dos pestañas/dispositivos.
 
 ## Limitación en este entorno de trabajo
 No se dispone de un proyecto Supabase real conectado en este entorno para ejecutar estos escenarios automáticamente. **Quedan pendientes de verificación manual por el usuario** tras el despliegue.

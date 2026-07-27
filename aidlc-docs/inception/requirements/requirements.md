@@ -247,3 +247,56 @@ La barra de selección (visible solo cuando hay ≥1 producto seleccionado) aña
 
 ## Alcance de esta iteración
 Se procede directamente a Functional Design (definir el detalle de migración de `quantity`, jerarquía de componentes del wizard, y reglas de negocio de sugerencias/categorías con icono) sin pasar por User Stories, por el mismo criterio que la Pantalla 1.
+
+---
+
+## CICLO 2 — Historial en Tickets (Unidad 7)
+
+### Intent Analysis Summary
+- **User Request**: Agrupar las compras marcadas como "bought" en tickets (una compra = un ticket), cada uno con su propio modal de detalle, que se puede deshacer o eliminar como unidad. Los filtros actuales (nombre, rango de fechas) deben seguir funcionando igual, pero operando sobre tickets.
+- **Request Type**: Enhancement (rediseño del modelo de datos e interfaz de FR-3/Historial, Unidad 3)
+- **Scope Estimate**: Multiple Components (esquema de datos, flujo de "Marcar como comprados", vista de historial, nuevo modal de ticket)
+- **Complexity Estimate**: Moderate (cambio de esquema con tabla nueva y FK, sin lógica de negocio compleja)
+- **Depth Applied**: Standard
+
+### Contexto técnico relevante
+Todas las acciones de "marcar como comprado" pasan hoy por la barra de selección en lote (`selection-bar.js` → `product-list.js`), que actualiza todos los productos seleccionados con el **mismo** `bought_at`, en una sola operación `.update(...).in('id', ids)`. No existe ningún otro punto de la app donde un producto pase a `status = 'bought'`. Por tanto, cada acción de "Comprados" ya equivale, uno a uno, a una compra completa.
+
+### FR-18: Modelo de datos — tabla `purchases`
+- FR-18.1: Nueva tabla `purchases` (`id`, `household_id`, `bought_by`, `bought_at`) + columna `purchase_id` (FK) en `products`.
+- FR-18.2: La acción "Marcar como comprados" (selección en lote) crea un único registro en `purchases` y asigna su `id` como `purchase_id` a todos los productos seleccionados, en la misma operación.
+- FR-18.3: No hay migración retroactiva de compras anteriores a este cambio — se asume que no hay datos reales de historial que preservar (decisión explícita del usuario). El historial existente puede limpiarse como parte de la migración de esquema.
+
+### FR-19: Vista de historial — lista de tickets
+- FR-19.1: La vista de historial (antes lista plana de productos) pasa a mostrar una **lista de tickets**, orden cronológico (más reciente primero) por `bought_at` del ticket.
+- FR-19.2: Cada entrada de la lista principal muestra: fecha y hora de la compra, quién la marcó como comprada (`bought_by`) y el número de productos del ticket. El detalle de productos solo se ve al abrir el modal (no hay preview de nombres en la lista).
+- FR-19.3: Al pulsar un ticket se abre un modal (reutilizando `common/modal.js`) con el detalle: nombre y cantidad de cada producto del ticket.
+
+### FR-20: Acciones sobre el ticket completo
+- FR-20.1: Desde el modal, "Deshacer ticket" revierte **todos** los productos del ticket a `status = 'pending'` (`bought_by = null`, `bought_at = null`, `purchase_id = null`) y elimina el registro de `purchases`.
+- FR-20.2: Desde el modal, "Eliminar ticket" elimina **todos** los productos del ticket y el propio registro de `purchases`.
+- FR-20.3: Ambas acciones son optimistas (mismo patrón `applyOptimistic` ya usado en el historial actual), con reversión visual y mensaje de error genérico si falla la operación remota.
+
+### FR-21: Acciones sobre un producto individual dentro del ticket
+- FR-21.1: Dentro del modal, cada producto individual tiene también sus propios botones "Desmarcar" y "Eliminar" (mismo comportamiento que hoy en el historial plano), independientes de las acciones de ticket completo.
+- FR-21.2: Si estas acciones dejan el ticket sin productos (se desmarcan/eliminan todos individualmente), el registro de `purchases` correspondiente se elimina también (un ticket vacío no debe quedar huérfano en la base de datos), y el modal se cierra.
+
+### FR-22: Filtros (mismo comportamiento, ahora sobre tickets)
+- FR-22.1: Mismo UI de filtros que hoy (`history-filters.js`, sin cambios): búsqueda por nombre + rango de fechas + "Limpiar filtros".
+- FR-22.2: Filtro por nombre: un ticket aparece en los resultados si **al menos uno** de sus productos coincide con el nombre buscado; el ticket se muestra completo (con todos sus productos) en el modal, no solo el que coincide.
+- FR-22.3: Filtro por fecha: se aplica sobre la fecha del ticket (`bought_at` de `purchases`), mismo rango que hoy.
+- FR-22.4: Paginación/límite: la unidad pasa a ser el ticket en vez del producto — 20 tickets por página sin filtro activo (reutilizando `common/pagination.js`), hasta 2000 tickets cargados sin paginar cuando hay un filtro activo (mismo patrón que hoy, límite `FILTERED_FETCH_LIMIT`).
+
+### FR-23: Estadísticas — sin cambios
+- FR-23.1: Las estadísticas (Unidad 3, `stats-page.js` / `calculations.js`) no cambian: siguen calculando el ranking de productos más comprados directamente sobre `products` con `status = 'bought'`, por producto individual, sin relación con el número de tickets.
+
+### Non-Functional Requirements
+
+**NFR-9 (esquema)**: la migración de esquema (`supabase/schema.sql`) añade la tabla `purchases` y la columna `products.purchase_id` (FK con `on delete cascade` desde `purchases` hacia `products`, para que eliminar un ticket elimine sus productos sin necesitar dos operaciones separadas desde el cliente — a confirmar en NFR Design). Reutiliza el patrón aditivo ya usado en Unidad 5/6 (bloques `alter table ... add column if not exists`).
+
+**NFR-10**: reutilización de patrones ya establecidos: `applyOptimistic` para las acciones sobre ticket y sobre producto individual, `common/modal.js` para el modal de detalle, fail-fast sin reintentos, mensajes de error genéricos, vanilla JS/CSS sin librerías de UI externas.
+
+**NFR-11**: seguridad (Security Baseline activada, ver NFR-3 global) — RLS sobre `purchases` sigue el mismo modelo permisivo ya usado en `products` (acceso por `household_id`, sin autenticación propia), consistente con la excepción SECURITY-08 ya aceptada para el proyecto.
+
+## Alcance de esta iteración (Ciclo 2 — Unidad 7)
+Se procede directamente a Functional Design (definir el detalle de la migración de esquema, ciclo de vida del ticket huérfano, y componentes del modal) sin pasar por User Stories, por el mismo criterio que las Pantallas 1 y 2.

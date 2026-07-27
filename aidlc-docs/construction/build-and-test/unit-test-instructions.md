@@ -8,12 +8,12 @@ npm test
 ```
 
 ### 2. Review Test Results
-- **Expected**: 174 tests pass, 0 failures, en 32 archivos de test (Unidades 1-6)
+- **Expected**: 214 tests pass, 0 failures, en 36 archivos de test (Unidades 1-7)
 - **Test Coverage**: no se mide cobertura formal (sin herramienta de coverage configurada); la cobertura funcional se rastrea vía trazabilidad manual a historias de usuario (ver cada `frontend-summary.md`/`business-logic-summary.md` por unidad)
 - **Test Report Location**: salida de consola de Vitest (no se genera reporte HTML en esta configuración)
 
 ### 3. Resultado real verificado en este entorno
-174/174 tests pasan. Desglose por archivo:
+214/214 tests pasan. Desglose por archivo:
 
 | Archivo | Tests |
 |---|---|
@@ -24,22 +24,26 @@ npm test
 | tests/common/dropdown-menu.test.js | 4 |
 | tests/common/confirm-modal.test.js | 5 |
 | tests/common/qr-modal.test.js | 1 |
+| tests/common/realtime-subscription.test.js | 7 |
 | tests/list/product-item.test.js | 8 |
 | tests/list/product-wizard-modal.test.js | 11 |
-| tests/list/product-list.test.js | 9 |
+| tests/list/product-list.test.js | 14 |
 | tests/list/categories.test.js | 4 |
 | tests/list/suggested-products.test.js | 7 |
 | tests/list/change-name-modal.test.js | 2 |
 | tests/list/list-header.test.js | 3 |
 | tests/list/greeting.test.js | 2 |
-| tests/list/tabs.test.js | 3 |
+| tests/list/tabs.test.js | 5 |
 | tests/onboarding/name-prompt.test.js | 5 |
 | tests/onboarding/qr-view.test.js | 3 |
 | tests/bulk-actions/selection-state.test.js | 9 |
-| tests/bulk-actions/selection-bar.test.js | 6 |
-| tests/bulk-actions/realtime-subscription.test.js | 5 |
+| tests/bulk-actions/selection-bar.test.js | 9 |
 | tests/history/filters.test.js | 5 |
 | tests/history/history-filters.test.js | 2 |
+| tests/history/ticket-row.test.js | 3 |
+| tests/history/ticket-product-row.test.js | 4 |
+| tests/history/ticket-modal.test.js | 8 |
+| tests/history/history-list.test.js | 12 |
 | tests/stats/calculations.test.js | 11 |
 | tests/stats/stats-ranking.test.js | 2 |
 | tests/stats/stats-cadence.test.js | 3 |
@@ -49,12 +53,12 @@ npm test
 | tests/home/list-card.test.js | 4 |
 | tests/home/list-form-modal.test.js | 4 |
 | tests/home/home-screen.test.js | 5 |
-| **Total** | **174** |
+| **Total** | **214** |
 
 ### 4. Fix Failing Tests
 Si un test falla:
 1. Revisar la salida de Vitest en consola (incluye diff esperado/recibido y, para PBT con fast-check, el caso mínimo reproducible tras shrinking).
-2. Determinar si el fallo es un bug de producción o un bug del propio test. Durante la Unidad 6, los tests nuevos encontraron **2 bugs reales de producción** (no de los tests): `getCategoryIcon` con un objeto plano vulnerable a nombres de propiedad heredados (`"valueOf"`), y una falta de re-render tras insertar un producto — ver `build-and-test-summary.md`.
+2. Determinar si el fallo es un bug de producción o un bug del propio test. Durante la Unidad 6, los tests nuevos encontraron **2 bugs reales de producción** (no de los tests): `getCategoryIcon` con un objeto plano vulnerable a nombres de propiedad heredados (`"valueOf"`), y una falta de re-render tras insertar un producto — ver `build-and-test-summary.md`. La Unidad 7 no encontró bugs de producción nuevos.
 3. Corregir y volver a ejecutar `npm test` hasta que todo pase.
 
 ## Property-Based Testing (PBT) — notas de ejecución

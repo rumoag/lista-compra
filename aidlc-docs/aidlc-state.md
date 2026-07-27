@@ -116,6 +116,23 @@
 ### Próximas pantallas
 Pendientes de que el usuario las describa una a una (a petición explícita: "vamos a ir 1 a 1").
 
+### Historial en Tickets (Unidad 7)
+- [x] Requirements Analysis — 8 preguntas de aclaración respondidas (modelo con tabla `purchases` + FK, sin migración retroactiva, acciones individuales dentro del modal permitidas, filtros por "al menos un producto coincide", paginación/límite por ticket, estadísticas sin cambios); requirements.md ampliado con sección "Ciclo 2 — Historial en Tickets"; aprobado
+- [x] Functional Design — 10 preguntas de aclaración respondidas (hack de `created_at` para reutilizar paginador, confirmación antes de deshacer/eliminar ticket completo, join completo purchases+products al cargar la lista, conteo siempre total, filtro reutilizando `filters.js` sobre productos, cascade de borrado, limpieza de huérfano en cliente); domain-entities/business-rules (BR-50 a BR-58)/business-logic-model/frontend-components generados; aprobado
+- [x] NFR Requirements — migración aditiva sin riesgo, sin límites nuevos, RLS permisivo reutilizado, sin cambios de stack; aprobado
+- [x] NFR Design — fail-fast sin compensación en operaciones multi-paso, sin componentes de infraestructura nuevos; aprobado
+- [x] Infrastructure Design — mismo entorno Vercel+Supabase, migración manual aditiva, Realtime habilitado en `purchases` (alcance completo INSERT+DELETE, BR-59 añadida retroactivamente a Functional Design + generalización de `realtime-subscription.js` a `common/` en NFR Design); aprobado
+- [x] Code Generation — migración de esquema, `common/realtime-subscription.js` generalizado, `ticket-row.js`/`ticket-product-row.js`/`ticket-modal.js` nuevos, `history-list.js` reescrito, `product-list.js` crea el ticket (BR-50); 214/214 tests pasan (36 nuevos/actualizados); `npm run build` verificado
+
+- [x] Build and Test (incremental) — build success, 214/214 tests, integration-test-instructions.md/security-test-instructions.md/build-and-test-summary.md/unit-test-instructions.md actualizados con el Scenario 8
+
+**UNIDAD 7 (Historial en Tickets): COMPLETA Y APROBADA** — próximo paso del usuario: ejecutar el bloque nuevo de `supabase/schema.sql` (`-- Unidad 7 — Historial en tickets`) en el proyecto Supabase ya desplegado, y verificar manualmente el Scenario 8 de `integration-test-instructions.md` (historial en vivo entre los dos móviles).
+- [ ] NFR Requirements
+- [ ] NFR Design
+- [ ] Infrastructure Design
+- [ ] Code Generation
+- [ ] Build and Test (incremental)
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.
