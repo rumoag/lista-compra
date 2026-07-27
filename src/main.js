@@ -13,6 +13,7 @@ import { renderTabs } from './list/tabs.js';
 import { renderProductList } from './list/product-list.js';
 import { renderHistoryList } from './history/history-list.js';
 import { renderStatsPage } from './stats/stats-page.js';
+import { openAddProductWizard } from './list/add-product.js';
 
 const appMain = document.getElementById('app-main');
 const appHeader = document.querySelector('[data-testid="app-header"]');
@@ -46,14 +47,18 @@ async function start() {
   appMain.innerHTML = `
     <div id="greeting-container"></div>
     <div id="list-header-container"></div>
-    <nav id="app-tabs" class="tabs-nav" data-testid="app-tabs"></nav>
     <div id="app-view"></div>
+    <div class="floating-bar" data-testid="floating-bar">
+      <nav id="app-tabs" class="tabs-nav" data-testid="app-tabs"></nav>
+      <button type="button" class="fab" data-testid="add-product-fab-button" aria-label="Añadir producto">+</button>
+    </div>
   `;
 
   const headerContainer = appMain.querySelector('#list-header-container');
   const greetingContainer = appMain.querySelector('#greeting-container');
   const tabsNav = appMain.querySelector('#app-tabs');
   const viewContainer = appMain.querySelector('#app-view');
+  const fabButton = appMain.querySelector('[data-testid="add-product-fab-button"]');
 
   function handleChangeName() {
     openChangeNameModal({
@@ -64,6 +69,8 @@ async function start() {
   renderListHeader(headerContainer, { household });
   renderGreeting(greetingContainer, { household, onChangeName: handleChangeName });
   renderTabs(tabsNav, viewContainer, { views: VIEWS, householdId, initialView: 'list' });
+  // FAB persistente entre Lista/Historial/Estadísticas: ya no depende de la vista montada.
+  fabButton.addEventListener('click', () => openAddProductWizard({ householdId }));
 }
 
 start();

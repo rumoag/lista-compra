@@ -319,18 +319,29 @@ button.secondary {
   font-size: 0.95rem;
 }
 
-.tabs-nav {
+/* Toolbar flotante (tabs) + FAB agrupados en una sola barra, centrada en pantalla y
+   persistente entre Lista/Historial/Estadísticas: ambos elementos comparten alto. */
+.floating-bar {
   position: fixed;
   bottom: 1.25rem;
-  right: calc(50% + 40px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.tabs-nav {
+  display: flex;
+  align-items: center;
   gap: 0.25rem;
+  height: 52px;
+  box-sizing: border-box;
   background: rgba(127, 127, 127, 0.16);
   backdrop-filter: blur(8px);
   border-radius: 999px;
-  padding: 0.35rem;
+  padding: 0 0.35rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -339,12 +350,13 @@ button.secondary {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  height: calc(100% - 0.5rem);
   text-align: center;
   background: transparent;
   color: inherit;
   border: none;
   border-radius: 999px;
-  padding: 0.5rem 0.85rem;
+  padding: 0 0.85rem;
   font-size: 0.85rem;
   white-space: nowrap;
 }
@@ -382,12 +394,9 @@ button.secondary {
 }
 
 .fab {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
+  flex: none;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   font-size: 1.8rem;
   line-height: 1;
