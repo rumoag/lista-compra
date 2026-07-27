@@ -35,6 +35,9 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-61: Acciones individuales como iconos (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: dentro del modal de ticket, "Desmarcar" y "Eliminar" por producto (BR-53) pasan de botones de texto a botones de icono (`common/icon-button`, mismo patrón ya usado en `bulk-actions/selection-bar.js`): ↩️ para desmarcar, 🗑️ para eliminar, cada uno con `title`/`aria-label` descriptivo. Sin cambio de comportamiento, solo de presentación.
+
 ## BR-60: Scroll infinito en el historial (petición de seguimiento del usuario, post-aprobación)
 - **Regla**: se sustituye el botón "Cargar más" por una carga automática de la siguiente página cuando un elemento centinela al final de la lista entra en el viewport (`IntersectionObserver`), mismo patrón exacto que BR-48 (Unidad 6, `list/product-list.js`). Solo aplica en modo paginado (sin filtro activo, BR-56/BR-57); mientras hay un filtro activo no se dispara ninguna carga adicional, ya que ese modo no pagina.
 

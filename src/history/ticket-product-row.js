@@ -14,8 +14,20 @@ export function renderTicketProductRow(product, { onUnmark, onDelete }) {
       ${quantity ? `<div class="meta" data-testid="ticket-product-quantity">${escapeHtml(quantity)}</div>` : ''}
     </div>
     <div>
-      <button type="button" class="secondary" data-testid="ticket-product-unmark-button">Desmarcar</button>
-      <button type="button" class="secondary" data-testid="ticket-product-delete-button">Eliminar</button>
+      <button
+        type="button"
+        class="icon-button"
+        data-testid="ticket-product-unmark-button"
+        title="Desmarcar"
+        aria-label="Desmarcar"
+      >↩️</button>
+      <button
+        type="button"
+        class="icon-button"
+        data-testid="ticket-product-delete-button"
+        title="Eliminar"
+        aria-label="Eliminar"
+      >🗑️</button>
     </div>
   `;
 

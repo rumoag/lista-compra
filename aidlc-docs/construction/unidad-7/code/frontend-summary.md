@@ -35,5 +35,8 @@
 ## Documentación
 - **Modificado**: `README.md` (estado actual, nota de migración ampliada a Unidad 7, estructura del proyecto, referencia a Realtime sobre `purchases`).
 
+## Iconos en acciones individuales (BR-61, seguimiento post-aprobación)
+- **Modificado**: `src/history/ticket-product-row.js` — "Desmarcar"/"Eliminar" pasan de botones de texto a `icon-button` (↩️/🗑️), mismo patrón que `bulk-actions/selection-bar.js`. Sin cambios de comportamiento ni de tests (no aserta contenido textual de los botones).
+
 ## Verificación
-`npm test`: 216/216 tests pasan (38 nuevos/actualizados, incluyendo BR-60). `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).
+`npm test`: 216/216 tests pasan. `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).
