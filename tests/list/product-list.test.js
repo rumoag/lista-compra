@@ -48,7 +48,7 @@ vi.mock('../../src/onboarding/name-prompt.js', () => ({
   getLocalName: vi.fn(() => 'Ana'),
 }));
 
-vi.mock('../../src/bulk-actions/realtime-subscription.js', () => ({
+vi.mock('../../src/common/realtime-subscription.js', () => ({
   createRealtimeSubscription: vi.fn(() => ({ subscribe: vi.fn(), unsubscribe: vi.fn() })),
 }));
 
@@ -282,5 +282,31 @@ describe('renderProductList (Unidad 6)', () => {
 
     expect(container.querySelector('[data-testid="product-item-p-last"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="selection-bar-count"]').textContent).toContain('41');
+  });
+
+  it('marcar como comprados crea un ticket (purchases) y enlaza los productos seleccionados (BR-50)', async () => {
+    queueResponse({ data: [makeProduct({ id: 'p1' }), makeProduct({ id: 'p2' })], error: null }); // primera página
+    queueResponse({ data: { id: 'ticket-1' }, error: null }); // insert purchases -> select().single()
+    queueResponse({ error: null }); // update products
+    const container = mount();
+    await renderProductList(container, { householdId: 'h1' });
+
+    container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
+    container.querySelector('[data-testid="product-item-p2"] [data-testid="product-item-body"]').click();
+    container.querySelector('[data-testid="selection-bar-mark-bought-button"]').click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    const purchasesBuilder = createdBuilders.find((b) => b.insert.mock.calls.length > 0);
+    expect(purchasesBuilder.insert).toHaveBeenCalledWith(
+      expect.objectContaining({ household_id: 'h1', bought_by: 'Ana' })
+    );
+
+    const updateBuilder = createdBuilders.find((b) => b.update.mock.calls.length > 0);
+    expect(updateBuilder.update).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'bought', bought_by: 'Ana', purchase_id: 'ticket-1' })
+    );
+    expect(updateBuilder.in).toHaveBeenCalledWith('id', ['p1', 'p2']);
+    expect(container.querySelector('[data-testid="product-item-p1"]')).toBeNull();
+    expect(container.querySelector('[data-testid="product-item-p2"]')).toBeNull();
   });
 });

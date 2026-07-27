@@ -121,3 +121,34 @@ alter table products add constraint products_quantity_unit_length check (quantit
 
 -- Elimina la columna y el constraint de longitud de la Unidad 1 asociado a ella
 alter table products drop column quantity;
+
+-- ---------------------------------------------------------------------------
+-- Unidad 7 — Historial en tickets (una compra = un ticket, ver domain-entities.md
+-- de la Unidad 7). Migración puramente aditiva: tabla nueva + columna nueva
+-- nullable, sin eliminar ni transformar datos existentes (NFR-9).
+-- ---------------------------------------------------------------------------
+create table if not exists purchases (
+  id uuid primary key default gen_random_uuid(),
+  household_id uuid not null references households(id) on delete cascade,
+  bought_by text not null,
+  bought_at timestamptz not null
+);
+
+-- Índice para paginación por cursor (bought_at) dentro de un household (BR-57)
+create index if not exists purchases_household_bought_at_idx
+  on purchases (household_id, bought_at desc);
+
+alter table purchases enable row level security;
+
+-- RLS permisiva, mismo patrón que products/households (NFR-11, excepción SECURITY-08 ya aceptada).
+create policy purchases_select on purchases for select using (true);
+create policy purchases_insert on purchases for insert with check (true);
+create policy purchases_update on purchases for update using (true) with check (true);
+create policy purchases_delete on purchases for delete using (true);
+
+-- BR-52: eliminar un ticket elimina en cascada todos sus productos.
+alter table products add column if not exists purchase_id uuid references purchases(id) on delete cascade;
+
+-- BR-59: historial en vivo — necesario para que Supabase emita eventos
+-- postgres_changes (INSERT/DELETE) sobre purchases.
+alter publication supabase_realtime add table purchases;

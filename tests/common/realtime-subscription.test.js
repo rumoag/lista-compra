@@ -13,7 +13,7 @@ vi.mock('../../src/common/supabase-client.js', () => ({
 }));
 
 const { supabase } = await import('../../src/common/supabase-client.js');
-const { createRealtimeSubscription } = await import('../../src/bulk-actions/realtime-subscription.js');
+const { createRealtimeSubscription } = await import('../../src/common/realtime-subscription.js');
 
 describe('createRealtimeSubscription', () => {
   beforeEach(() => {
@@ -22,15 +22,24 @@ describe('createRealtimeSubscription', () => {
     mockChannel.subscribe.mockReturnThis();
   });
 
-  it('crea un canal con el nombre derivado del householdId', () => {
-    const sub = createRealtimeSubscription({ householdId: 'abc-123' });
+  it('crea un canal con el nombre derivado de la tabla y el householdId', () => {
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'products' });
     sub.subscribe({ onInsert: vi.fn(), onUpdate: vi.fn(), onDelete: vi.fn() });
 
     expect(supabase.channel).toHaveBeenCalledWith('products-abc-123');
   });
 
+  it('usa la tabla indicada para un table distinto (BR-59)', () => {
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'purchases' });
+    sub.subscribe({ onInsert: vi.fn(), onUpdate: vi.fn(), onDelete: vi.fn() });
+
+    expect(supabase.channel).toHaveBeenCalledWith('purchases-abc-123');
+    const events = mockChannel.on.mock.calls.map((call) => call[1]);
+    events.forEach((event) => expect(event.table).toBe('purchases'));
+  });
+
   it('se suscribe a los eventos INSERT, UPDATE y DELETE (BR-9)', () => {
-    const sub = createRealtimeSubscription({ householdId: 'abc-123' });
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'products' });
     sub.subscribe({ onInsert: vi.fn(), onUpdate: vi.fn(), onDelete: vi.fn() });
 
     const events = mockChannel.on.mock.calls.map((call) => call[1].event);
@@ -39,7 +48,7 @@ describe('createRealtimeSubscription', () => {
 
   it('invoca onInsert con el nuevo registro al recibir un evento INSERT', () => {
     const onInsert = vi.fn();
-    const sub = createRealtimeSubscription({ householdId: 'abc-123' });
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'products' });
     sub.subscribe({ onInsert, onUpdate: vi.fn(), onDelete: vi.fn() });
 
     const insertHandler = mockChannel.on.mock.calls.find((call) => call[1].event === 'INSERT')[2];
@@ -48,8 +57,19 @@ describe('createRealtimeSubscription', () => {
     expect(onInsert).toHaveBeenCalledWith({ id: 'p1' });
   });
 
+  it('invoca onDelete con el registro anterior al recibir un evento DELETE', () => {
+    const onDelete = vi.fn();
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'purchases' });
+    sub.subscribe({ onInsert: vi.fn(), onUpdate: vi.fn(), onDelete });
+
+    const deleteHandler = mockChannel.on.mock.calls.find((call) => call[1].event === 'DELETE')[2];
+    deleteHandler({ old: { id: 't1' } });
+
+    expect(onDelete).toHaveBeenCalledWith({ id: 't1' });
+  });
+
   it('unsubscribe llama a supabase.removeChannel con el canal creado', () => {
-    const sub = createRealtimeSubscription({ householdId: 'abc-123' });
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'products' });
     sub.subscribe({ onInsert: vi.fn(), onUpdate: vi.fn(), onDelete: vi.fn() });
 
     sub.unsubscribe();
@@ -58,7 +78,7 @@ describe('createRealtimeSubscription', () => {
   });
 
   it('unsubscribe sin haberse suscrito antes no falla', () => {
-    const sub = createRealtimeSubscription({ householdId: 'abc-123' });
+    const sub = createRealtimeSubscription({ householdId: 'abc-123', table: 'products' });
     expect(() => sub.unsubscribe()).not.toThrow();
     expect(supabase.removeChannel).not.toHaveBeenCalled();
   });

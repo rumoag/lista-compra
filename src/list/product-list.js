@@ -12,7 +12,7 @@ import { fetchSuggestedProducts } from './suggested-products.js';
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { createSelectionState } from '../bulk-actions/selection-state.js';
 import { renderSelectionBar } from '../bulk-actions/selection-bar.js';
-import { createRealtimeSubscription } from '../bulk-actions/realtime-subscription.js';
+import { createRealtimeSubscription } from '../common/realtime-subscription.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 
 const PAGE_SIZE = 20;
@@ -36,7 +36,7 @@ export async function renderProductList(container, { householdId }) {
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const selection = createSelectionState();
-  const realtime = createRealtimeSubscription({ householdId });
+  const realtime = createRealtimeSubscription({ householdId, table: 'products' });
 
   let hasMore = true;
   let isLoadingMore = false;
@@ -224,11 +224,15 @@ export async function renderProductList(container, { householdId }) {
   }
 
   // BR-11: marcar en lote como una única transacción lógica (revert total ante cualquier fallo).
+  // BR-50 (Unidad 7): la acción crea un único ticket (purchases) y enlaza todos los
+  // productos seleccionados a ese ticket, en la misma operación optimista.
   async function handleMarkAsBought() {
     const ids = [...selection.getSelection()];
     if (ids.length === 0) return;
 
     const removedItems = paginator.getItems().filter((item) => ids.includes(item.id));
+    const boughtBy = getLocalName();
+    const boughtAt = new Date().toISOString();
 
     await applyOptimistic({
       apply: () => {
@@ -242,9 +246,16 @@ export async function renderProductList(container, { householdId }) {
         renderList();
       },
       remoteOperation: async () => {
+        const { data: purchase, error: purchaseError } = await supabase
+          .from('purchases')
+          .insert({ household_id: householdId, bought_by: boughtBy, bought_at: boughtAt })
+          .select()
+          .single();
+        if (purchaseError) throw purchaseError;
+
         const { error } = await supabase
           .from('products')
-          .update({ status: 'bought', bought_by: getLocalName(), bought_at: new Date().toISOString() })
+          .update({ status: 'bought', bought_by: boughtBy, bought_at: boughtAt, purchase_id: purchase.id })
           .in('id', ids);
         if (error) throw error;
       },
