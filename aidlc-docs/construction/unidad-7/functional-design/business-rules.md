@@ -35,6 +35,10 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-62: Estética de ticket físico en el modal (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: el cuerpo del modal de ticket se presenta como un ticket de compra físico: papel (color fijo, no dependiente del tema claro/oscuro de la app — un ticket real es siempre papel claro), tipografía monoespaciada, cabecera centrada ("🧾 TICKET DE COMPRA" + fecha + quién compró), líneas discontinuas entre secciones, fila de "TOTAL" con el número de productos, mensaje "¡GRACIAS POR TU COMPRA!" y una barra decorativa tipo código de barras (puramente visual, `aria-hidden`). Bordes superior/inferior dentados simulando el corte de un ticket real.
+- **Alcance**: solo la presentación del modal — sin cambios de comportamiento, datos ni acciones (BR-51 a BR-54 sin cambios). Las acciones sobre el ticket completo ("Deshacer ticket"/"Eliminar ticket") quedan fuera del área de "papel", como controles de la aplicación.
+
 ## BR-61: Acciones individuales como iconos (petición de seguimiento del usuario, post-aprobación)
 - **Regla**: dentro del modal de ticket, "Desmarcar" y "Eliminar" por producto (BR-53) pasan de botones de texto a botones de icono (`common/icon-button`, mismo patrón ya usado en `bulk-actions/selection-bar.js`): ↩️ para desmarcar, 🗑️ para eliminar, cada uno con `title`/`aria-label` descriptivo. Sin cambio de comportamiento, solo de presentación.
 

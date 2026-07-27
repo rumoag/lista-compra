@@ -38,5 +38,10 @@
 ## Iconos en acciones individuales (BR-61, seguimiento post-aprobación)
 - **Modificado**: `src/history/ticket-product-row.js` — "Desmarcar"/"Eliminar" pasan de botones de texto a `icon-button` (↩️/🗑️), mismo patrón que `bulk-actions/selection-bar.js`. Sin cambios de comportamiento ni de tests (no aserta contenido textual de los botones).
 
+## Estética de ticket físico (BR-62, seguimiento post-aprobación)
+- **Modificado**: `src/history/ticket-modal.js` — el cuerpo del modal se reestructura como un ticket de compra (papel, monoespaciado, cabecera centrada, líneas discontinuas, total, código de barras decorativo, bordes dentados), sin cambios de comportamiento ni de tests (mismos `data-testid`).
+- **Modificado**: `css/style.css` — nuevas clases `.receipt`/`.receipt-*` (color de papel fijo, independiente del tema claro/oscuro de la app, a propósito).
+- Verificado visualmente con una página de prueba temporal (Browser pane), luego eliminada.
+
 ## Verificación
 `npm test`: 216/216 tests pasan. `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).

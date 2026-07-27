@@ -18,9 +18,32 @@ import { renderTicketProductRow } from './ticket-product-row.js';
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
   const { body, close } = openModal({ title: new Date(purchase.bought_at).toLocaleString('es-ES') });
 
+  // BR-62 (seguimiento post-aprobación): el cuerpo del modal imita visualmente un ticket
+  // de compra físico (papel, tipografía monoespaciada, líneas discontinuas, borde
+  // dentado, código de barras decorativo). Las acciones sobre el ticket completo quedan
+  // fuera del "papel", como controles de la aplicación, no como parte del documento.
   body.innerHTML = `
-    <div class="error-message" data-testid="ticket-modal-error" hidden></div>
-    <div data-testid="ticket-modal-products"></div>
+    <div class="receipt" data-testid="ticket-modal-receipt">
+      <div class="receipt-zigzag receipt-zigzag--top" aria-hidden="true"></div>
+      <div class="receipt-content">
+        <div class="receipt-header">
+          <div class="receipt-title">🧾 TICKET DE COMPRA</div>
+          <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
+          <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
+        </div>
+        <div class="receipt-divider"></div>
+        <div class="error-message" data-testid="ticket-modal-error" hidden></div>
+        <div class="receipt-items" data-testid="ticket-modal-products"></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-total">
+          <span>TOTAL</span>
+          <span data-testid="ticket-modal-total"></span>
+        </div>
+        <div class="receipt-footer">¡GRACIAS POR TU COMPRA!</div>
+        <div class="receipt-barcode" aria-hidden="true"></div>
+      </div>
+      <div class="receipt-zigzag receipt-zigzag--bottom" aria-hidden="true"></div>
+    </div>
     <div class="confirm-modal-actions">
       <button type="button" class="secondary" data-testid="ticket-modal-undo-button">Deshacer ticket</button>
       <button type="button" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
@@ -28,6 +51,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   `;
 
   const productsContainer = body.querySelector('[data-testid="ticket-modal-products"]');
+  const totalEl = body.querySelector('[data-testid="ticket-modal-total"]');
   const errorEl = body.querySelector('[data-testid="ticket-modal-error"]');
 
   function showError(message) {
@@ -45,6 +69,8 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
         })
       );
     });
+    const count = purchase.products.length;
+    totalEl.textContent = `${count} producto${count === 1 ? '' : 's'}`;
   }
 
   // BR-53/BR-54: quita el producto de la vista, ejecuta su operación remota y, si el
@@ -155,4 +181,8 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   renderProducts();
 
   return { close };
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
