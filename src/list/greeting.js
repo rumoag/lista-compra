@@ -1,23 +1,31 @@
-// Topbar superior: saludo con nombre local (BR-45) + menú de 3 puntos de la lista (BR-46,
-// movido aquí desde list-header.js para que este contenedor tenga el mismo tamaño que el
-// header fijo de selección y el cambio entre ambos no salte visualmente).
+// Topbar superior (BR-45/BR-46): título de la lista (icono+nombre) a la izquierda, y a la
+// derecha un botón circular con la inicial del nombre local que abre el menú de opciones de
+// la lista — el saludo "Hola, X" vive ahora como primera entrada de ese menú en vez de como
+// texto suelto en la topbar, y el toggle deja de ser "3 puntos" para mostrar la inicial.
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
 import { openQrModal } from '../common/qr-modal.js';
 
 export function renderGreeting(container, { household, onChangeName }) {
+  const name = getLocalName() ?? '';
+  const initial = name.trim().charAt(0).toUpperCase() || '?';
+
   container.innerHTML = `
     <div class="list-topbar" data-testid="list-topbar">
-      <button type="button" class="greeting" data-testid="greeting">Hola, ${escapeHtml(getLocalName() ?? '')}</button>
+      <div class="list-header-title" data-testid="list-header-title">
+        <span data-testid="list-header-icon">${escapeHtml(household.image_icon)}</span>
+        <span>${escapeHtml(household.title)}</span>
+      </div>
       <div data-testid="list-topbar-menu-container"></div>
     </div>
   `;
 
-  container.querySelector('[data-testid="greeting"]').addEventListener('click', onChangeName);
-
   renderDropdownMenu(container.querySelector('[data-testid="list-topbar-menu-container"]'), {
+    toggleClass: 'avatar-button',
+    toggleContent: escapeHtml(initial),
+    toggleLabel: 'Opciones de la lista',
     actions: [
-      { testid: 'change-name', label: 'Cambiar nombre', onClick: onChangeName },
+      { testid: 'change-name', label: `Hola, ${escapeHtml(name)}`, onClick: onChangeName },
       { testid: 'qr', label: 'Ver QR', onClick: () => openQrModal({ householdId: household.id }) },
       { testid: 'back', label: 'Volver al listado de listas', onClick: () => (window.location.href = '/') },
     ],

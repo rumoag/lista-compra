@@ -68,4 +68,33 @@ describe('renderDropdownMenu', () => {
 
     expect(container.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(true);
   });
+
+  it('sin personalizar, el toggle son los "3 puntos" por defecto', () => {
+    const container = mount();
+    renderDropdownMenu(container, { actions: makeActions() });
+
+    const toggle = container.querySelector('[data-testid="dropdown-menu-toggle"]');
+    expect(toggle.textContent).toBe('⋮');
+    expect(toggle.className).toBe('secondary');
+  });
+
+  it('permite personalizar el toggle (ej. avatar con inicial) sin afectar el resto del comportamiento', () => {
+    const container = mount();
+    const actions = makeActions();
+    renderDropdownMenu(container, {
+      actions,
+      toggleClass: 'avatar-button',
+      toggleContent: 'A',
+      toggleLabel: 'Opciones de la lista',
+    });
+
+    const toggle = container.querySelector('[data-testid="dropdown-menu-toggle"]');
+    expect(toggle.textContent).toBe('A');
+    expect(toggle.className).toBe('avatar-button');
+    expect(toggle.getAttribute('aria-label')).toBe('Opciones de la lista');
+
+    toggle.click();
+    container.querySelector('[data-testid="dropdown-menu-edit"]').click();
+    expect(actions[0].onClick).toHaveBeenCalled();
+  });
 });

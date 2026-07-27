@@ -1,12 +1,11 @@
 // Punto de entrada — enrutado mínimo por household_id en la URL (US-5.2, US-5.3).
 // Sin householdId: pantalla de inicio con el listado de listas activas (Unidad 5).
-// Con householdId: cabecera (icono+título+menú) + saludo + tabs Lista/Historial/Estadísticas
+// Con householdId: topbar (icono+título+avatar con menú) + tabs Lista/Historial/Estadísticas
 // (Unidad 6 — sustituye la barra de navegación de botones y el botón "Cambiar nombre" sueltos
-// de las Unidades 1-4; el QR se movió al menú de la cabecera).
+// de las Unidades 1-4; el saludo "Hola, X" vive ahora dentro del menú del avatar).
 import { renderHomeScreen } from './home/home-screen.js';
 import { fetchHousehold } from './home/households-api.js';
 import { ensureLocalName } from './onboarding/name-prompt.js';
-import { renderListHeader } from './list/list-header.js';
 import { renderGreeting } from './list/greeting.js';
 import { openChangeNameModal } from './list/change-name-modal.js';
 import { renderTabs } from './list/tabs.js';
@@ -38,7 +37,7 @@ async function start() {
   }
 
   // La cabecera estática solo tiene sentido en la pantalla de inicio (listado de
-  // listas); dentro de una lista concreta, list-header.js ya muestra su icono+título.
+  // listas); dentro de una lista concreta, greeting.js ya muestra icono+título+menú.
   if (appHeader) appHeader.hidden = true;
 
   await ensureLocalName(appMain);
@@ -46,7 +45,6 @@ async function start() {
 
   appMain.innerHTML = `
     <div id="greeting-container"></div>
-    <div id="list-header-container"></div>
     <div id="app-view"></div>
     <div class="floating-bar" data-testid="floating-bar">
       <nav id="app-tabs" class="tabs-nav" data-testid="app-tabs"></nav>
@@ -54,7 +52,6 @@ async function start() {
     </div>
   `;
 
-  const headerContainer = appMain.querySelector('#list-header-container');
   const greetingContainer = appMain.querySelector('#greeting-container');
   const tabsNav = appMain.querySelector('#app-tabs');
   const viewContainer = appMain.querySelector('#app-view');
@@ -66,7 +63,6 @@ async function start() {
     });
   }
 
-  renderListHeader(headerContainer, { household });
   renderGreeting(greetingContainer, { household, onChangeName: handleChangeName });
   renderTabs(tabsNav, viewContainer, { views: VIEWS, householdId, initialView: 'list' });
   // FAB persistente entre Lista/Historial/Estadísticas: ya no depende de la vista montada.
