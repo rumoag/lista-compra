@@ -82,6 +82,11 @@ button.secondary {
   border: 1px solid rgba(127, 127, 127, 0.4);
 }
 
+button.danger {
+  background: #dc2626;
+  color: white;
+}
+
 .error-message {
   color: #dc2626;
   font-size: 0.85rem;

@@ -48,5 +48,9 @@
 - **Modificado**: `css/style.css` — `.ticket-row-open-area` pasa a flex con el nuevo `.ticket-row-icon`.
 - Verificado visualmente con una página de prueba temporal (Browser pane, en móvil), luego eliminada.
 
+## "Eliminar ticket" en rojo (BR-64, seguimiento post-aprobación)
+- **Creado**: `button.danger` en `css/style.css` (fondo `#dc2626`), reutilizable para futuras acciones destructivas.
+- **Modificado**: `src/history/ticket-modal.js` — el botón "Eliminar ticket" usa `class="danger"`.
+
 ## Verificación
 `npm test`: 216/216 tests pasan. `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).

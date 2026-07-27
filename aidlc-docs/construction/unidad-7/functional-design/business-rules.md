@@ -35,6 +35,9 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-64: "Eliminar ticket" en rojo (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: el botón "Eliminar ticket" (BR-52) usa un estilo `button.danger` (fondo rojo `#dc2626`, mismo tono que `.error-message`) en vez del azul por defecto, para señalar visualmente que es una acción destructiva. "Deshacer ticket" (BR-51, reversible en la práctica aunque borra el ticket, ya que los productos vuelven a pendientes) mantiene el estilo `secondary` sin cambios.
+
 ## BR-63: Fila del historial — icono, fecha corta y sin borde propio (petición de seguimiento del usuario, post-aprobación)
 - **Regla**: cada fila de la lista de historial (BR-55) muestra un icono de ticket (🧾) delante del texto, y la fecha se presenta en formato corto "Sáb, 18 jul 2024" (día de semana y mes abreviados, `Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })`, con la primera letra en mayúscula) en vez de fecha y hora completas. La hora completa sigue disponible en el encabezado del modal de detalle del ticket.
 - **Alcance**: la fila deja de tener su propio borde (`.card`) — se apoya únicamente en el borde del contenedor de la lista, evitando el doble borde visual (contenedor + fila).

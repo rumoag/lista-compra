@@ -46,7 +46,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     </div>
     <div class="confirm-modal-actions">
       <button type="button" class="secondary" data-testid="ticket-modal-undo-button">Deshacer ticket</button>
-      <button type="button" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
+      <button type="button" class="danger" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
     </div>
   `;
 
