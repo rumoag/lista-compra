@@ -2,11 +2,11 @@
 
 App web móvil para que una pareja gestione una lista de la compra compartida, con acceso por QR, tiempo real, historial y estadísticas. Ver el contexto completo de diseño en [aidlc-docs/](aidlc-docs/).
 
-**Estado actual**: MVP completo (Unidades 1-4) + ciclo de mejora de usabilidad (Unidad 5: pantalla de inicio con listado de listas; Unidad 6: pantalla de lista de la compra rediseñada) — CRUD de productos pendientes vía asistente de 3 pasos, tiempo real, selección múltiple/marcar en lote/eliminar en lote, historial con filtros/corrección, estadísticas, onboarding de nombre local, generación de QR, PWA instalable (sin icono personalizado todavía, ver más abajo).
+**Estado actual**: MVP completo (Unidades 1-4) + ciclo de mejora de usabilidad (Unidad 5: pantalla de inicio con listado de listas; Unidad 6: pantalla de lista de la compra rediseñada; Unidad 7: historial agrupado en tickets) — CRUD de productos pendientes vía asistente de 3 pasos, tiempo real, selección múltiple/marcar en lote/eliminar en lote, historial en tickets (una compra = un ticket, con modal de detalle, deshacer/eliminar y filtros) en vivo entre dispositivos, estadísticas, onboarding de nombre local, generación de QR, PWA instalable (sin icono personalizado todavía, ver más abajo).
 
 ⚠️ **Nota de seguridad/privacidad (Unidad 5, temporal y aceptada)**: la pantalla de inicio muestra **todas** las listas de **todos** los hogares a cualquiera que abra la app, sin ningún filtro por dispositivo ni login. Es una decisión de producto explícita, no un descuido — ver `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` (BR-34). Está previsto sustituirla por un sistema de credenciales en un ciclo futuro.
 
-⚠️ **Nota de migración (Unidades 5 y 6)**: si tu proyecto Supabase ya estaba desplegado antes de estas unidades, **no reejecutes `supabase/schema.sql` completo** (falla porque las políticas RLS de Unidad 1/2 ya existen y `create policy` no soporta `IF NOT EXISTS`). Ejecuta solo los bloques nuevos del archivo: el que empieza en `-- Unidad 5 — título e icono de lista` y, tras ese, el que empieza en `-- Unidad 6 — cantidad numérica en productos`. Este último es **destructivo** (elimina la columna `quantity`) — revisa el bloque antes de ejecutarlo si tienes datos reales.
+⚠️ **Nota de migración (Unidades 5, 6 y 7)**: si tu proyecto Supabase ya estaba desplegado antes de estas unidades, **no reejecutes `supabase/schema.sql` completo** (falla porque las políticas RLS de Unidad 1/2 ya existen y `create policy` no soporta `IF NOT EXISTS`). Ejecuta solo los bloques nuevos del archivo: el que empieza en `-- Unidad 5 — título e icono de lista`, el que empieza en `-- Unidad 6 — cantidad numérica en productos` (este es **destructivo**, elimina la columna `quantity` — revisa el bloque antes de ejecutarlo si tienes datos reales) y, tras ese, el que empieza en `-- Unidad 7 — Historial en tickets` (puramente aditivo, sin riesgo de pérdida de datos).
 
 ## Stack
 - Frontend: vanilla JS/HTML (sin bundler), `@supabase/supabase-js` y `qrcode` importados directamente por URL desde esm.sh (`import ... from 'https://esm.sh/...'`) — sin import map, sin instalar estos paquetes vía npm
@@ -16,7 +16,7 @@ App web móvil para que una pareja gestione una lista de la compra compartida, c
 
 ## Setup local
 
-1. Crea un proyecto en [Supabase](https://supabase.com) y ejecuta `supabase/schema.sql` en el SQL Editor (incluye el esquema, RLS, y la activación de Realtime sobre `products`).
+1. Crea un proyecto en [Supabase](https://supabase.com) y ejecuta `supabase/schema.sql` en el SQL Editor (incluye el esquema, RLS, y la activación de Realtime sobre `products` y `purchases`).
 2. Copia `.env.example` a `.env` y rellena `SUPABASE_URL` y `SUPABASE_ANON_KEY` con los valores de tu proyecto (Settings → API).
 3. Instala dependencias:
    ```bash
@@ -41,7 +41,7 @@ Incluye tests de ejemplo y property-based testing (fast-check) para las funcione
 
 También incluye PBT para el cálculo de estadísticas (`src/stats/calculations.js`) y los filtros de historial (`src/history/filters.js`), bloqueantes bajo PBT-03 en esta unidad.
 
-Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5,6}/code/frontend-summary.md`.
+Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5,6,7}/code/frontend-summary.md`.
 
 ## Despliegue (Vercel)
 
@@ -55,18 +55,20 @@ Ver el detalle de verificación en `aidlc-docs/construction/unidad-{1,2,3,4,5,6}
 index.html
 src/
   common/         # cliente Supabase, validación, optimistic update, paginación, modal genérico,
-                  # menú de 3 puntos y modal de confirmación genéricos (Unidad 6), modal de QR
+                  # menú de 3 puntos y modal de confirmación genéricos (Unidad 6), modal de QR,
+                  # suscripción Realtime genérica por tabla (Unidad 7)
   list/           # Unidad 6: cabecera, saludo, tabs, lista de pendientes (scroll infinito),
                   # asistente de 3 pasos crear/editar producto, categorías con icono, sugeridos
-  bulk-actions/   # selección múltiple, barra de acción en lote, suscripción Realtime
-  history/        # filtros, lista de historial, corrección
+  bulk-actions/   # selección múltiple, barra de acción en lote
+  history/        # Unidad 7: historial en tickets (fila de ticket, modal de detalle con
+                  # deshacer/eliminar y acciones individuales, filtros) en vivo entre dispositivos
   stats/          # cálculo y visualización de estadísticas
   onboarding/     # identidad local (name-prompt), vista de QR
   home/           # Unidad 5: pantalla de inicio, tarjetas de lista, modal crear/editar
 css/
 manifest.json     # PWA (sin icono todavía)
 supabase/
-  schema.sql    # esquema de datos + RLS + Realtime
+  schema.sql    # esquema de datos + RLS + Realtime (products, purchases)
 tests/
 ```
 

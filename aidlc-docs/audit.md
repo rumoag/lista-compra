@@ -1082,3 +1082,140 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **User Input**: "Approve & Continue"
 **AI Response**: "Build and Test de la Unidad 6 marcado como completo. Pantalla 2 (Vista de lista de la compra) del Ciclo 2 de mejora de usabilidad queda completa de extremo a extremo. Procediendo a OPERATIONS PHASE (placeholder) para esta unidad; despliegue real (incluyendo reejecutar el bloque de migración destructivo) y verificación manual del Scenario 7 quedan como próximos pasos del usuario. Se invita al usuario a describir la Pantalla 3."
 **Context**: Construction Phase - Unidad 6 completa; Build and Test approval gate passed; CICLO 2 Pantalla 2 completa
+
+## Requirements Analysis — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T11:45:53Z
+**User Input**: "me gustaria mejorar el historial cuando se compran productos. Quiero que al compran productos se conglomeren en una unica compra y se llamen tickets. Y que cada compra tenga su modal el ticket de lo que se ha comprado. ese ticket se podra deshacer y eliminar. los filtros quiero que funcionen igual."
+**AI Response**: Creado history-tickets-questions.md con 8 preguntas de aclaración (modelo de datos, migración retroactiva, acciones individuales dentro del modal, contenido de la lista de tickets, comportamiento del filtro por nombre, filtro por fecha, paginación por ticket, estadísticas sin cambios).
+**Context**: Requirements Analysis, Ciclo 2, Unidad 7 (Historial en Tickets)
+
+---
+
+## Requirements Analysis — Respuestas del usuario
+**Timestamp**: 2026-07-27T11:45:53Z
+**User Input**: Respuestas en history-tickets-questions.md: Q1=A (tabla purchases + FK), Q2=C (sin migración retroactiva, ok borrar historial actual), Q3=B (acciones individuales dentro del modal permitidas), Q4=A (fecha+quien+numero de productos), Q5=A (filtro por nombre: al menos un producto coincide), Q6=A (filtro por fecha igual que hoy), Q7=A (paginación por ticket), Q8=A (estadísticas sin cambios)
+**AI Response**: Sin contradicciones ni ambigüedades detectadas. requirements.md ampliado con sección "CICLO 2 — Historial en Tickets (Unidad 7)" (FR-18 a FR-23, NFR-9 a NFR-11). aidlc-state.md actualizado.
+**Context**: Requirements Analysis, Ciclo 2, Unidad 7 (Historial en Tickets) — GATE pasado, listo para presentar aprobación
+
+---
+
+## Aprobación Requirements Analysis — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T11:47:00Z
+**User Input**: "Aprobar y continuar"
+**AI Response**: Requirements Analysis aprobado. Se procede a Functional Design para Unidad 7 (Historial en Tickets), sin User Stories (mismo criterio que Pantallas 1 y 2).
+**Context**: Requirements Analysis, Ciclo 2, Unidad 7 — GATE cerrado
+
+---
+
+## Functional Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:00:20Z
+**User Input**: Respuestas en unidad-7-functional-design-plan.md: Q1=B (hack created_at para reutilizar pagination.js), Q2=A (confirmación con openConfirmModal antes de deshacer/eliminar ticket completo), Q3=B (join completo purchases+products al cargar lista), Q4=A (conteo siempre total del ticket), Q5=A (filtro carga hasta 2000 products y deriva purchase_id), Q6=A (filters.js sin cambios), Q7=A (FK con on delete cascade), Q8=A (deshacer: update productos luego delete purchase), Q9=A (limpieza de huérfano decidida en cliente), Q10=A (nueva función de render para producto dentro del modal)
+**AI Response**: Sin contradicciones ni ambigüedades detectadas. Generados domain-entities.md, business-rules.md (BR-50 a BR-58), business-logic-model.md (7 flujos + Testable Properties) y frontend-components.md en aidlc-docs/construction/unidad-7/functional-design/. aidlc-state.md actualizado.
+**Context**: Functional Design, Ciclo 2, Unidad 7 (Historial en Tickets)
+
+---
+
+## Aprobación Functional Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:05:15Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Functional Design aprobado. Se procede a NFR Requirements para Unidad 7.
+**Context**: Functional Design, Ciclo 2, Unidad 7 — GATE cerrado
+
+---
+
+## NFR Requirements — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:10:00Z
+**User Input**: Respuestas en unidad-7-nfr-requirements-plan.md: Q1=A (migración aditiva, sin riesgo), Q2=A (sin límite adicional por producto/ticket), Q3=A (RLS permisivo reutilizado, sin revisión), Q4=A (sin cambios de stack)
+**AI Response**: Sin ambigüedades. Generados nfr-requirements.md y tech-stack-decisions.md en aidlc-docs/construction/unidad-7/nfr-requirements/.
+**Context**: NFR Requirements, Ciclo 2, Unidad 7 (Historial en Tickets)
+
+---
+
+## Aprobación NFR Requirements — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:14:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: NFR Requirements aprobado. Se procede a NFR Design para Unidad 7.
+**Context**: NFR Requirements, Ciclo 2, Unidad 7 — GATE cerrado
+
+---
+
+## NFR Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:21:31Z
+**User Input**: Respuestas en unidad-7-nfr-design-plan.md: Q1=A (fail-fast sin compensación/rollback en operaciones multi-paso), Q2=A (sin componentes de infraestructura nuevos)
+**AI Response**: Sin ambigüedades. Generados nfr-design-patterns.md y logical-components.md en aidlc-docs/construction/unidad-7/nfr-design/.
+**Context**: NFR Design, Ciclo 2, Unidad 7 (Historial en Tickets)
+
+---
+
+## Aprobación NFR Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:25:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: NFR Design aprobado. Se procede a Infrastructure Design para Unidad 7.
+**Context**: NFR Design, Ciclo 2, Unidad 7 — GATE cerrado
+
+---
+
+## Infrastructure Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:27:42Z
+**User Input**: Respuestas en unidad-7-infrastructure-design-plan.md: Q1=A (mismo entorno Vercel+Supabase), Q2=A (migración manual, mismo flujo), Q3=B (sí quiero Realtime en purchases, sin motivo detallado -> generó pregunta de aclaración). Respuesta en unidad-7-infrastructure-design-clarification-questions.md: Q1=A (alcance completo: INSERT+DELETE de purchases en vivo mientras el historial está abierto y sin filtro activo).
+**AI Response**: Se añadió BR-59 (historial en vivo) y Flujo 8 a business-logic-model.md (Unidad 7, Functional Design), y se generalizó `bulk-actions/realtime-subscription.js` a `common/realtime-subscription.js` (parámetro `table`) en frontend-components.md y logical-components.md (NFR Design), ambos ya aprobados, ampliados con esta adición derivada de la decisión de Infrastructure Design. Generados infrastructure-design.md y deployment-architecture.md en aidlc-docs/construction/unidad-7/infrastructure-design/.
+**Context**: Infrastructure Design, Ciclo 2, Unidad 7 (Historial en Tickets) — incluye ampliación retroactiva de Functional Design/NFR Design ya aprobados para incorporar Realtime en purchases
+
+---
+
+## Aprobación Infrastructure Design — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:32:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Infrastructure Design aprobado. Se procede a Code Generation para Unidad 7.
+**Context**: Infrastructure Design, Ciclo 2, Unidad 7 — GATE cerrado
+
+---
+
+## Code Generation Plan (Part 1) — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T12:40:00Z
+**AI Response**: Creado aidlc-docs/construction/plans/unidad-7-code-generation-plan.md con 10 pasos numerados (migración de esquema, generalización de realtime-subscription, product-list.js crea el ticket, 3 componentes nuevos de historial, reescritura de history-list.js con test dedicado, CSS, documentación).
+**Context**: Code Generation Part 1 (Planning), Ciclo 2, Unidad 7 — pendiente de aprobación del usuario antes de generar código
+
+---
+
+## Aprobación Code Generation Plan — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T14:29:00Z
+**User Input**: "Continue"
+**AI Response**: Plan de Code Generation aprobado. Se procede a la Parte 2 (Generación) siguiendo el plan paso a paso.
+**Context**: Code Generation Part 1 → Part 2, Ciclo 2, Unidad 7 — GATE cerrado
+**Estado**: Code Generation Part 1 (Planning) COMPLETA
+
+---
+
+## Code Generation (Part 2) — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T14:38:48Z
+**AI Response**: Ejecutados los 10 pasos del plan: migración de esquema (purchases + products.purchase_id + RLS + Realtime), generalización de realtime-subscription.js a common/, product-list.js crea el ticket al marcar comprados (BR-50), 3 componentes nuevos (ticket-row.js, ticket-product-row.js, ticket-modal.js), reescritura de history-list.js (join completo, filtrado derivado, historial en vivo), CSS, README.md y resumen de documentación. 214/214 tests pasan (36 nuevos/actualizados); `npm run build` verificado con variables de prueba.
+**Context**: Code Generation Part 2 (Generation), Ciclo 2, Unidad 7 (Historial en Tickets) — COMPLETA
+
+---
+
+## Aprobación Code Generation — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T14:42:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Code Generation aprobado. Se procede a Build and Test (incremental, mismo criterio que Unidades 5 y 6).
+**Context**: Code Generation, Ciclo 2, Unidad 7 — GATE cerrado
+**Estado**: UNIDAD 7 (Historial en Tickets) COMPLETA
+
+---
+
+## Build and Test Stage (incremental) — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T14:46:13Z
+**Build Status**: Success
+**Test Status**: Pass (214/214)
+**Files Updated**: integration-test-instructions.md (Scenario 8), security-test-instructions.md (RLS de purchases, npm audit sin cambios), build-and-test-summary.md, unit-test-instructions.md (tabla de tests actualizada a 214)
+
+---
+
+## Aprobación Build and Test — Historial en Tickets (Unidad 7)
+**Timestamp**: 2026-07-27T14:50:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Build and Test aprobado. Unidad 7 (Historial en Tickets) completa. Se procede a Operations (placeholder, sin trabajo activo).
+**Context**: Build and Test, Ciclo 2, Unidad 7 — GATE cerrado
+**Estado**: CONSTRUCTION PHASE (incremental, Unidad 7) COMPLETE
+
+---
