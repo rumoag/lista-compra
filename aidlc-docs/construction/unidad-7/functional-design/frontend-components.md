@@ -10,6 +10,7 @@
 - Filtrado (Flujo 7): sigue orquestando `history/history-filters.js` (sin cambios) y `history/filters.js` (sin cambios, Q6=A) sobre productos; deriva los `purchase_id` a mostrar.
 - Estado vacío: mismo patrón que hoy ("Aún no hay compras registradas." / "No hay resultados para el filtro aplicado."), ahora referido a tickets.
 - Historial en vivo (Flujo 8, BR-59): se suscribe a `common/realtime-subscription.js` con `table: 'purchases'` mientras el modo paginado está activo; ignora eventos mientras hay un filtro activo; desuscribe en `cleanup()`.
+- Scroll infinito (BR-60): sustituye el botón "Cargar más" por un centinela + `IntersectionObserver`, mismo patrón que `list/product-list.js` (BR-48); no se dispara mientras hay un filtro activo.
 
 ### `history/history-filters.js`
 - **Sin cambios** (Q6=A) — misma UI, mismo `onChange({ nameQuery, dateFrom, dateTo })`.

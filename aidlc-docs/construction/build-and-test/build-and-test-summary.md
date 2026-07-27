@@ -9,8 +9,8 @@
 ## Test Execution Summary
 
 ### Unit Tests
-- **Total Tests**: 214 (174 de Unidades 1-6 + 40 de Unidad 7: 5 archivos nuevos/reescritos — `common/realtime-subscription.test.js`, `history/ticket-row.test.js`, `history/ticket-product-row.test.js`, `history/ticket-modal.test.js`, `history/history-list.test.js` — más 1 test nuevo en `list/product-list.test.js`, neto de los tests eliminados de `bulk-actions/realtime-subscription.test.js`)
-- **Passed**: 214
+- **Total Tests**: 216 (174 de Unidades 1-6 + 42 de Unidad 7: 5 archivos nuevos/reescritos — `common/realtime-subscription.test.js`, `history/ticket-row.test.js`, `history/ticket-product-row.test.js`, `history/ticket-modal.test.js`, `history/history-list.test.js` (incluye BR-60, scroll infinito) — más 1 test nuevo en `list/product-list.test.js`, neto de los tests eliminados de `bulk-actions/realtime-subscription.test.js`)
+- **Passed**: 216
 - **Failed**: 0
 - **Coverage**: no medida formalmente (sin herramienta de coverage); trazabilidad manual a las historias/requisitos documentada por unidad
 - **Status**: Pass
@@ -36,10 +36,11 @@
    - `product-list.js#handleAdd` no volvía a renderizar la lista tras sustituir el item optimista por el real devuelto por el servidor (patrón heredado de la Unidad 1, nunca antes cubierto por un test). Corregido añadiendo el `renderList()` que faltaba.
 5. **Unidad 6 — desviación de diseño** (no bug): la migración de `quantity` se ejecuta con `drop column` en vez de renombrar a `quantity_legacy`, tras confirmación explícita del usuario asumiendo el riesgo de irreversibilidad (ver `nfr-requirements.md` de la Unidad 6).
 6. **Unidad 7**: sin bugs detectados durante Code Generation; todos los tests nuevos pasaron en la primera ejecución salvo un ajuste de aserción en `history-list.test.js` (el test comparaba el objeto `purchase` original en vez de la versión con el alias `created_at` añadido por `toPaginatorItem`, corregido en el propio test, no en el código de producción).
+7. **Unidad 7 (seguimiento)**: sustitución del botón "Cargar más" del historial por scroll infinito (BR-60, mismo patrón que BR-48), a petición del usuario tras la aprobación inicial de la unidad. Sin bugs detectados.
 
 ## Overall Status
 - **Build**: Success
-- **All Automated Tests**: Pass (214/214)
+- **All Automated Tests**: Pass (216/216)
 - **Manual Integration/E2E Tests**: Pendientes de ejecución por el usuario contra un proyecto Supabase real desplegado, incluyendo el nuevo Scenario 8 (Unidad 7) y la reejecución de los bloques de migración de esquema
 - **Ready for Operations**: Sí, condicionado a que el usuario (a) reejecute los bloques de migración de `schema.sql` en su proyecto Supabase ya desplegado (Unidad 5, 6 y 7, en ese orden), (b) tenga en cuenta que el bloque de Unidad 6 es destructivo sobre `quantity` (el de Unidad 7 no lo es), y (c) complete la verificación manual de `integration-test-instructions.md` y `security-test-instructions.md` (sección de cabeceras HTTP) tras el despliegue
 

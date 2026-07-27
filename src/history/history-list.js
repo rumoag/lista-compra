@@ -1,7 +1,8 @@
 // Vista de historial (Unidad 7 — historial en tickets): paginado de tickets por defecto;
 // al aplicar filtros, carga hasta 2000 productos comprados y deriva los tickets a mostrar
 // (BR-56), sin paginación mientras el filtro esté activo. Historial en vivo (BR-59) solo
-// mientras el filtro está inactivo.
+// mientras el filtro está inactivo. Scroll infinito (BR-60, mismo patrón que BR-48 en
+// list/product-list.js) en vez de un botón "Cargar más".
 import { supabase } from '../common/supabase-client.js';
 import { createPaginator } from '../common/pagination.js';
 import { createRealtimeSubscription } from '../common/realtime-subscription.js';
@@ -19,20 +20,22 @@ export async function renderHistoryList(container, { householdId }) {
     <div class="card">
       <div id="history-items" data-testid="history-items"></div>
       <div id="history-empty" class="empty-state" data-testid="history-empty" hidden></div>
-      <button type="button" class="secondary" data-testid="history-load-more-button" hidden>Cargar más</button>
+      <div id="history-sentinel" data-testid="history-sentinel"></div>
     </div>
   `;
 
   const filtersContainer = container.querySelector('#history-filters-container');
   const itemsContainer = container.querySelector('#history-items');
   const emptyState = container.querySelector('#history-empty');
-  const loadMoreButton = container.querySelector('[data-testid="history-load-more-button"]');
+  const sentinel = container.querySelector('#history-sentinel');
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const realtime = createRealtimeSubscription({ householdId, table: 'purchases' });
   let activeFilters = { nameQuery: '', dateFrom: null, dateTo: null };
   let filteredResults = null; // null = modo paginado sin filtro activo
   let openTicket = null; // { id, close } — ticket actualmente abierto en el modal, si lo hay
+  let hasMore = true;
+  let isLoadingMore = false;
 
   function hasActiveFilters() {
     return Boolean(activeFilters.nameQuery || activeFilters.dateFrom || activeFilters.dateTo);
@@ -86,8 +89,6 @@ export async function renderHistoryList(container, { householdId }) {
       emptyState.hidden = true;
       items.forEach((purchase) => itemsContainer.appendChild(renderTicketRow(purchase, { onOpen: handleOpenTicket })));
     }
-
-    loadMoreButton.hidden = hasActiveFilters();
   }
 
   // BR-56: filtra sobre productos (reutilizando filters.js sin cambios) y deriva los
@@ -127,10 +128,26 @@ export async function renderHistoryList(container, { householdId }) {
     },
   });
 
-  loadMoreButton.addEventListener('click', async () => {
-    await paginator.loadNextPage(fetchPage);
-    renderList();
+  // BR-60: scroll infinito — un IntersectionObserver dispara la siguiente página cuando
+  // el centinela final entra en el viewport, en vez de un botón "Cargar más" (mismo patrón
+  // que BR-48 en list/product-list.js). No se dispara mientras hay un filtro activo (el
+  // modo filtrado no pagina, BR-56).
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      return loadNextPageIfAny();
+    }
   });
+
+  async function loadNextPageIfAny() {
+    if (hasActiveFilters() || !hasMore || isLoadingMore) return;
+    isLoadingMore = true;
+    const before = paginator.getItems().length;
+    await paginator.loadNextPage(fetchPage);
+    const loaded = paginator.getItems().length - before;
+    if (loaded < PAGE_SIZE) hasMore = false;
+    isLoadingMore = false;
+    renderList();
+  }
 
   function handleOpenTicket(purchase) {
     const modal = openTicketModal(purchase, {
@@ -184,12 +201,15 @@ export async function renderHistoryList(container, { householdId }) {
 
   function cleanup() {
     realtime.unsubscribe();
+    observer.disconnect();
     window.removeEventListener('pagehide', cleanup);
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 
   await paginator.loadNextPage(fetchPage);
+  if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
   renderList();
+  observer.observe(sentinel);
 
   return cleanup;
 }

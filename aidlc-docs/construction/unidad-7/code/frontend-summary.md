@@ -18,6 +18,10 @@
 - **Modificado (reescrito)**: `src/history/history-list.js` — lista de tickets (join completo), paginación con alias `created_at→bought_at` (BR-57), filtrado derivando `purchase_id` de productos coincidentes (BR-56), historial en vivo (BR-59).
 - **Sin cambios**: `src/history/history-filters.js`, `src/history/filters.js` (Q6=A).
 
+## Scroll infinito (BR-60, seguimiento post-aprobación)
+- **Modificado**: `src/history/history-list.js` — sustituye el botón "Cargar más" por un centinela + `IntersectionObserver`, mismo patrón que `list/product-list.js` (BR-48); no se dispara mientras hay un filtro activo (BR-56/BR-57 siguen aplicando).
+- **Modificado**: `tests/history/history-list.test.js` — `FakeIntersectionObserver` (mismo patrón que `tests/list/product-list.test.js`) y tests de scroll infinito automático/manual y de que no se dispara con filtro activo.
+
 ## CSS
 - **Modificado**: `css/style.css` — `.ticket-row-open-area` (área clicable de la fila) y separador entre productos dentro del modal de ticket.
 
@@ -32,4 +36,4 @@
 - **Modificado**: `README.md` (estado actual, nota de migración ampliada a Unidad 7, estructura del proyecto, referencia a Realtime sobre `purchases`).
 
 ## Verificación
-`npm test`: 214/214 tests pasan (36 nuevos/actualizados). `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).
+`npm test`: 216/216 tests pasan (38 nuevos/actualizados, incluyendo BR-60). `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).

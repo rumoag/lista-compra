@@ -76,7 +76,8 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
   7. Repetir el paso 1 (crear un ticket nuevo) y, esta vez, abrir su modal y pulsar "Deshacer ticket" → confirmar en el diálogo → los productos vuelven al tab "Lista" como pendientes y el ticket desaparece del historial, **en ambas pestañas** (BR-51, BR-59).
   8. Repetir el paso 1 una vez más y, en su modal, pulsar "Eliminar ticket" → confirmar → los productos y el ticket se borran permanentemente, en ambas pestañas (BR-52, BR-59).
   9. Con un filtro de nombre/fecha activo, verificar que los filtros siguen funcionando igual que antes (un ticket aparece si al menos uno de sus productos coincide) y que los cambios remotos NO se reflejan en vivo mientras el filtro está activo (BR-59).
-- **Expected Results**: todos los pasos anteriores funcionan sin errores; el historial en vivo sincroniza entre ambas pestañas solo en modo paginado (sin filtro).
+  10. Con más de 20 tickets en el historial (sin filtro), hacer scroll hasta el final → se cargan automáticamente más tickets sin pulsar ningún botón (BR-60).
+- **Expected Results**: todos los pasos anteriores funcionan sin errores; el historial en vivo sincroniza entre ambas pestañas solo en modo paginado (sin filtro); el scroll infinito no se dispara mientras hay un filtro activo.
 - **Cleanup**: eliminar cualquier producto/ticket de prueba restante.
 
 ## Setup Integration Test Environment

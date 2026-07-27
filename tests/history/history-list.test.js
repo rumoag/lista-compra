@@ -1,5 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Mismo fake que tests/list/product-list.test.js: el IntersectionObserver real invoca su
+// callback casi inmediatamente al llamar a observe(), informando del estado de intersección
+// actual del elemento (incluido "true" si ya es visible, ej. lista corta sin scroll posible).
+let observedCallback;
+class FakeIntersectionObserver {
+  constructor(callback) {
+    observedCallback = callback;
+  }
+  observe() {
+    Promise.resolve().then(() => observedCallback([{ isIntersecting: true }]));
+  }
+  disconnect() {}
+}
+global.IntersectionObserver = FakeIntersectionObserver;
+
 let responseQueue = [];
 let createdBuilders = [];
 
@@ -217,16 +232,58 @@ describe('renderHistoryList (Unidad 7 — tickets)', () => {
     expect(container.querySelector('[data-testid="ticket-row-t2"]')).toBeNull();
   });
 
-  it('"Cargar más" carga la siguiente página', async () => {
-    queueResponse({ data: [makePurchase({ id: 't1' })], error: null });
+  it('scroll infinito: el centinela visible carga la siguiente página automáticamente en cuanto termina la primera (BR-60)', async () => {
+    const firstPage = Array.from({ length: 20 }, (_, i) => makePurchase({ id: `t${i}` }));
+    const secondPage = [makePurchase({ id: 't-extra' })];
+    queueResponse({ data: firstPage, error: null });
+    queueResponse({ data: secondPage, error: null });
     const container = mount();
-    await renderHistoryList(container, { householdId: 'h1' });
 
-    queueResponse({ data: [makePurchase({ id: 't2', bought_at: '2026-07-26T18:30:00.000Z' })], error: null });
-    container.querySelector('[data-testid="history-load-more-button"]').click();
+    await renderHistoryList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(container.querySelector('[data-testid="ticket-row-t2"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="ticket-row-t-extra"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-testid^="ticket-row-t"]')).toHaveLength(21);
+  });
+
+  it('scroll infinito manual (simulando un scroll real posterior) carga páginas adicionales sin duplicar', async () => {
+    const page1 = Array.from({ length: 20 }, (_, i) => makePurchase({ id: `t${i}` }));
+    const page2 = Array.from({ length: 20 }, (_, i) => makePurchase({ id: `u${i}` })); // consumida por el auto-disparo tras la primera carga
+    queueResponse({ data: page1, error: null });
+    queueResponse({ data: page2, error: null });
+    const container = mount();
+    await renderHistoryList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+
+    queueResponse({ data: [makePurchase({ id: 't-extra' })], error: null });
+    await observedCallback([{ isIntersecting: true }]);
+
+    expect(container.querySelector('[data-testid="ticket-row-t-extra"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="history-items"]').children).toHaveLength(41);
+  });
+
+  it('no dispara scroll infinito mientras hay un filtro activo (BR-60)', async () => {
+    const firstPage = Array.from({ length: 20 }, (_, i) => makePurchase({ id: `t${i}` }));
+    queueResponse({ data: firstPage, error: null });
+    const container = mount();
+    await renderHistoryList(container, { householdId: 'h1' });
+    await new Promise((r) => setTimeout(r, 0));
+
+    queueResponse({ data: [], error: null }); // fetchProductsForFiltering
+    container.querySelector('[data-testid="history-filter-name-input"]').value = 'leche';
+    container.querySelector('[data-testid="history-filter-name-input"]').dispatchEvent(new Event('input'));
+    await new Promise((r) => setTimeout(r, 0));
+
+    await observedCallback([{ isIntersecting: true }]);
+    await new Promise((r) => setTimeout(r, 0));
+
+    // Ninguna consulta adicional a purchases quedó pendiente de consumir: si el scroll
+    // infinito hubiera disparado una carga, el builder por defecto ({ data: [], error: null })
+    // no habría añadido productos, pero el filtro debe seguir mostrando la lista vacía sin
+    // que se reactive el modo paginado.
+    expect(container.querySelector('[data-testid="history-empty"]').hidden).toBe(false);
   });
 
   it('desuscribe Realtime al desmontar (pagehide)', async () => {

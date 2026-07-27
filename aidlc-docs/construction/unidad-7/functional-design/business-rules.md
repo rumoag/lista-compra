@@ -35,6 +35,9 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-60: Scroll infinito en el historial (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: se sustituye el botón "Cargar más" por una carga automática de la siguiente página cuando un elemento centinela al final de la lista entra en el viewport (`IntersectionObserver`), mismo patrón exacto que BR-48 (Unidad 6, `list/product-list.js`). Solo aplica en modo paginado (sin filtro activo, BR-56/BR-57); mientras hay un filtro activo no se dispara ninguna carga adicional, ya que ese modo no pagina.
+
 ## BR-59: Historial en vivo (decidido en Infrastructure Design, Q1 de clarificación = A)
 - **Regla**: mientras la vista de historial está abierta, se refleja en vivo cualquier cambio remoto sobre `purchases` del household — ticket nuevo (INSERT), o ticket deshecho/eliminado por el otro usuario desde su propio móvil (DELETE; no hay UPDATE de `purchases` en el diseño actual, solo INSERT/DELETE). Mismo criterio de sincronización en vivo entre los dos móviles ya aplicado a la lista de pendientes (BR-8/BR-9, Unidad 2).
 - **Alcance**: solo aplica mientras el filtro está inactivo (modo paginado); con un filtro de nombre/fecha activo, el resultado ya es una instantánea recalculada en memoria (BR-56) y no se mantiene en vivo — evita reconciliar inserciones/borrados en vivo contra un filtro complejo, consistente con la ausencia de scroll infinito/paginación durante el filtrado (BR-57).

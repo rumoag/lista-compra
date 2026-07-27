@@ -127,6 +127,9 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [x] Build and Test (incremental) — build success, 214/214 tests, integration-test-instructions.md/security-test-instructions.md/build-and-test-summary.md/unit-test-instructions.md actualizados con el Scenario 8
 
 **UNIDAD 7 (Historial en Tickets): COMPLETA Y APROBADA** — próximo paso del usuario: ejecutar el bloque nuevo de `supabase/schema.sql` (`-- Unidad 7 — Historial en tickets`) en el proyecto Supabase ya desplegado, y verificar manualmente el Scenario 8 de `integration-test-instructions.md` (historial en vivo entre los dos móviles).
+
+### Unidad 7 — Seguimiento: scroll infinito (BR-60)
+- [x] Petición del usuario tras la aprobación: sustituir el botón "Cargar más" del historial por scroll infinito (mismo patrón que BR-48, Unidad 6). Implementado directamente en `history-list.js` (sin ambigüedad de diseño, reutiliza un patrón ya aprobado) + tests actualizados; 216/216 tests pasan; build verificado. Documentado como BR-60 en `functional-design/business-rules.md` y reflejado en `frontend-components.md`, `code/frontend-summary.md` y `build-and-test/*`.
 - [ ] NFR Requirements
 - [ ] NFR Design
 - [ ] Infrastructure Design

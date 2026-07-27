@@ -8,12 +8,12 @@ npm test
 ```
 
 ### 2. Review Test Results
-- **Expected**: 214 tests pass, 0 failures, en 36 archivos de test (Unidades 1-7)
+- **Expected**: 216 tests pass, 0 failures, en 36 archivos de test (Unidades 1-7)
 - **Test Coverage**: no se mide cobertura formal (sin herramienta de coverage configurada); la cobertura funcional se rastrea vía trazabilidad manual a historias de usuario (ver cada `frontend-summary.md`/`business-logic-summary.md` por unidad)
 - **Test Report Location**: salida de consola de Vitest (no se genera reporte HTML en esta configuración)
 
 ### 3. Resultado real verificado en este entorno
-214/214 tests pasan. Desglose por archivo:
+216/216 tests pasan. Desglose por archivo:
 
 | Archivo | Tests |
 |---|---|
@@ -43,7 +43,7 @@ npm test
 | tests/history/ticket-row.test.js | 3 |
 | tests/history/ticket-product-row.test.js | 4 |
 | tests/history/ticket-modal.test.js | 8 |
-| tests/history/history-list.test.js | 12 |
+| tests/history/history-list.test.js | 14 |
 | tests/stats/calculations.test.js | 11 |
 | tests/stats/stats-ranking.test.js | 2 |
 | tests/stats/stats-cadence.test.js | 3 |
@@ -53,7 +53,7 @@ npm test
 | tests/home/list-card.test.js | 4 |
 | tests/home/list-form-modal.test.js | 4 |
 | tests/home/home-screen.test.js | 5 |
-| **Total** | **214** |
+| **Total** | **216** |
 
 ### 4. Fix Failing Tests
 Si un test falla:
