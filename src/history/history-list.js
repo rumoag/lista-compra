@@ -17,7 +17,7 @@ const FILTERED_FETCH_LIMIT = 2000;
 export async function renderHistoryList(container, { householdId }) {
   container.innerHTML = `
     <div id="history-filters-container"></div>
-    <div class="card">
+    <div class="card card--flush">
       <div id="history-items" data-testid="history-items"></div>
       <div id="history-empty" class="empty-state" data-testid="history-empty" hidden></div>
       <div id="history-sentinel" data-testid="history-sentinel"></div>

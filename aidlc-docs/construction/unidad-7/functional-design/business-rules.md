@@ -35,6 +35,9 @@
 ## BR-58: Estadísticas sin cambios (FR-23.1)
 - **Regla**: `stats-page.js`/`calculations.js` siguen leyendo directamente de `products` con `status = 'bought'`, por producto individual. La existencia de `purchases`/tickets no afecta al cálculo del ranking.
 
+## BR-65: Contenedor de la lista de historial sin borde (petición de seguimiento del usuario, post-aprobación)
+- **Regla**: el contenedor que envuelve la lista de tickets pasa de `.card` a `.card--flush` (sin borde ni padding propio), mismo patrón ya usado en `list/product-list.js` para la lista de pendientes. Complementa BR-63 (las filas ya no tenían borde propio) eliminando también el borde exterior.
+
 ## BR-64: "Eliminar ticket" en rojo (petición de seguimiento del usuario, post-aprobación)
 - **Regla**: el botón "Eliminar ticket" (BR-52) usa un estilo `button.danger` (fondo rojo `#dc2626`, mismo tono que `.error-message`) en vez del azul por defecto, para señalar visualmente que es una acción destructiva. "Deshacer ticket" (BR-51, reversible en la práctica aunque borra el ticket, ya que los productos vuelven a pendientes) mantiene el estilo `secondary` sin cambios.
 

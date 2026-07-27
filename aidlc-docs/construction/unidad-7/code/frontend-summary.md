@@ -52,5 +52,8 @@
 - **Creado**: `button.danger` en `css/style.css` (fondo `#dc2626`), reutilizable para futuras acciones destructivas.
 - **Modificado**: `src/history/ticket-modal.js` — el botón "Eliminar ticket" usa `class="danger"`.
 
+## Contenedor de la lista sin borde (BR-65, seguimiento post-aprobación)
+- **Modificado**: `src/history/history-list.js` — el contenedor pasa de `.card` a `.card--flush` (sin borde ni padding propio), mismo patrón que `list/product-list.js`.
+
 ## Verificación
 `npm test`: 216/216 tests pasan. `npm run build`: verificado con variables de entorno de prueba (`SUPABASE_URL`/`SUPABASE_ANON_KEY`).
