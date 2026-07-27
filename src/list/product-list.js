@@ -27,14 +27,12 @@ export async function renderProductList(container, { householdId }) {
       </div>
       <div id="product-list-sentinel" data-testid="product-list-sentinel"></div>
     </div>
-    <button type="button" class="fab" data-testid="product-list-fab-button" aria-label="Añadir producto">+</button>
   `;
 
   const selectionBarContainer = container.querySelector('#selection-bar-container');
   const itemsContainer = container.querySelector('#product-list-items');
   const emptyState = container.querySelector('#product-list-empty');
   const sentinel = container.querySelector('#product-list-sentinel');
-  const fabButton = container.querySelector('[data-testid="product-list-fab-button"]');
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const selection = createSelectionState();
@@ -141,7 +139,7 @@ export async function renderProductList(container, { householdId }) {
     renderList();
   }
 
-  async function openWizard(mode, product) {
+  async function handleEditRequest(product) {
     let suggestedProducts = [];
     try {
       suggestedProducts = await fetchSuggestedProducts(householdId);
@@ -150,65 +148,11 @@ export async function renderProductList(container, { householdId }) {
     }
 
     openProductWizardModal({
-      mode,
+      mode: 'edit',
       product,
       suggestedProducts,
-      onSave: mode === 'edit' ? (values) => handleEditProduct(product.id, values) : handleAdd,
+      onSave: (values) => handleEditProduct(product.id, values),
     });
-  }
-
-  fabButton.addEventListener('click', () => openWizard('create'));
-  function handleEditRequest(product) {
-    openWizard('edit', product);
-  }
-
-  async function handleAdd({ name, quantity_number, quantity_unit, category }) {
-    const optimisticProduct = {
-      id: `optimistic-${crypto.randomUUID()}`,
-      household_id: householdId,
-      name,
-      quantity_number,
-      quantity_unit,
-      category,
-      status: 'pending',
-      added_by: getLocalName(),
-      created_at: new Date().toISOString(),
-      bought_by: null,
-      bought_at: null,
-    };
-
-    await applyOptimistic({
-      apply: () => {
-        paginator.prependItem(optimisticProduct);
-        renderList();
-      },
-      revert: () => {
-        paginator.removeItem(optimisticProduct.id);
-        renderList();
-      },
-      remoteOperation: async () => {
-        const { data, error } = await supabase
-          .from('products')
-          .insert({
-            household_id: householdId,
-            name,
-            quantity_number,
-            quantity_unit,
-            category,
-            status: 'pending',
-            added_by: getLocalName(),
-          })
-          .select()
-          .single();
-        if (error) throw error;
-        paginator.removeItem(optimisticProduct.id);
-        paginator.prependItem(data);
-        renderList();
-      },
-      onError: () => {
-        showGlobalError('No se pudo añadir el producto. Inténtalo de nuevo.');
-      },
-    }).catch(() => {});
   }
 
   async function handleEditProduct(id, changes) {

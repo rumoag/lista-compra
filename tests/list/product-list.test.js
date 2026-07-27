@@ -122,38 +122,6 @@ describe('renderProductList (Unidad 6)', () => {
     );
   });
 
-  it('el FAB abre el wizard en modo create con productos sugeridos', async () => {
-    queueResponse({ data: [], error: null });
-    const container = mount();
-    await renderProductList(container, { householdId: 'h1' });
-
-    container.querySelector('[data-testid="product-list-fab-button"]').click();
-    await new Promise((r) => setTimeout(r, 0));
-
-    expect(openProductWizardModal).toHaveBeenCalledWith(
-      expect.objectContaining({ mode: 'create', suggestedProducts: ['Leche'], onSave: expect.any(Function) })
-    );
-  });
-
-  it('guardar desde el wizard de creación inserta el producto (optimista + remoto)', async () => {
-    queueResponse({ data: [], error: null }); // primera página
-    queueResponse({ data: makeProduct({ id: 'server-id' }), error: null }); // insert().select().single()
-    const container = mount();
-    await renderProductList(container, { householdId: 'h1' });
-
-    container.querySelector('[data-testid="product-list-fab-button"]').click();
-    await new Promise((r) => setTimeout(r, 0));
-
-    const { onSave } = openProductWizardModal.mock.calls[0][0];
-    await onSave({ name: 'Leche', quantity_number: 2, quantity_unit: 'litros', category: 'Lácteos' });
-
-    const insertBuilder = createdBuilders.find((b) => b.insert.mock.calls.length > 0);
-    expect(insertBuilder.insert).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Leche', quantity_number: 2, quantity_unit: 'litros', category: 'Lácteos' })
-    );
-    expect(container.querySelector('[data-testid="product-item-server-id"]')).not.toBeNull();
-  });
-
   it('mantener pulsado un item abre el wizard en modo edit con el producto', async () => {
     vi.useFakeTimers();
     const product = makeProduct({ id: 'p1' });
