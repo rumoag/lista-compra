@@ -14,6 +14,7 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
         <button type="button" class="modal-close-button" data-testid="modal-close-button" aria-label="Cerrar">${icon('x')}</button>
       </div>
       <div class="modal-body" data-testid="modal-body"></div>
+      <div class="modal-footer" data-testid="modal-footer"></div>
     </div>
   `;
 
@@ -37,6 +38,7 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
 
   return {
     body: overlay.querySelector('[data-testid="modal-body"]'),
+    footer: overlay.querySelector('[data-testid="modal-footer"]'),
     close,
   };
 }

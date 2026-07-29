@@ -10,6 +10,17 @@ function goToStep2ViaChip(name = 'Leche') {
   document.querySelector('[data-testid="wizard-next-button"]').click();
 }
 
+function goToStep3ViaChip(name = 'Leche') {
+  goToStep2ViaChip(name);
+  document.querySelector('[data-testid="wizard-next-button"]').click();
+}
+
+function goToStep4(name = 'Leche', category = 'Lácteos') {
+  goToStep3ViaChip(name);
+  document.querySelector(`[data-testid="wizard-category-chip-${category}"]`).click();
+  document.querySelector('[data-testid="wizard-next-button"]').click();
+}
+
 describe('openProductWizardModal — modo create (FR-13)', () => {
   it('paso 1: seleccionar un chip sugerido y avanzar', () => {
     openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche', 'Pan'], onSave: vi.fn() });
@@ -29,14 +40,13 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
     expect(document.querySelector('[data-testid="wizard-quantity-input"]')).toBeNull();
   });
 
-  it('paso 1: chip "Otros" revela input y valida como BR-1', () => {
+  it('paso 1: se puede escribir el nombre directamente en el input, sin chip', () => {
     openProductWizardModal({ mode: 'create', suggestedProducts: [], onSave: vi.fn() });
 
-    document.querySelector('[data-testid="wizard-product-chip-other"]').click();
-    document.querySelector('[data-testid="wizard-product-name-input"]').value = 'Leche (2%)';
+    document.querySelector('[data-testid="wizard-product-name-input"]').value = 'Leche fresca';
     document.querySelector('[data-testid="wizard-next-button"]').click();
 
-    expect(document.querySelector('[data-testid="wizard-step1-error"]').hidden).toBe(false);
+    expect(document.querySelector('[data-testid="wizard-quantity-input"]')).not.toBeNull();
   });
 
   it('paso 2: stepper +/- respeta límites 1-999 (BR-35)', () => {
@@ -66,7 +76,18 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
     );
   });
 
-  it('flujo completo: producto + cantidad + categoría llama a onSave con los valores correctos', async () => {
+  it('paso 3: avanza al paso 4 (nota) en lugar de guardar directamente', () => {
+    openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche'], onSave: vi.fn() });
+    goToStep3ViaChip('Leche');
+
+    document.querySelector('[data-testid="wizard-category-chip-Lácteos"]').click();
+    document.querySelector('[data-testid="wizard-next-button"]').click();
+
+    expect(document.querySelector('[data-testid="wizard-note-input"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="wizard-save-button"]')).not.toBeNull();
+  });
+
+  it('flujo completo: producto + cantidad + categoría + nota llama a onSave con los valores correctos', async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche'], onSave });
     goToStep2ViaChip('Leche');
@@ -76,6 +97,9 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
     document.querySelector('[data-testid="wizard-next-button"]').click();
 
     document.querySelector('[data-testid="wizard-category-chip-Lácteos"]').click();
+    document.querySelector('[data-testid="wizard-next-button"]').click();
+
+    document.querySelector('[data-testid="wizard-note-input"]').value = 'Marca sin lactosa';
     document.querySelector('[data-testid="wizard-save-button"]').click();
     await new Promise((r) => setTimeout(r, 0));
 
@@ -84,18 +108,30 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
       quantity_number: 2,
       quantity_unit: 'litros',
       category: 'Lácteos',
+      note: 'Marca sin lactosa',
     });
     expect(document.querySelector('[data-testid="modal-overlay"]')).toBeNull();
+  });
+
+  it('paso 4: la nota es opcional, se guarda como null si se deja vacía', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche'], onSave });
+    goToStep4('Leche', 'Lácteos');
+
+    document.querySelector('[data-testid="wizard-save-button"]').click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ note: null }));
   });
 
   it('categoría "Otra…" con texto libre se guarda tal cual', async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche'], onSave });
-    goToStep2ViaChip('Leche');
-    document.querySelector('[data-testid="wizard-next-button"]').click();
+    goToStep3ViaChip('Leche');
 
     document.querySelector('[data-testid="wizard-category-chip-other"]').click();
     document.querySelector('[data-testid="wizard-category-input"]').value = 'Bricolaje';
+    document.querySelector('[data-testid="wizard-next-button"]').click();
     document.querySelector('[data-testid="wizard-save-button"]').click();
     await new Promise((r) => setTimeout(r, 0));
 
@@ -105,13 +141,12 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
   it('muestra error genérico si onSave falla, sin cerrar el modal', async () => {
     const onSave = vi.fn().mockRejectedValue(new Error('boom'));
     openProductWizardModal({ mode: 'create', suggestedProducts: ['Leche'], onSave });
-    goToStep2ViaChip('Leche');
-    document.querySelector('[data-testid="wizard-next-button"]').click();
-    document.querySelector('[data-testid="wizard-category-chip-Fruta"]').click();
+    goToStep4('Leche', 'Fruta');
+
     document.querySelector('[data-testid="wizard-save-button"]').click();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(document.querySelector('[data-testid="wizard-step3-error"]').hidden).toBe(false);
+    expect(document.querySelector('[data-testid="wizard-step4-error"]').hidden).toBe(false);
     expect(document.querySelector('[data-testid="modal-overlay"]')).not.toBeNull();
   });
 
@@ -126,20 +161,18 @@ describe('openProductWizardModal — modo create (FR-13)', () => {
 });
 
 describe('openProductWizardModal — modo edit', () => {
-  it('precarga nombre, cantidad, unidad y categoría del producto', () => {
+  it('precarga nombre, cantidad, unidad, categoría y nota del producto', () => {
     const product = {
       id: 'p1',
       name: 'Huevos',
       quantity_number: 6,
       quantity_unit: 'unidades',
       category: 'Fruta',
+      note: 'Camperos',
     };
     openProductWizardModal({ mode: 'edit', product, suggestedProducts: ['Leche'], onSave: vi.fn() });
 
     expect(document.querySelector('[data-testid="modal-title"]').textContent).toBe('Editar producto');
-    expect(document.querySelector('[data-testid="wizard-product-chip-other"]').getAttribute('aria-pressed')).toBe(
-      'true'
-    );
     expect(document.querySelector('[data-testid="wizard-product-name-input"]').value).toBe('Huevos');
 
     document.querySelector('[data-testid="wizard-next-button"]').click();
@@ -150,17 +183,17 @@ describe('openProductWizardModal — modo edit', () => {
     expect(document.querySelector('[data-testid="wizard-category-chip-Fruta"]').getAttribute('aria-pressed')).toBe(
       'true'
     );
+
+    document.querySelector('[data-testid="wizard-next-button"]').click();
+    expect(document.querySelector('[data-testid="wizard-note-input"]').value).toBe('Camperos');
   });
 
-  it('si el nombre actual está entre los sugeridos, se preselecciona el chip (no "Otros")', () => {
-    const product = { id: 'p1', name: 'Leche', quantity_number: 1, quantity_unit: null, category: null };
+  it('si el nombre actual está entre los sugeridos, se preselecciona el chip', () => {
+    const product = { id: 'p1', name: 'Leche', quantity_number: 1, quantity_unit: null, category: null, note: null };
     openProductWizardModal({ mode: 'edit', product, suggestedProducts: ['Leche', 'Pan'], onSave: vi.fn() });
 
     expect(document.querySelector('[data-testid="wizard-product-chip-Leche"]').getAttribute('aria-pressed')).toBe(
       'true'
-    );
-    expect(document.querySelector('[data-testid="wizard-product-chip-other"]').getAttribute('aria-pressed')).toBe(
-      'false'
     );
   });
 });

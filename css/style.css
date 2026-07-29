@@ -2,6 +2,7 @@
   color-scheme: light;
   --spacing: 0.75rem;
   --radius: 10px;
+  --color-secondary: #7c3aed;
 }
 
 * {
@@ -183,6 +184,10 @@ button.danger {
   opacity: 0.7;
 }
 
+.product-item-note {
+  font-style: italic;
+}
+
 .empty-state {
   opacity: 0.7;
   text-align: center;
@@ -360,6 +365,60 @@ button.danger {
 .modal-panel--fullscreen .modal-body {
   flex: 1;
   overflow-y: auto;
+}
+
+.modal-panel--fullscreen .modal-header {
+  flex-shrink: 0;
+  height: 48px;
+}
+
+.modal-panel--fullscreen .modal-close-button {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  padding: 0;
+}
+
+.modal-panel--fullscreen .modal-footer {
+  flex-shrink: 0;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 calc(var(--spacing) * -1) calc(var(--spacing) * -1);
+  padding: 0 var(--spacing);
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+}
+
+.wizard-progress {
+  display: flex;
+  gap: 4px;
+  margin: 0 calc(var(--spacing) * -1);
+  margin-top: -1px;
+}
+
+.wizard-progress-segment {
+  flex: 1;
+  height: 3px;
+  background: rgba(127, 127, 127, 0.25);
+  border-radius: 999px;
+}
+
+.wizard-progress-segment[data-active="true"] {
+  background: var(--color-secondary);
+}
+
+.modal-footer .wizard-actions {
+  margin-top: 0;
+}
+
+.quantity-stepper button {
+  background: var(--color-secondary);
+  color: white;
 }
 
 /* Unidad 6 — cabecera, saludo, tabs, FAB, icono de categoría, stepper de cantidad */

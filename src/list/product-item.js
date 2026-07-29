@@ -27,6 +27,7 @@ export function renderProductItem(product, { onEdit, onToggleSelect, selected = 
         <div class="meta" data-testid="product-item-meta">
           ${quantityText ? escapeHtml(quantityText) + ' · ' : ''}${product.category ? escapeHtml(product.category) : 'Sin categoría'}
         </div>
+        ${product.note ? `<div class="meta product-item-note" data-testid="product-item-note">${escapeHtml(product.note)}</div>` : ''}
       </div>
     </div>
   `;

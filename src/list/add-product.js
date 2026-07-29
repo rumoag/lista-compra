@@ -19,13 +19,14 @@ export async function openAddProductWizard({ householdId }) {
   openProductWizardModal({
     mode: 'create',
     suggestedProducts,
-    onSave: async ({ name, quantity_number, quantity_unit, category }) => {
+    onSave: async ({ name, quantity_number, quantity_unit, category, note }) => {
       const { error } = await supabase.from('products').insert({
         household_id: householdId,
         name,
         quantity_number,
         quantity_unit,
         category,
+        note,
         status: 'pending',
         added_by: getLocalName(),
       });

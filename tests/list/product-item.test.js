@@ -34,6 +34,18 @@ describe('renderProductItem (revisado: sin menú de 3 puntos por item)', () => {
     expect(el.querySelector('[data-testid="product-item-meta"]').textContent).toContain('Sin categoría');
   });
 
+  it('con nota, muestra la nota', () => {
+    const el = mount(renderProductItem(makeProduct({ note: 'Marca sin lactosa' }), { onEdit: vi.fn() }));
+
+    expect(el.querySelector('[data-testid="product-item-note"]').textContent).toBe('Marca sin lactosa');
+  });
+
+  it('sin nota, no muestra el elemento de nota', () => {
+    const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn() }));
+
+    expect(el.querySelector('[data-testid="product-item-note"]')).toBeNull();
+  });
+
   it('no muestra checkbox si no se pasa onToggleSelect', () => {
     const el = mount(renderProductItem(makeProduct(), { onEdit: vi.fn() }));
 

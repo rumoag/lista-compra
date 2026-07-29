@@ -7,6 +7,9 @@ export const CATEGORY_ICON_MAP = new Map([
   ['Fruta', '🍎'],
   ['Verdura', '🥦'],
   ['Panadería', '🍞'],
+  ['Higiene personal', '🧼'],
+  ['Carnicería', '🥩'],
+  ['Pescadería', '🐟'],
 ]);
 
 export const GENERIC_CATEGORY_ICON = '📦';
