@@ -14,7 +14,8 @@
 - **Confirmación** (Q2=A): requiere `openConfirmModal` antes de ejecutar.
 
 ## BR-53: Acciones individuales dentro del modal (FR-21.1)
-- **Regla**: dentro del modal, cada producto tiene sus propios botones "Desmarcar" (→ `pending`, `bought_by = null`, `bought_at = null`, `purchase_id = null`) y "Eliminar" (→ `delete` del producto), sin confirmación adicional (mismo comportamiento optimista directo que el historial plano de hoy).
+- **Regla**: dentro del modal, cada producto tiene sus propios botones "Desmarcar" (→ `pending`, `bought_by = null`, `bought_at = null`, `purchase_id = null`) y "Eliminar" (→ `delete` del producto).
+- **Confirmación** (corrección post-aprobación, reportada como bug por el usuario 2026-07-29): ambas acciones requieren `openConfirmModal` antes de ejecutar, igual que el resto de acciones destructivas/individuales de la app (BR-51/BR-52 a nivel de ticket, borrado individual/en lote en `product-list.js`). El comportamiento original ("sin confirmación adicional") quedaba inconsistente con el resto de la app y se corrige aquí.
 - **Independencia**: estas acciones no afectan a los demás productos del mismo ticket ni requieren tocar el registro de `purchases` directamente (ver BR-54 para el caso de vaciado completo).
 
 ## BR-54: Limpieza de ticket huérfano (FR-21.2, Q9=A)
