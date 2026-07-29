@@ -24,7 +24,7 @@ function queueResponse(response) {
 
 function makeBuilder() {
   const builder = {};
-  ['select', 'eq', 'order', 'limit', 'lt', 'insert', 'update', 'delete', 'in'].forEach((method) => {
+  ['select', 'eq', 'order', 'limit', 'lt', 'gt', 'insert', 'update', 'delete', 'in'].forEach((method) => {
     builder[method] = vi.fn(() => builder);
   });
   builder.single = vi.fn(() => builder);
@@ -175,6 +175,26 @@ describe('renderHistoryList (Unidad 7 — tickets)', () => {
     expect(container.querySelector('[data-testid="ticket-row-t1"]')).not.toBeNull();
   });
 
+  it('el chip de fecha "Hoy" incluye tickets comprados hoy a cualquier hora del día', async () => {
+    queueResponse({ data: [], error: null }); // primera página inicial
+    const container = mount();
+    await renderHistoryList(container, { householdId: 'h1' });
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const purchase = makePurchase({ bought_at: `${todayIso}T23:30:00.000Z` });
+    queueResponse({
+      data: [{ id: 'p1', name: 'Leche', purchase_id: 't1', bought_at: purchase.bought_at }],
+      error: null,
+    }); // fetchProductsForFiltering
+    queueResponse({ data: [purchase], error: null }); // purchases .in(purchaseIds)
+
+    container.querySelector('[data-testid="history-filter-date-chip"]').click();
+    document.querySelector('[data-testid="history-date-option-today"]').click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(container.querySelector('[data-testid="ticket-row-t1"]')).not.toBeNull();
+  });
+
   it('filtro sin coincidencias muestra el mensaje de "sin resultados"', async () => {
     queueResponse({ data: [], error: null }); // primera página inicial
     const container = mount();
@@ -284,6 +304,21 @@ describe('renderHistoryList (Unidad 7 — tickets)', () => {
     // no habría añadido productos, pero el filtro debe seguir mostrando la lista vacía sin
     // que se reactive el modo paginado.
     expect(container.querySelector('[data-testid="history-empty"]').hidden).toBe(false);
+  });
+
+  it('cambiar el chip de orden a "más antiguo primero" recarga la primera página en orden ascendente', async () => {
+    queueResponse({ data: [makePurchase()], error: null }); // primera página inicial (desc)
+    const container = mount();
+    await renderHistoryList(container, { householdId: 'h1' });
+
+    queueResponse({ data: [makePurchase({ id: 't-old' })], error: null }); // recarga tras cambiar el orden
+    container.querySelector('[data-testid="history-filter-sort-chip"]').click();
+    document.querySelector('[data-testid="history-sort-option-asc"]').click();
+    await new Promise((r) => setTimeout(r, 0));
+
+    const reloadBuilder = createdBuilders.find((b) => b.gt.mock.calls.length === 0 && b.order.mock.calls.some((call) => call[1]?.ascending === true));
+    expect(reloadBuilder).toBeDefined();
+    expect(container.querySelector('[data-testid="ticket-row-t-old"]')).not.toBeNull();
   });
 
   it('desuscribe Realtime al desmontar (pagehide)', async () => {
