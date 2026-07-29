@@ -59,6 +59,14 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
   function renderStep1() {
     body.innerHTML = `
       <label class="form-label">Selecciona tu producto</label>
+      <input
+        type="text"
+        class="text-input"
+        data-testid="wizard-product-name-input"
+        maxlength="50"
+        placeholder="Nombre del producto"
+        value="${escapeAttr(state.name)}"
+      />
       <div class="chip-group" data-testid="wizard-product-chips">
         ${suggestedProducts
           .map(
@@ -67,13 +75,6 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
           )
           .join('')}
       </div>
-      <input
-        type="text"
-        data-testid="wizard-product-name-input"
-        maxlength="50"
-        placeholder="Nombre del producto"
-        value="${escapeAttr(state.name)}"
-      />
       <div class="error-message" data-testid="wizard-step1-error" hidden></div>
     `;
 
@@ -295,6 +296,12 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
   }
 
   renderStep();
+
+  if (!isEdit) {
+    const nameInput = body.querySelector('[data-testid="wizard-product-name-input"]');
+    nameInput.focus();
+    nameInput.select();
+  }
 }
 
 function escapeHtml(value) {
