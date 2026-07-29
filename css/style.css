@@ -330,7 +330,7 @@ button.danger {
    persistente entre Lista/Historial/Estadísticas: ambos elementos comparten alto. */
 .floating-bar {
   position: fixed;
-  bottom: 1.25rem;
+  bottom: 48px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
