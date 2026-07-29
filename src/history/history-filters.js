@@ -20,7 +20,7 @@ export function renderHistoryFilters(container, { onChange }) {
   container.innerHTML = `
     <div class="chip-group" data-testid="history-filters">
       <button type="button" class="chip chip--icon" data-testid="history-filter-search-toggle" aria-label="Buscar por nombre">🔍</button>
-      <input type="text" class="chip-search-input" placeholder="Buscar por nombre" data-testid="history-filter-name-input" hidden />
+      <input type="text" class="chip-search-input" placeholder="Buscar producto" data-testid="history-filter-name-input" hidden />
       <button type="button" class="chip" data-testid="history-filter-search-value-chip" hidden>
         <span data-testid="history-filter-search-value-text"></span>
         <span class="chip-remove" data-testid="history-filter-search-clear-button" aria-label="Quitar búsqueda">✕</span>
