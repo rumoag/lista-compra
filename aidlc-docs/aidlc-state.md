@@ -136,6 +136,9 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [ ] Code Generation
 - [ ] Build and Test (incremental)
 
+### Unidad 5 — Seguimiento: tarjeta "Crear nueva lista" (BR-66)
+- [x] Petición del usuario: la "Crear nueva lista" pasa de botón de cabecera a tarjeta con forma de `list-card`, primera del listado, icono "+" en contenedor gris redondeado, subtítulo "Toca para empezar"; estado vacío se mantiene debajo. 3 dudas de diseño resueltas por el usuario antes de implementar (estado vacío, subtítulo, forma del icono). Implementado directamente en `home/list-card.js` (nueva función `renderCreateListCard`) y `home/home-screen.js` + estilos en `css/style.css`; 228/228 tests pasan (sin cambios de test necesarios, mismo `data-testid`); build verificado (falla únicamente por falta de variables de entorno Supabase locales, no relacionado). Documentado como BR-66 en `functional-design/business-rules.md` y reflejado en `frontend-components.md`.
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.

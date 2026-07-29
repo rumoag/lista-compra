@@ -196,12 +196,6 @@ button.danger {
 
 /* Unidad 5 — pantalla de inicio, tarjetas de lista y modales */
 
-.home-screen-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--spacing);
-}
-
 .list-card {
   display: flex;
   justify-content: space-between;
@@ -219,6 +213,22 @@ button.danger {
 
 .list-card-icon {
   font-size: 1.8rem;
+}
+
+.list-card-icon--create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  background: rgba(127, 127, 127, 0.18);
+  border-radius: var(--radius);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.list-card--create {
+  cursor: pointer;
 }
 
 .list-card-title {

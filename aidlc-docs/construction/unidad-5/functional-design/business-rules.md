@@ -40,3 +40,9 @@
 
 ## BR-34: Visibilidad sin filtro (excepción de seguridad aceptada)
 - **Regla** (NFR-2 de requirements.md): la consulta que alimenta el listado de la pantalla de inicio trae **todas** las filas de `households`, sin filtrar por dispositivo ni identidad. Esta es una decisión de producto explícita y temporal, no un descuido — debe implementarse literalmente así (sin añadir un filtro "de más" por `localStorage` que el usuario no ha pedido), documentando el riesgo donde corresponda (comentario en el código de la consulta, igual que se hizo con SECURITY-08 en la Unidad 1).
+
+## BR-66: "Crear nueva lista" como primera tarjeta del listado
+- **Regla** (petición directa del usuario tras la aprobación de la Unidad 5, sin ambigüedad de diseño — mismo patrón que BR-60 en Unidad 7): el botón "Crear nueva lista" deja de ser un botón de cabecera independiente y pasa a renderizarse con la misma forma visual que una tarjeta de lista (`list-card`), como primer elemento del listado, siempre por delante de las listas existentes.
+- **Icono**: el icono de la tarjeta es un "+" en lugar de un emoji, alojado en un contenedor con fondo gris y esquinas redondeadas (mismo radio que el resto de tarjetas/botones de la app).
+- **Subtítulo**: incluye una segunda línea "Toca para empezar" para mantener la misma estructura de dos líneas que el resto de tarjetas.
+- **Estado vacío (BR-30)**: cuando no hay ninguna lista, la tarjeta de crear aparece igualmente primera, y el mensaje "Aún no hay listas, crea la primera" se mantiene debajo como refuerzo (no se elimina).

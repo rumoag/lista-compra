@@ -1219,3 +1219,12 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: CONSTRUCTION PHASE (incremental, Unidad 7) COMPLETE
 
 ---
+
+## Seguimiento — Tarjeta "Crear nueva lista" (BR-66, Unidad 5)
+**Timestamp**: 2026-07-29T14:45:05Z
+**User Input**: "en la lista de listas de la compra me gustaria que el crear nueva lista tenga la forma de un producto y se aloje el primero. Cambiando el icon por un + y el contenedor del icon por un fondo gris. dudas?"
+**AI Response**: Se plantearon 3 preguntas de aclaración (estado vacío tras añadir la tarjeta, texto/subtítulo de la tarjeta, forma del contenedor gris del icono). Respuestas del usuario: mantener el mensaje de estado vacío debajo de la tarjeta; título + subtítulo "Toca para empezar"; contenedor cuadrado redondeado (mismo radio que el resto de la app). Implementado directamente (sin ambigüedad tras las respuestas, mismo patrón que BR-60): nueva función `renderCreateListCard` en `home/list-card.js`, `home/home-screen.js` la renderiza como primer elemento del listado (elimina el botón de cabecera `home-screen-header`), estilos nuevos `.list-card-icon--create`/`.list-card--create` en `css/style.css`. 228/228 tests pasan sin cambios necesarios (mismo `data-testid="home-create-list-button"`); build verificado (falla solo por falta de env vars de Supabase en local, no relacionado). Documentado como BR-66 en `aidlc-docs/construction/unidad-5/functional-design/business-rules.md` y `frontend-components.md`.
+**Context**: Seguimiento post-aprobación, Ciclo 2, Unidad 5
+**Estado**: UNIDAD 5 (Pantalla 1) — seguimiento BR-66 completo
+
+---

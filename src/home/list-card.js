@@ -2,6 +2,26 @@
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
 import { formatParticipants } from './participants.js';
 
+export function renderCreateListCard(onClick) {
+  const el = document.createElement('div');
+  el.className = 'card list-card list-card--create';
+  el.dataset.testid = 'home-create-list-button';
+
+  el.innerHTML = `
+    <div class="list-card-main" data-testid="list-card-open-area">
+      <div class="list-card-icon list-card-icon--create" data-testid="list-card-icon">+</div>
+      <div>
+        <div class="list-card-title" data-testid="list-card-title">Crear nueva lista</div>
+        <div class="meta" data-testid="list-card-participants">Toca para empezar</div>
+      </div>
+    </div>
+  `;
+
+  el.addEventListener('click', onClick);
+
+  return el;
+}
+
 export function renderListCard(household, { onEdit, onDelete, onViewQr, onOpen }) {
   const el = document.createElement('div');
   el.className = 'card list-card';

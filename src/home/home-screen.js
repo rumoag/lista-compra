@@ -1,15 +1,12 @@
 // Pantalla de inicio (FR-1, FR-2, BR-30) — listado de listas activas + "Crear nueva lista".
 import { fetchAllHouseholdsWithParticipants, deleteHousehold } from './households-api.js';
-import { renderListCard } from './list-card.js';
+import { renderListCard, renderCreateListCard } from './list-card.js';
 import { openListFormModal } from './list-form-modal.js';
 import { openQrModal } from '../common/qr-modal.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 
 export async function renderHomeScreen(container) {
   container.innerHTML = `
-    <div class="home-screen-header">
-      <button type="button" data-testid="home-create-list-button">Crear nueva lista</button>
-    </div>
     <div class="error-message" data-testid="home-load-error" hidden></div>
     <div data-testid="home-list-container"></div>
     <div class="empty-state" data-testid="home-empty-state" hidden>Aún no hay listas, crea la primera</div>
@@ -18,7 +15,6 @@ export async function renderHomeScreen(container) {
   const listContainer = container.querySelector('[data-testid="home-list-container"]');
   const emptyState = container.querySelector('[data-testid="home-empty-state"]');
   const loadError = container.querySelector('[data-testid="home-load-error"]');
-  const createButton = container.querySelector('[data-testid="home-create-list-button"]');
 
   async function refresh() {
     loadError.hidden = true;
@@ -32,12 +28,11 @@ export async function renderHomeScreen(container) {
     }
 
     listContainer.innerHTML = '';
+    listContainer.appendChild(
+      renderCreateListCard(() => openListFormModal({ mode: 'create', onSaved: refresh }))
+    );
 
-    if (households.length === 0) {
-      emptyState.hidden = false;
-      return;
-    }
-    emptyState.hidden = true;
+    emptyState.hidden = households.length !== 0;
 
     households.forEach((household) => {
       listContainer.appendChild(
@@ -61,10 +56,6 @@ export async function renderHomeScreen(container) {
       );
     });
   }
-
-  createButton.addEventListener('click', () => {
-    openListFormModal({ mode: 'create', onSaved: refresh });
-  });
 
   await refresh();
 }
