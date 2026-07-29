@@ -136,6 +136,19 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [ ] Code Generation
 - [ ] Build and Test (incremental)
 
+## CICLO 3 — Design System basado en Radix UI (iniciado 2026-07-29)
+
+**Contexto**: Nueva solicitud del usuario tras Ciclo 2, para adoptar el lenguaje visual de Radix UI (Radix Colors + Radix Themes) como design system: color de acento Lime, neutro Sand, modo oscuro completo, tipografía Inter + escala Radix, escala completa de radios, remaquetado de todos los componentes visuales existentes.
+
+- [x] Requirements Analysis — 7 preguntas de aclaración respondidas (alcance = remaquetar todo; acento Lime; neutro Sand; dark mode completo por `prefers-color-scheme`; tipografía Inter + escala Radix; escala completa de radios; verificación visual manual del usuario); requirements.md ampliado con sección "Ciclo 3"; aprobado
+- [x] Workflow Planning — User Stories/Application Design/Units Generation/Functional Design/NFR Requirements/NFR Design/Infrastructure Design SKIP (cambio puramente visual, sin lógica de negocio ni infraestructura nueva); Code Generation en 5 lotes con checkpoints visuales; aprobado
+- [x] Code Generation — Lote 0 (Fundaciones: tokens color/tipografía/radio) — `css/tokens.css` creado, `style.css`/`index.html` actualizados; 230/230 tests pasan; sin cambio visual todavía
+- [ ] Code Generation — Lote 1 (Componentes base: tarjetas/botones/chips/inputs)
+- [ ] Code Generation — Lote 2 (Componentes de listas)
+- [ ] Code Generation — Lote 3 (Modales e historial)
+- [ ] Code Generation — Lote 4 (Onboarding/QR y detalles finales)
+- [ ] Build and Test
+
 ### Unidad 5 — Seguimiento: tarjeta "Crear nueva lista" (BR-66)
 - [x] Petición del usuario: la "Crear nueva lista" pasa de botón de cabecera a tarjeta con forma de `list-card`, primera del listado, icono "+" en contenedor gris redondeado, subtítulo "Toca para empezar"; estado vacío se mantiene debajo. 3 dudas de diseño resueltas por el usuario antes de implementar (estado vacío, subtítulo, forma del icono). Implementado directamente en `home/list-card.js` (nueva función `renderCreateListCard`) y `home/home-screen.js` + estilos en `css/style.css`; 228/228 tests pasan (sin cambios de test necesarios, mismo `data-testid`); build verificado (falla únicamente por falta de variables de entorno Supabase locales, no relacionado). Documentado como BR-66 en `functional-design/business-rules.md` y reflejado en `frontend-components.md`.
 

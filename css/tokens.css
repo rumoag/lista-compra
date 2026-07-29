@@ -1,0 +1,100 @@
+/* Design tokens basados en Radix UI.
+   Color: Lime (accent) + Sand (neutral). Valores oficiales de @radix-ui/colors.
+   Radios/tipografía: valores oficiales de @radix-ui/themes (tokens/base.css).
+   Consultados vía npm (unpkg) el 2026-07-29. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Accent — Lime (claro) */
+  --accent-1: #fcfdfa;
+  --accent-2: #f8faf3;
+  --accent-3: #eef6d6;
+  --accent-4: #e2f0bd;
+  --accent-5: #d3e7a6;
+  --accent-6: #c2da91;
+  --accent-7: #abc978;
+  --accent-8: #8db654;
+  --accent-9: #bdee63;
+  --accent-10: #b0e64c;
+  --accent-11: #5c7c2f;
+  --accent-12: #37401c;
+
+  /* Sand (claro) */
+  --sand-1: #fdfdfc;
+  --sand-2: #f9f9f8;
+  --sand-3: #f1f0ef;
+  --sand-4: #e9e8e6;
+  --sand-5: #e2e1de;
+  --sand-6: #dad9d6;
+  --sand-7: #cfceca;
+  --sand-8: #bcbbb5;
+  --sand-9: #8d8d86;
+  --sand-10: #82827c;
+  --sand-11: #63635e;
+  --sand-12: #21201c;
+
+  /* Radios (Radix Themes, radius-factor 1) */
+  --radius-1: 3px;
+  --radius-2: 4px;
+  --radius-3: 6px;
+  --radius-4: 8px;
+  --radius-5: 12px;
+  --radius-6: 16px;
+  --radius-full: 9999px;
+
+  /* Tipografía (Radix Themes) */
+  --font-family-base: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --font-size-1: 12px;
+  --font-size-2: 14px;
+  --font-size-3: 16px;
+  --font-size-4: 18px;
+  --font-size-5: 20px;
+  --font-size-6: 24px;
+  --font-size-7: 28px;
+  --font-size-8: 35px;
+  --font-size-9: 60px;
+
+  --line-height-1: 16px;
+  --line-height-2: 20px;
+  --line-height-3: 24px;
+  --line-height-4: 26px;
+  --line-height-5: 28px;
+  --line-height-6: 30px;
+  --line-height-7: 36px;
+  --line-height-8: 40px;
+  --line-height-9: 60px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Accent — Lime (oscuro) */
+    --accent-1: #11130c;
+    --accent-2: #151a10;
+    --accent-3: #1f2917;
+    --accent-4: #29371d;
+    --accent-5: #334423;
+    --accent-6: #3d522a;
+    --accent-7: #496231;
+    --accent-8: #577538;
+    --accent-9: #bdee63;
+    --accent-10: #d4ff70;
+    --accent-11: #bde56c;
+    --accent-12: #e3f7ba;
+
+    /* Sand (oscuro) */
+    --sand-1: #111110;
+    --sand-2: #191918;
+    --sand-3: #222221;
+    --sand-4: #2a2a28;
+    --sand-5: #31312e;
+    --sand-6: #3b3a37;
+    --sand-7: #494844;
+    --sand-8: #62605b;
+    --sand-9: #6f6d66;
+    --sand-10: #7c7b74;
+    --sand-11: #b5b3ad;
+    --sand-12: #eeeeec;
+  }
+}

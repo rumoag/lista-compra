@@ -300,3 +300,52 @@ Todas las acciones de "marcar como comprado" pasan hoy por la barra de selecció
 
 ## Alcance de esta iteración (Ciclo 2 — Unidad 7)
 Se procede directamente a Functional Design (definir el detalle de la migración de esquema, ciclo de vida del ticket huérfano, y componentes del modal) sin pasar por User Stories, por el mismo criterio que las Pantallas 1 y 2.
+
+---
+
+## CICLO 3 — Design System basado en Radix UI
+
+### Intent Analysis Summary
+- **User Request**: "me gustaria generar un design system basado en https://www.radix-ui.com/"
+- **Request Type**: Enhancement (fundamentos visuales + remaquetado de componentes existentes)
+- **Scope Estimate**: System-wide (afecta a `css/style.css` completo y a todos los componentes de `src/`)
+- **Complexity Estimate**: Moderate (sin lógica de negocio nueva; el riesgo está en no romper comportamiento/tests existentes al remaquetar)
+- **Depth Applied**: Standard
+
+### Contexto técnico relevante
+La app es HTML/CSS/JS vanilla (sin React ni bundler de UI), con un único `css/style.css` (753 líneas) y variables CSS mínimas (`--spacing`, `--radius`, `--color-primary`, `--color-secondary`). Radix UI (los primitivos React) no es aplicable sin React; el design system adopta en su lugar el **lenguaje visual de Radix**: escalas de color de [Radix Colors](https://www.radix-ui.com/colors) (12 pasos por color, claro y oscuro), escala de radios, escala tipográfica y espaciado de [Radix Themes](https://www.radix-ui.com/themes/docs/theme/overview), traducidos a variables CSS propias del proyecto.
+
+### FR-24: Tokens de color (Radix Colors)
+- FR-24.1: Color de acento: **Lime** (escala completa de 12 pasos, claro y oscuro).
+- FR-24.2: Color neutro: **Sand** (escala completa de 12 pasos, claro y oscuro).
+- FR-24.3: Los 12 pasos de cada escala se exponen como variables CSS (`--accent-1` … `--accent-12`, `--sand-1` … `--sand-12`) con los valores oficiales publicados por Radix Colors, siguiendo el uso previsto por paso (1-2 fondo, 3-5 componentes interactivos, 6-8 bordes, 9-10 sólidos/acento, 11-12 texto).
+- FR-24.4: Colores semánticos existentes hoy con valores hardcodeados sueltos (estados de error, éxito, etc., si los hay) se migran a la escala Radix correspondiente donde exista una equivalencia clara; si no la hay, se documenta como excepción.
+
+### FR-25: Modo oscuro
+- FR-25.1: Se implementa modo oscuro completo con la escala oscura de Radix Colors para `accent` y `sand`.
+- FR-25.2: El modo se activa automáticamente por preferencia del sistema (`prefers-color-scheme: dark`), sin selector manual en esta iteración (no solicitado).
+- FR-25.3: `color-scheme` en `:root` se ajusta dinámicamente (`light dark`) para que los controles nativos del navegador (inputs, scrollbars) reflejen el tema correcto.
+
+### FR-26: Tipografía
+- FR-26.1: Se adopta **Inter** como fuente principal, cargada vía Google Fonts (`<link>` en `index.html`), con `system-ui`/`sans-serif` como fallback de la pila de fuentes.
+- FR-26.2: Se adopta la escala tipográfica de tamaños de Radix Themes (9 pasos) como variables CSS (`--font-size-1` … `--font-size-9`), aplicada a título de app, títulos de sección, texto de cuerpo, texto secundario/metadatos y labels.
+
+### FR-27: Radios
+- FR-27.1: Se adopta la escala de radios de Radix (`--radius-1` … `--radius-6`, más un radio "full"/999px para elementos tipo píldora).
+- FR-27.2: Cada tipo de elemento usa el paso de radio que le corresponda por convención Radix (ej.: inputs/botones pequeños → radio bajo, tarjetas/modales → radio medio-alto, chips/badges → full).
+
+### FR-28: Remaquetado de componentes existentes
+- FR-28.1: Se remaquetan **todos** los componentes visuales existentes en `css/style.css` para usar los tokens de FR-24 a FR-27, incluyendo (no limitado a): tarjetas (`.card`), formulario de producto, chips, botones/acciones, barra de selección en lote, modales, filas de historial/tickets, vista de estadísticas, tarjetas de lista (`list-card`), onboarding/QR.
+- FR-28.2: El remaquetado es solo visual (color, tipografía, radio, espaciado); no cambia estructura HTML, `data-testid`, comportamiento JS ni lógica de negocio, salvo ajustes mínimos de marcado inevitables para aplicar un token (a valorar caso por caso en Functional/NFR Design).
+- FR-28.3: Se prioriza mantener los 228 tests existentes en verde; cualquier test que dependa de un valor de estilo hardcodeado que cambie de intención se actualiza como parte de esta iteración.
+
+### Non-Functional Requirements
+
+**NFR-12 (verificación)**: la validación de que el resultado "se ve como Radix" es manual: el usuario revisará visualmente en el navegador tras cada componente/tanda remaquetada. No se exige pixel-perfect frente a Radix Themes, pero los valores de los tokens (colores, radios, tamaños tipográficos) deben coincidir con los oficiales de Radix Colors/Themes para el color Lime/Sand.
+
+**NFR-13**: sin dependencias nuevas de build ni frameworks de UI — los tokens se definen como variables CSS puras en `css/style.css` (o un archivo de tokens separado importado desde ahí), consistente con el enfoque vanilla ya establecido (NFR-8).
+
+**NFR-14**: accesibilidad de contraste — al aplicar los pasos de texto (11-12) de las escalas Radix sobre los pasos de fondo (1-2), se preserva el contraste AA ya garantizado por el diseño de Radix Colors; no se introducen combinaciones de color fuera de las parejas fondo/texto recomendadas por Radix.
+
+## Alcance de esta iteración (Ciclo 3)
+Dado que es un cambio transversal (afecta a todos los componentes visuales) pero sin ambigüedad de negocio ni nuevos flujos de usuario, se procede sin User Stories, directamente a Workflow Planning para definir cómo secuenciar el remaquetado (tokens primero, luego componentes por lotes, con puntos de verificación visual del usuario).
