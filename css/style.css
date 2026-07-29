@@ -8,6 +8,11 @@
   box-sizing: border-box;
 }
 
+.ph-icon {
+  display: inline-block;
+  vertical-align: -0.125em;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;

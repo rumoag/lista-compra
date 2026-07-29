@@ -69,12 +69,12 @@ describe('renderDropdownMenu', () => {
     expect(container.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(true);
   });
 
-  it('sin personalizar, el toggle son los "3 puntos" por defecto', () => {
+  it('sin personalizar, el toggle son los "3 puntos" por defecto (icono Phosphor)', () => {
     const container = mount();
     renderDropdownMenu(container, { actions: makeActions() });
 
     const toggle = container.querySelector('[data-testid="dropdown-menu-toggle"]');
-    expect(toggle.textContent).toBe('⋮');
+    expect(toggle.querySelector('svg.ph-icon')).not.toBeNull();
     expect(toggle.className).toBe('secondary');
   });
 

@@ -13,6 +13,7 @@ import { renderProductList } from './list/product-list.js';
 import { renderHistoryList } from './history/history-list.js';
 import { renderStatsPage } from './stats/stats-page.js';
 import { openAddProductWizard } from './list/add-product.js';
+import { icon } from './common/icon.js';
 
 const appMain = document.getElementById('app-main');
 const appHeader = document.querySelector('[data-testid="app-header"]');
@@ -23,9 +24,9 @@ function getHouseholdIdFromPath() {
 }
 
 const VIEWS = {
-  list: { label: 'Lista', icon: '📋', render: renderProductList },
-  history: { label: 'Tickets', icon: '🕓', render: renderHistoryList },
-  stats: { label: 'Estadísticas', icon: '📊', render: renderStatsPage },
+  list: { label: 'Lista', icon: icon('list-bullets'), render: renderProductList },
+  history: { label: 'Tickets', icon: icon('clock-counter-clockwise'), render: renderHistoryList },
+  stats: { label: 'Estadísticas', icon: icon('chart-bar'), render: renderStatsPage },
 };
 
 async function start() {
