@@ -39,12 +39,20 @@ export function renderHistoryFilters(container, { onChange }) {
   const sortChip = container.querySelector('[data-testid="history-filter-sort-chip"]');
 
   let dateFrom = null;
-  let dateTo = null;
+  let dateToRaw = null; // fecha de "hasta" tal cual la elige el usuario (día natural, sin hora)
   let currentDatePreset = 'any';
   let sortAscending = false;
 
+  // El día de "hasta" debe cubrir el día entero: si se emitiera tal cual (medianoche),
+  // filterByDateRange excluiría cualquier compra registrada después de las 00:00 de ese
+  // día — que es prácticamente cualquier compra real (BR-16 no lo amplía por su cuenta).
   function emitChange() {
-    onChange({ nameQuery: nameInput.value, dateFrom, dateTo, sortAscending });
+    onChange({
+      nameQuery: nameInput.value,
+      dateFrom,
+      dateTo: dateToRaw ? `${dateToRaw}T23:59:59.999Z` : null,
+      sortAscending,
+    });
   }
 
   // --- Búsqueda: icono de lupa -> input -> chip con el texto buscado y una "x" para quitarlo ---
@@ -90,30 +98,30 @@ export function renderHistoryFilters(container, { onChange }) {
     const today = new Date();
     switch (preset) {
       case 'today':
-        dateFrom = dateTo = toDateInputValue(today);
+        dateFrom = dateToRaw = toDateInputValue(today);
         break;
       case 'yesterday':
-        dateFrom = dateTo = toDateInputValue(addDays(today, -1));
+        dateFrom = dateToRaw = toDateInputValue(addDays(today, -1));
         break;
       case '7d':
         dateFrom = toDateInputValue(addDays(today, -6));
-        dateTo = toDateInputValue(today);
+        dateToRaw = toDateInputValue(today);
         break;
       case '30d':
         dateFrom = toDateInputValue(addDays(today, -29));
-        dateTo = toDateInputValue(today);
+        dateToRaw = toDateInputValue(today);
         break;
       case 'any':
       default:
         dateFrom = null;
-        dateTo = null;
+        dateToRaw = null;
     }
   }
 
   function dateChipLabel() {
     if (currentDatePreset === 'custom') {
       const from = dateFrom ? formatDisplayDate(dateFrom) : '…';
-      const to = dateTo ? formatDisplayDate(dateTo) : '…';
+      const to = dateToRaw ? formatDisplayDate(dateToRaw) : '…';
       return `${from} - ${to}`;
     }
     return DATE_PRESETS.find((option) => option.value === currentDatePreset)?.label ?? 'Cualquier fecha';
@@ -147,7 +155,7 @@ export function renderHistoryFilters(container, { onChange }) {
         if (option.value === 'custom') {
           customRange.hidden = false;
           fromInput.value = dateFrom ?? '';
-          toInput.value = dateTo ?? '';
+          toInput.value = dateToRaw ?? '';
           return;
         }
         applyDatePreset(option.value);
@@ -161,7 +169,7 @@ export function renderHistoryFilters(container, { onChange }) {
 
     applyButton.addEventListener('click', () => {
       dateFrom = fromInput.value || null;
-      dateTo = toInput.value || null;
+      dateToRaw = toInput.value || null;
       currentDatePreset = 'custom';
       dateChip.textContent = dateChipLabel();
       close();

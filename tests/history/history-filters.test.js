@@ -57,7 +57,7 @@ describe('renderHistoryFilters', () => {
     expect(onChange).toHaveBeenLastCalledWith({
       nameQuery: '',
       dateFrom: todayIso,
-      dateTo: todayIso,
+      dateTo: `${todayIso}T23:59:59.999Z`,
       sortAscending: false,
     });
     expect(container.querySelector('[data-testid="history-filter-date-chip"]').textContent).toBe('Hoy');
@@ -78,7 +78,7 @@ describe('renderHistoryFilters', () => {
     expect(onChange).toHaveBeenLastCalledWith({
       nameQuery: '',
       dateFrom: '2026-07-01',
-      dateTo: '2026-07-15',
+      dateTo: '2026-07-15T23:59:59.999Z',
       sortAscending: false,
     });
   });
