@@ -6,12 +6,12 @@
 - **Reutilizado por**: `list-form-modal.js`, `qr-modal.js`, `delete-confirm-modal.js`.
 
 ## Componente nuevo: `home/home-screen.js`
-- **Responsabilidad**: pantalla de inicio (sustituye la llamada directa a `renderCreateHousehold` en `main.js` cuando no hay `householdId` en la URL). Consulta todas las listas (Flujo 1), renderiza estado vacío o el listado de tarjetas, y el botón "Crear nueva lista".
+- **Responsabilidad**: pantalla de inicio (sustituye la llamada directa a `renderCreateHousehold` en `main.js` cuando no hay `householdId` en la URL). Consulta todas las listas (Flujo 1), renderiza la tarjeta de "Crear nueva lista" (BR-66) como primer elemento del listado seguida del resto de tarjetas, o el estado vacío (BR-30) debajo si no hay ninguna.
 - **Props**: `container`.
-- **Hijos**: `list-card.js` (uno por household), botón que abre `list-form-modal.js` en modo `create`.
+- **Hijos**: `list-card.js` (uno por household) + `renderCreateListCard` (BR-66, mismo módulo) siempre primero.
 
 ## Componente nuevo: `home/list-card.js`
-- **Responsabilidad**: tarjeta individual — icono, título, participantes truncados (BR-28), botón de 3 puntos.
+- **Responsabilidad**: tarjeta individual — icono, título, participantes truncados (BR-28), botón de 3 puntos. Exporta también `renderCreateListCard` (BR-66): misma forma visual (`list-card`), icono "+" en contenedor con fondo gris, sin menú de 3 puntos, click abre `list-form-modal.js` en modo `create`.
 - **Props**: `household` (`{ id, title, image_icon, participants }`), callbacks `onEdit`, `onDelete`, `onViewQr`.
 - **Interacción**: click en la tarjeta (fuera del menú) navega a `/{household.id}`; click en el botón de 3 puntos abre `list-actions-menu.js`.
 
