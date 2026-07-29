@@ -61,7 +61,21 @@ describe('openTicketModal', () => {
     expect(document.querySelector('[data-testid="ticket-product-p2"]')).not.toBeNull();
   });
 
-  it('desmarcar un producto (no el último) lo quita de la vista y actualiza remoto (BR-53)', async () => {
+  it('desmarcar un producto abre confirmación antes de actuar (BR-53)', () => {
+    const purchase = makePurchase();
+    openTicketModal(purchase, { onTicketChanged: vi.fn(), onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    document
+      .querySelector('[data-testid="ticket-product-p1"] [data-testid="ticket-product-unmark-button"]')
+      .click();
+
+    expect(openConfirmModal).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Desmarcar producto', onConfirm: expect.any(Function) })
+    );
+    expect(document.querySelector('[data-testid="ticket-product-p1"]')).not.toBeNull();
+  });
+
+  it('confirmar desmarcar un producto (no el último) lo quita de la vista y actualiza remoto (BR-53)', async () => {
     queueResponse({ error: null }); // update products
     const purchase = makePurchase();
     const onTicketChanged = vi.fn();
@@ -70,7 +84,7 @@ describe('openTicketModal', () => {
     document
       .querySelector('[data-testid="ticket-product-p1"] [data-testid="ticket-product-unmark-button"]')
       .click();
-    await new Promise((r) => setTimeout(r, 0));
+    await openConfirmModal.mock.calls[0][0].onConfirm();
 
     const updateBuilder = createdBuilders.find((b) => b.update.mock.calls.length > 0);
     expect(updateBuilder.update).toHaveBeenCalledWith(
@@ -82,7 +96,21 @@ describe('openTicketModal', () => {
     expect(onTicketChanged).toHaveBeenCalledWith(purchase);
   });
 
-  it('eliminar el último producto del ticket borra también el purchase huérfano y cierra el modal (BR-54)', async () => {
+  it('eliminar un producto abre confirmación antes de actuar (BR-53)', () => {
+    const purchase = makePurchase();
+    openTicketModal(purchase, { onTicketChanged: vi.fn(), onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    document
+      .querySelector('[data-testid="ticket-product-p1"] [data-testid="ticket-product-delete-button"]')
+      .click();
+
+    expect(openConfirmModal).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Eliminar producto', onConfirm: expect.any(Function) })
+    );
+    expect(document.querySelector('[data-testid="ticket-product-p1"]')).not.toBeNull();
+  });
+
+  it('confirmar eliminar el último producto del ticket borra también el purchase huérfano y cierra el modal (BR-54)', async () => {
     const purchase = makePurchase({
       products: [{ id: 'p1', name: 'Leche', quantity_number: 1, quantity_unit: null }],
     });
@@ -94,7 +122,7 @@ describe('openTicketModal', () => {
     document
       .querySelector('[data-testid="ticket-product-p1"] [data-testid="ticket-product-delete-button"]')
       .click();
-    await new Promise((r) => setTimeout(r, 0));
+    await openConfirmModal.mock.calls[0][0].onConfirm();
 
     const deleteBuilders = createdBuilders.filter((b) => b.delete.mock.calls.length > 0);
     expect(deleteBuilders).toHaveLength(2);
@@ -110,7 +138,7 @@ describe('openTicketModal', () => {
     document
       .querySelector('[data-testid="ticket-product-p1"] [data-testid="ticket-product-unmark-button"]')
       .click();
-    await new Promise((r) => setTimeout(r, 0));
+    await openConfirmModal.mock.calls[0][0].onConfirm();
 
     expect(document.querySelector('[data-testid="ticket-product-p1"]')).not.toBeNull();
     expect(purchase.products).toHaveLength(2);

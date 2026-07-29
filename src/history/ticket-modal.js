@@ -105,19 +105,33 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   }
 
   function handleUnmarkProduct(id) {
-    return removeProductAndCheckOrphan(id, async () => {
-      const { error } = await supabase
-        .from('products')
-        .update({ status: 'pending', bought_by: null, bought_at: null, purchase_id: null })
-        .eq('id', id);
-      if (error) throw error;
+    const product = purchase.products.find((p) => p.id === id);
+    openConfirmModal({
+      title: 'Desmarcar producto',
+      message: `¿Desmarcar "${product.name}"? Volverá a la lista de pendientes.`,
+      confirmLabel: 'Desmarcar',
+      onConfirm: () =>
+        removeProductAndCheckOrphan(id, async () => {
+          const { error } = await supabase
+            .from('products')
+            .update({ status: 'pending', bought_by: null, bought_at: null, purchase_id: null })
+            .eq('id', id);
+          if (error) throw error;
+        }),
     });
   }
 
   function handleDeleteProduct(id) {
-    return removeProductAndCheckOrphan(id, async () => {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (error) throw error;
+    const product = purchase.products.find((p) => p.id === id);
+    openConfirmModal({
+      title: 'Eliminar producto',
+      message: `¿Eliminar "${product.name}" de este ticket?`,
+      confirmLabel: 'Eliminar',
+      onConfirm: () =>
+        removeProductAndCheckOrphan(id, async () => {
+          const { error } = await supabase.from('products').delete().eq('id', id);
+          if (error) throw error;
+        }),
     });
   }
 
