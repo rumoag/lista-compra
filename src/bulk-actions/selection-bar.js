@@ -3,6 +3,7 @@
 // (icono con tooltip en desktop), marcar como comprados (icono+texto) y un menú de 3 puntos
 // con "Seleccionar todos" y, si hay exactamente 1 producto seleccionado, "Editar".
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
+import { icon } from '../common/icon.js';
 
 export function renderSelectionBar(
   container,
@@ -20,7 +21,7 @@ export function renderSelectionBar(
   container.innerHTML = `
     <div class="selection-header" data-testid="selection-bar">
       <div class="selection-header-left">
-        <button type="button" class="icon-button" data-testid="selection-bar-close-button" aria-label="Deseleccionar todos">✕</button>
+        <button type="button" class="icon-button" data-testid="selection-bar-close-button" aria-label="Deseleccionar todos">${icon('x')}</button>
         <span data-testid="selection-bar-count">${selectedCount} seleccionados</span>
       </div>
       <div class="selection-header-right">
@@ -30,9 +31,9 @@ export function renderSelectionBar(
           data-testid="selection-bar-delete-button"
           title="Eliminar seleccionados"
           aria-label="Eliminar seleccionados"
-        >🗑️</button>
+        >${icon('trash')}</button>
         <button type="button" class="icon-text-button" data-testid="selection-bar-mark-bought-button">
-          <span aria-hidden="true">✅</span> Comprados
+          <span aria-hidden="true">${icon('check-circle')}</span> Comprados
         </button>
         <div data-testid="selection-bar-menu-container"></div>
       </div>

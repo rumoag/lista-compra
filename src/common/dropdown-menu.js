@@ -3,9 +3,11 @@
 // abre el menú es personalizable (toggleClass/toggleContent/toggleLabel) para poder mostrarlo
 // como un avatar circular en la topbar (BR-46) sin cambiar el resto de usos, que siguen con
 // los "3 puntos" por defecto.
+import { icon } from './icon.js';
+
 export function renderDropdownMenu(
   container,
-  { actions, toggleClass = 'secondary', toggleContent = '⋮', toggleLabel = 'Más opciones' }
+  { actions, toggleClass = 'secondary', toggleContent = icon('dots-three-vertical'), toggleLabel = 'Más opciones' }
 ) {
   container.innerHTML = `
     <div class="dropdown-menu" data-testid="dropdown-menu">

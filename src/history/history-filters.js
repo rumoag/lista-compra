@@ -1,6 +1,7 @@
 // Filtros de historial (US-3.2) — chips estilo Google Fotos (búsqueda, fecha, orden) que
 // emiten onChange({ nameQuery, dateFrom, dateTo, sortAscending }).
 import { openModal } from '../common/modal.js';
+import { icon } from '../common/icon.js';
 
 const DATE_PRESETS = [
   { value: 'any', label: 'Cualquier fecha' },
@@ -19,11 +20,11 @@ const SORT_OPTIONS = [
 export function renderHistoryFilters(container, { onChange }) {
   container.innerHTML = `
     <div class="chip-group" data-testid="history-filters">
-      <button type="button" class="chip chip--icon" data-testid="history-filter-search-toggle" aria-label="Buscar por nombre">🔍</button>
+      <button type="button" class="chip chip--icon" data-testid="history-filter-search-toggle" aria-label="Buscar por nombre">${icon('magnifying-glass')}</button>
       <input type="text" class="chip-search-input" placeholder="Buscar producto" data-testid="history-filter-name-input" hidden />
       <button type="button" class="chip" data-testid="history-filter-search-value-chip" hidden>
         <span data-testid="history-filter-search-value-text"></span>
-        <span class="chip-remove" data-testid="history-filter-search-clear-button" aria-label="Quitar búsqueda">✕</span>
+        <span class="chip-remove" data-testid="history-filter-search-clear-button" aria-label="Quitar búsqueda">${icon('x')}</span>
       </button>
       <button type="button" class="chip" data-testid="history-filter-date-chip">Cualquier fecha</button>
       <button type="button" class="chip" data-testid="history-filter-sort-chip">Fecha (más reciente primero)</button>

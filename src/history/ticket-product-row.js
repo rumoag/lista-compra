@@ -1,5 +1,6 @@
 // Fila de producto dentro del modal de ticket (BR-53) — nombre + cantidad + acciones
 // individuales, sin fecha/quién (ya se muestran a nivel de ticket, Q10 de Functional Design).
+import { icon } from '../common/icon.js';
 
 export function renderTicketProductRow(product, { onUnmark, onDelete }) {
   const el = document.createElement('div');
@@ -20,14 +21,14 @@ export function renderTicketProductRow(product, { onUnmark, onDelete }) {
         data-testid="ticket-product-unmark-button"
         title="Desmarcar"
         aria-label="Desmarcar"
-      >↩️</button>
+      >${icon('arrow-u-up-left')}</button>
       <button
         type="button"
         class="icon-button"
         data-testid="ticket-product-delete-button"
         title="Eliminar"
         aria-label="Eliminar"
-      >🗑️</button>
+      >${icon('trash')}</button>
     </div>
   `;
 
