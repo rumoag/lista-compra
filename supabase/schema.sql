@@ -152,3 +152,10 @@ alter table products add column if not exists purchase_id uuid references purcha
 -- BR-59: historial en vivo — necesario para que Supabase emita eventos
 -- postgres_changes (INSERT/DELETE) sobre purchases.
 alter publication supabase_realtime add table purchases;
+
+-- ---------------------------------------------------------------------------
+-- Unidad 6 (paso 4 del asistente) — nota libre opcional por producto.
+-- Migración puramente aditiva: columna nueva nullable.
+-- ---------------------------------------------------------------------------
+alter table products add column if not exists note text;
+alter table products add constraint products_note_length check (note is null or char_length(note) <= 200);

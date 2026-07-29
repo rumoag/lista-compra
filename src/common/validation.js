@@ -88,6 +88,22 @@ export function validateQuantityNumber(value) {
   return { valid: true, value: number };
 }
 
+const NOTE_MAX_LENGTH = 200;
+
+export function validateNote(note) {
+  if (note === null || note === undefined || note === '') {
+    return { valid: true, value: null };
+  }
+  if (typeof note !== 'string') {
+    return { valid: false, error: 'La nota no es válida.' };
+  }
+  const normalized = normalizeWhitespace(note);
+  if (normalized.length > NOTE_MAX_LENGTH) {
+    return { valid: false, error: `La nota no puede superar los ${NOTE_MAX_LENGTH} caracteres.` };
+  }
+  return { valid: true, value: normalized || null };
+}
+
 export function validateQuantityUnit(unit) {
   if (unit === null || unit === undefined || unit === '') {
     return { valid: true, value: null };
