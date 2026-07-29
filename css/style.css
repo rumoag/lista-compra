@@ -74,6 +74,13 @@ body {
   padding: 0.3rem 0.5rem;
 }
 
+/* .chip fija display:inline-flex, que pisa el [hidden] del user-agent (misma
+   especificidad, pero el estilo de autor siempre gana) — sin esto, los chips
+   ocultos (p.ej. el chip de búsqueda antes de escribir nada) quedarían visibles. */
+.chip[hidden] {
+  display: none;
+}
+
 .chip-search-input {
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
