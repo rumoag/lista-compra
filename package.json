@@ -4,13 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/generate-config.js",
+    "build": "node scripts/generate-config.js && npm run build:css",
+    "build:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/daisyui.css --minify",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "daisyui": "^5.7.7",
     "fast-check": "3.22.0",
     "jsdom": "25.0.1",
+    "tailwindcss": "^4.3.3",
     "vitest": "2.1.4"
   },
   "dependencies": {

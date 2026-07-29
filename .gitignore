@@ -2,6 +2,7 @@ node_modules/
 .env
 .vercel
 src/common/config.generated.js
+css/daisyui.css
 .claude/
 
 # Material de referencia del framework AI-DLC (no forma parte de la app)

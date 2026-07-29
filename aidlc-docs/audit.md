@@ -1228,3 +1228,19 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: UNIDAD 5 (Pantalla 1) — seguimiento BR-66 completo
 
 ---
+
+## Nueva Solicitud del Usuario
+**Timestamp**: 2026-07-29T15:19:10Z
+**User Input**: "me gustaria anadir la libreria daisy ui para el proyecto de la lista de la compra"
+**AI Response**: Pendiente - se van a plantear preguntas de aclaracion antes de implementar (Requirements Analysis, profundidad minima) dado que anadir daisyUI implica introducir Tailwind CSS y un paso de build que el proyecto no tiene actualmente (CSS a mano, sin bundler).
+**Context**: Nueva peticion, fuera de las unidades existentes
+
+---
+
+## Instalacion de daisyUI
+**Timestamp**: 2026-07-29T15:25:58Z
+**User Input**: "si" (confirmando Tailwind CLI standalone + solo dejarlo instalado, sin migrar nada existente)
+**AI Response**: Instaladas devDependencies tailwindcss@4.3.3, @tailwindcss/cli@4.3.3, daisyui@5.7.7. Creado css/tailwind-input.css (@import "tailwindcss"; @plugin "daisyui";). Anadido script npm build:css (tailwindcss -i ./css/tailwind-input.css -o ./css/daisyui.css --minify) e integrado en npm run build. index.html enlaza /css/daisyui.css antes de /css/style.css (los estilos existentes siguen ganando). css/daisyui.css anadido a .gitignore (archivo generado). Verificacion local del build de CSS bloqueada por una politica de Application Control de Windows en esta maquina que impide cargar el binario nativo de @tailwindcss/oxide; no se ha intentado eludir esa politica. El build de Vercel corre en Linux y usara el binario nativo linux-x64, por lo que no deberia verse afectado. Ningun componente existente ha sido modificado; daisyUI queda instalado y disponible para usarse en componentes nuevos o en una migracion futura pantalla a pantalla.
+**Context**: Peticion fuera de las unidades existentes (no ligada al ciclo de features)
+
+---
