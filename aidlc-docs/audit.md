@@ -1295,3 +1295,36 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: Pendiente revisión/aprobación del usuario
 
 ---
+
+## Aprobación Code Generation — Ciclo 3, Lote 0
+**Timestamp**: 2026-07-29T19:00:00Z
+**User Input**: "Continue to Next Stage — proceed to Lote 1" (tras crear y hacer push del PR #15)
+**AI Response**: Lote 0 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 1 (Componentes base: tarjetas, botones, chips, inputs).
+**Context**: Code Generation, Ciclo 3, Lote 0 — GATE cerrado
+**Estado**: LOTE 0 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 1 (Componentes base)
+**Timestamp**: 2026-07-29T19:05:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-1-code-generation-plan.md`: 6 pasos (tipografía/fondo globales, tarjetas, botones, chips, inputs/option-item, documentación). Decisiones de mapeo documentadas (radios por tipo de elemento, botón primario con texto oscuro sobre Lime-9 por contraste, botón danger mantiene rojo hardcodeado como excepción documentada — no se pidió escala roja de Radix).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 1
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 1
+**Timestamp**: 2026-07-29T19:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 1 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 1 (Componentes base)
+**Timestamp**: 2026-07-29T19:20:00Z
+**AI Response**: 6 pasos ejecutados en `css/style.css`: tipografía/fondo global (Inter, sand-1/sand-12), tarjetas (sand-2/sand-6/radius-4), botones (accent-9/accent-12, danger mantiene rojo hardcodeado como excepción), chips (sand-7/radius-full, seleccionado accent-9/accent-12), inputs/option-item/icon-picker-option (sand-7/radius-3, seleccionado accent-9/accent-3). Documentación en `lote-1-componentes-base-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 1
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---

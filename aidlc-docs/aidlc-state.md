@@ -143,7 +143,7 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [x] Requirements Analysis — 7 preguntas de aclaración respondidas (alcance = remaquetar todo; acento Lime; neutro Sand; dark mode completo por `prefers-color-scheme`; tipografía Inter + escala Radix; escala completa de radios; verificación visual manual del usuario); requirements.md ampliado con sección "Ciclo 3"; aprobado
 - [x] Workflow Planning — User Stories/Application Design/Units Generation/Functional Design/NFR Requirements/NFR Design/Infrastructure Design SKIP (cambio puramente visual, sin lógica de negocio ni infraestructura nueva); Code Generation en 5 lotes con checkpoints visuales; aprobado
 - [x] Code Generation — Lote 0 (Fundaciones: tokens color/tipografía/radio) — `css/tokens.css` creado, `style.css`/`index.html` actualizados; 230/230 tests pasan; sin cambio visual todavía
-- [ ] Code Generation — Lote 1 (Componentes base: tarjetas/botones/chips/inputs)
+- [x] Code Generation — Lote 1 (Componentes base: tarjetas/botones/chips/inputs) — `style.css` remaquetado (tipografía/fondo global, tarjetas, botones, chips, inputs); botón danger mantiene rojo hardcodeado (excepción documentada); 230/230 tests pasan; pendiente revisión visual del usuario
 - [ ] Code Generation — Lote 2 (Componentes de listas)
 - [ ] Code Generation — Lote 3 (Modales e historial)
 - [ ] Code Generation — Lote 4 (Onboarding/QR y detalles finales)
