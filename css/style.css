@@ -129,6 +129,10 @@ body {
   margin-top: 0.75rem;
 }
 
+.custom-date-range[hidden] {
+  display: none;
+}
+
 .custom-date-range input[type="date"] {
   padding: 0.4rem;
   border-radius: 8px;
