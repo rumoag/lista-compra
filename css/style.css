@@ -52,6 +52,9 @@ body {
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
   border: 1px solid rgba(127, 127, 127, 0.4);
@@ -65,6 +68,64 @@ body {
   background: #2563eb;
   color: white;
   border-color: #2563eb;
+}
+
+.chip--icon {
+  padding: 0.3rem 0.5rem;
+}
+
+.chip-search-input {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
+  font-size: 0.85rem;
+  max-width: 10rem;
+}
+
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: rgba(127, 127, 127, 0.25);
+  font-size: 0.65rem;
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.option-item {
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+.option-item[aria-pressed="true"] {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+  font-weight: 600;
+}
+
+.custom-date-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.custom-date-range input[type="date"] {
+  padding: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid rgba(127, 127, 127, 0.4);
 }
 
 button {

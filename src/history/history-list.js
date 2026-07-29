@@ -32,6 +32,7 @@ export async function renderHistoryList(container, { householdId }) {
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const realtime = createRealtimeSubscription({ householdId, table: 'purchases' });
   let activeFilters = { nameQuery: '', dateFrom: null, dateTo: null };
+  let sortAscending = false; // chip de orden — false = más reciente primero (por defecto)
   let filteredResults = null; // null = modo paginado sin filtro activo
   let openTicket = null; // { id, close } — ticket actualmente abierto en el modal, si lo hay
   let hasMore = true;
@@ -52,11 +53,11 @@ export async function renderHistoryList(container, { householdId }) {
       .from('purchases')
       .select('*, products(*)')
       .eq('household_id', householdId)
-      .order('bought_at', { ascending: false })
+      .order('bought_at', { ascending: sortAscending })
       .limit(limit);
 
     if (before) {
-      query = query.lt('bought_at', before);
+      query = sortAscending ? query.gt('bought_at', before) : query.lt('bought_at', before);
     }
 
     const { data, error } = await query;
@@ -70,7 +71,7 @@ export async function renderHistoryList(container, { householdId }) {
       .select('*')
       .eq('household_id', householdId)
       .eq('status', 'bought')
-      .order('bought_at', { ascending: false })
+      .order('bought_at', { ascending: sortAscending })
       .limit(FILTERED_FETCH_LIMIT);
     if (error) throw error;
     return data ?? [];
@@ -115,16 +116,29 @@ export async function renderHistoryList(container, { householdId }) {
       .from('purchases')
       .select('*, products(*)')
       .in('id', purchaseIds)
-      .order('bought_at', { ascending: false });
+      .order('bought_at', { ascending: sortAscending });
     if (error) throw error;
     filteredResults = (data ?? []).map(toPaginatorItem);
     renderList();
   }
 
+  // BR-57 (seguimiento): el chip de orden afecta tanto al modo paginado como al filtrado —
+  // si cambia mientras no hay filtro activo, se recarga la primera página desde cero en la
+  // nueva dirección (el cursor de paginación no es reutilizable entre direcciones).
   renderHistoryFilters(filtersContainer, {
-    onChange: (filters) => {
-      activeFilters = filters;
-      applyFilters();
+    onChange: async (filters) => {
+      const sortChanged = filters.sortAscending !== sortAscending;
+      activeFilters = { nameQuery: filters.nameQuery, dateFrom: filters.dateFrom, dateTo: filters.dateTo };
+      sortAscending = filters.sortAscending;
+
+      if (!hasActiveFilters() && sortChanged) {
+        paginator.reset();
+        hasMore = true;
+        await paginator.loadNextPage(fetchPage);
+        if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
+      }
+
+      await applyFilters();
     },
   });
 
