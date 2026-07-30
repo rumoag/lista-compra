@@ -1531,3 +1531,12 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: AJUSTADO — pendiente verificación manual del usuario (click en la cabecera del modal para editar, Enter/blur guardan, Escape cancela, recibo siempre "TICKET DE COMPRA")
 
 ---
+
+## Unidad 6 — Seguimiento: "Editar lista de la compra" en el menú del avatar
+**Timestamp**: 2026-07-30T02:00:00Z
+**User Input**: "cuando abro el dropdown al pulsar el perfil quiero añadir despues del hola usuario una opcion para editar la lista de la compra y asi abrir el modal de cambierle el titulo y el icon"
+**AI Response**: Implementado reutilizando el modal ya existente `home/list-form-modal.js` (mismo que usa `home/list-card.js` para editar una lista desde la pantalla de inicio), en vez de crear uno nuevo. `list/greeting.js` añade el parámetro `onEditList` y una nueva entrada de menú "Editar lista de la compra" justo después de "Hola, X" (antes de "Ver QR"). `main.js` añade `handleEditList`, que abre `openListFormModal({ mode: 'edit', household, onSaved })`; al guardar, refresca `household.title`/`household.image_icon` con `fetchHousehold(householdId)` (la mutación local evita que la topbar quede desincronizada sin recargar la página) y vuelve a pintar la topbar vía una nueva función `refreshGreeting()` compartida con `handleChangeName`. Test nuevo en `greeting.test.js` (la entrada vive justo después del saludo y llama a `onEditList`). `npm test`: 251/251 pass.
+**Context**: Ciclo 2, Unidad 6 — seguimiento sobre la topbar (greeting.js), reutiliza un patrón/modal ya aprobado (Unidad 5)
+**Estado**: IMPLEMENTADO — pendiente verificación manual del usuario (abrir el menú del avatar, pulsar "Editar lista de la compra", cambiar título/icono, comprobar que la topbar se actualiza sin recargar)
+
+---

@@ -8,6 +8,7 @@ import { fetchHousehold } from './home/households-api.js';
 import { ensureLocalName } from './onboarding/name-prompt.js';
 import { renderGreeting } from './list/greeting.js';
 import { openChangeNameModal } from './list/change-name-modal.js';
+import { openListFormModal } from './home/list-form-modal.js';
 import { renderTabs } from './list/tabs.js';
 import { renderProductList } from './list/product-list.js';
 import { renderHistoryList } from './history/history-list.js';
@@ -58,13 +59,31 @@ async function start() {
   const viewContainer = appMain.querySelector('#app-view');
   const fabButton = appMain.querySelector('[data-testid="add-product-fab-button"]');
 
+  function refreshGreeting() {
+    renderGreeting(greetingContainer, { household, onChangeName: handleChangeName, onEditList: handleEditList });
+  }
+
   function handleChangeName() {
-    openChangeNameModal({
-      onSaved: () => renderGreeting(greetingContainer, { household, onChangeName: handleChangeName }),
+    openChangeNameModal({ onSaved: refreshGreeting });
+  }
+
+  // (Seguimiento) "Editar lista de la compra" en el menú del avatar abre el mismo modal de
+  // crear/editar lista (title+icon) que usa home/list-card.js — tras guardar, se refresca el
+  // household local (title/image_icon) para que la topbar quede al día sin recargar la página.
+  function handleEditList() {
+    openListFormModal({
+      mode: 'edit',
+      household,
+      onSaved: async () => {
+        const updated = await fetchHousehold(householdId);
+        household.title = updated.title;
+        household.image_icon = updated.image_icon;
+        refreshGreeting();
+      },
     });
   }
 
-  renderGreeting(greetingContainer, { household, onChangeName: handleChangeName });
+  refreshGreeting();
   renderTabs(tabsNav, viewContainer, { views: VIEWS, householdId, initialView: 'list' });
   // FAB persistente entre Lista/Historial/Estadísticas: ya no depende de la vista montada.
   fabButton.addEventListener('click', () => openAddProductWizard({ householdId }));

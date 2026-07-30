@@ -174,6 +174,11 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 
 **UNIDAD 7 (Seguimiento): AJUSTE COMPLETO** — próximo paso del usuario: verificación manual (click en la cabecera del modal para editar el título, Enter/blur guarda, Escape cancela, el recibo muestra siempre "TICKET DE COMPRA").
 
+### Unidad 6 — Seguimiento: "Editar lista de la compra" en el menú del avatar
+- [x] Petición del usuario: en el menú del avatar (topbar de `list/greeting.js`), justo después de "Hola, X", añadir una opción "Editar lista de la compra" que abra el mismo modal de crear/editar lista (título+icono, `home/list-form-modal.js`) que ya usa `home/list-card.js`. Implementado: `greeting.js` acepta un nuevo `onEditList` y añade la entrada `edit-list` al menú; `main.js` define `handleEditList` (abre `openListFormModal({ mode: 'edit', household, onSaved })`, y tras guardar refresca `household.title`/`household.image_icon` locales vía `fetchHousehold` y vuelve a pintar la topbar sin recargar la página). 251/251 tests pasan (1 test nuevo en `greeting.test.js`).
+
+**UNIDAD 6 (Seguimiento): COMPLETA** — próximo paso del usuario: verificación manual (abrir el menú del avatar, pulsar "Editar lista de la compra", cambiar título/icono, comprobar que la topbar se actualiza).
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.

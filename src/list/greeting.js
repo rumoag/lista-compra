@@ -2,11 +2,13 @@
 // derecha un botón circular con la inicial del nombre local que abre el menú de opciones de
 // la lista — el saludo "Hola, X" vive ahora como primera entrada de ese menú en vez de como
 // texto suelto en la topbar, y el toggle deja de ser "3 puntos" para mostrar la inicial.
+// (Seguimiento) "Editar lista de la compra" justo después del saludo abre el mismo modal de
+// crear/editar lista (title+icon) que usa home/list-card.js, ver main.js.
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
 import { openQrModal } from '../common/qr-modal.js';
 
-export function renderGreeting(container, { household, onChangeName }) {
+export function renderGreeting(container, { household, onChangeName, onEditList }) {
   const name = getLocalName() ?? '';
   const initial = name.trim().charAt(0).toUpperCase() || '?';
 
@@ -26,6 +28,7 @@ export function renderGreeting(container, { household, onChangeName }) {
     toggleLabel: 'Opciones de la lista',
     actions: [
       { testid: 'change-name', label: `Hola, ${escapeHtml(name)}`, onClick: onChangeName },
+      { testid: 'edit-list', label: 'Editar lista de la compra', onClick: onEditList },
       { testid: 'qr', label: 'Ver QR', onClick: () => openQrModal({ householdId: household.id }) },
       { testid: 'back', label: 'Volver al listado de listas', onClick: () => (window.location.href = '/') },
     ],
