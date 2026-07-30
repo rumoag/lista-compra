@@ -102,8 +102,11 @@ body {
   padding: 0.3rem 0.7rem;
   border-radius: var(--md-sys-shape-corner-small);
   border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--md-sys-typescale-label-medium-size);
   max-width: 10rem;
+  transition: border-color 0.15s ease;
 }
 
 .chip-remove {
@@ -353,7 +356,9 @@ button.danger {
   transition: border-color 0.15s ease;
 }
 
-.text-input:focus {
+.text-input:focus,
+.chip-search-input:focus,
+.quantity-stepper input:focus {
   outline: none;
   border-color: var(--md-sys-color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent);
@@ -620,6 +625,7 @@ button.danger {
   border: 1px solid var(--md-sys-color-outline);
   background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
+  transition: border-color 0.15s ease;
 }
 
 /* Header de selección múltiple: fijo al viewport, se superpone a la cabecera normal
