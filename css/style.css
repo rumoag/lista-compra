@@ -385,6 +385,18 @@ button.danger {
   margin-top: var(--spacing);
 }
 
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.modal-footer:not(:empty) {
+  margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
 .modal-panel--fullscreen {
   max-width: 100%;
   width: 100%;

@@ -5,12 +5,12 @@ import { createHousehold, updateHousehold } from './households-api.js';
 
 export function openListFormModal({ mode, household, onSaved }) {
   const isEdit = mode === 'edit';
-  const { body, close } = openModal({ title: isEdit ? 'Editar lista' : 'Crear nueva lista' });
+  const { body, footer, close } = openModal({ title: isEdit ? 'Editar lista' : 'Crear nueva lista' });
 
   let selectedIcon = isEdit ? household.image_icon : HOUSEHOLD_ICON_SET[0];
 
   body.innerHTML = `
-    <form data-testid="list-form">
+    <form id="list-form" data-testid="list-form">
       <label class="form-label" for="list-form-title-input">Nombre de la lista de la compra</label>
       <input
         type="text"
@@ -31,9 +31,11 @@ export function openListFormModal({ mode, household, onSaved }) {
         ).join('')}
       </div>
       <div class="error-message" data-testid="list-form-icon-error" hidden></div>
-
-      <button type="submit" data-testid="list-form-submit-button">${isEdit ? 'Guardar' : 'Crear'}</button>
     </form>
+  `;
+
+  footer.innerHTML = `
+    <button type="submit" form="list-form" data-testid="list-form-submit-button">${isEdit ? 'Guardar' : 'Crear'}</button>
   `;
 
   const form = body.querySelector('[data-testid="list-form"]');
@@ -74,7 +76,7 @@ export function openListFormModal({ mode, household, onSaved }) {
     }
     if (hasError) return;
 
-    const submitButton = body.querySelector('[data-testid="list-form-submit-button"]');
+    const submitButton = footer.querySelector('[data-testid="list-form-submit-button"]');
     submitButton.disabled = true;
 
     try {
