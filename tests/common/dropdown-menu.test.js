@@ -75,7 +75,7 @@ describe('renderDropdownMenu', () => {
 
     const toggle = container.querySelector('[data-testid="dropdown-menu-toggle"]');
     expect(toggle.querySelector('svg.ph-icon')).not.toBeNull();
-    expect(toggle.className).toBe('secondary');
+    expect(toggle.className).toBe('icon-button');
   });
 
   it('permite personalizar el toggle (ej. avatar con inicial) sin afectar el resto del comportamiento', () => {

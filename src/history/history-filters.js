@@ -12,6 +12,22 @@ const DATE_PRESETS = [
   { value: 'custom', label: 'Periodo personalizado' },
 ];
 
+const MONTH_NAMES = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+const WEEKDAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
 const SORT_OPTIONS = [
   { value: false, label: 'Fecha (más reciente primero)' },
   { value: true, label: 'Fecha (más antiguo primero)' },
@@ -129,21 +145,31 @@ export function renderHistoryFilters(container, { onChange }) {
   }
 
   function openDatePicker() {
-    const { body, close } = openModal({ title: 'Fecha' });
+    const { body, footer, close } = openModal({ title: 'Fecha' });
     body.innerHTML = `
       <div class="option-list" data-testid="history-date-options"></div>
-      <div class="custom-date-range" data-testid="history-date-custom-range" hidden>
-        <input type="date" data-testid="history-filter-date-from-input" />
-        <input type="date" data-testid="history-filter-date-to-input" />
-        <button type="button" data-testid="history-date-apply-button">Aplicar</button>
-      </div>
+      <div class="custom-date-range" data-testid="history-date-custom-range" hidden></div>
     `;
 
     const optionsList = body.querySelector('[data-testid="history-date-options"]');
     const customRange = body.querySelector('[data-testid="history-date-custom-range"]');
-    const fromInput = body.querySelector('[data-testid="history-filter-date-from-input"]');
-    const toInput = body.querySelector('[data-testid="history-filter-date-to-input"]');
-    const applyButton = body.querySelector('[data-testid="history-date-apply-button"]');
+
+    // Rango en curso mientras se navega el calendario, aplicado solo al pulsar "Aplicar"
+    // (igual que el resto de selectores de este modal: elegir no cierra hasta confirmar).
+    let pendingFrom = dateFrom;
+    let pendingTo = dateToRaw;
+
+    function showApplyButton() {
+      footer.innerHTML = `<button type="button" data-testid="history-date-apply-button">Aplicar</button>`;
+      footer.querySelector('[data-testid="history-date-apply-button"]').addEventListener('click', () => {
+        dateFrom = pendingFrom;
+        dateToRaw = pendingTo;
+        currentDatePreset = 'custom';
+        dateChip.textContent = dateChipLabel();
+        close();
+        emitChange();
+      });
+    }
 
     DATE_PRESETS.forEach((option) => {
       const button = document.createElement('button');
@@ -155,8 +181,18 @@ export function renderHistoryFilters(container, { onChange }) {
       button.addEventListener('click', () => {
         if (option.value === 'custom') {
           customRange.hidden = false;
-          fromInput.value = dateFrom ?? '';
-          toInput.value = dateToRaw ?? '';
+          const anchor = pendingFrom ? new Date(`${pendingFrom}T00:00:00`) : new Date();
+          renderCalendar(customRange, {
+            year: anchor.getFullYear(),
+            month: anchor.getMonth(),
+            rangeFrom: pendingFrom,
+            rangeTo: pendingTo,
+            onRangeChange: (from, to) => {
+              pendingFrom = from;
+              pendingTo = to;
+            },
+          });
+          showApplyButton();
           return;
         }
         applyDatePreset(option.value);
@@ -167,15 +203,87 @@ export function renderHistoryFilters(container, { onChange }) {
       });
       optionsList.appendChild(button);
     });
+  }
 
-    applyButton.addEventListener('click', () => {
-      dateFrom = fromInput.value || null;
-      dateToRaw = toInput.value || null;
-      currentDatePreset = 'custom';
-      dateChip.textContent = dateChipLabel();
-      close();
-      emitChange();
-    });
+  // --- Calendario M3 (BR-16, selección de rango "desde"/"hasta") -----------------------
+  // Google no distribuye un componente web oficial de date picker M3 (solo existe en
+  // Android/Flutter/Compose); se implementa a mano con los tokens del design system, igual
+  // que el resto de componentes del proyecto (chips, tabs, botones...).
+  function renderCalendar(container, { year, month, rangeFrom, rangeTo, onRangeChange }) {
+    let viewYear = year;
+    let viewMonth = month;
+
+    function draw() {
+      const firstOfMonth = new Date(viewYear, viewMonth, 1);
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const firstWeekday = (firstOfMonth.getDay() + 6) % 7; // 0 = lunes
+      const todayIso = toDateInputValue(new Date());
+
+      let daysHtml = '';
+      for (let i = 0; i < firstWeekday; i++) {
+        daysHtml += `<span class="date-picker-day date-picker-day--empty" aria-hidden="true"></span>`;
+      }
+      for (let day = 1; day <= daysInMonth; day++) {
+        const iso = toDateInputValue(new Date(viewYear, viewMonth, day));
+        const isEndpoint = iso === rangeFrom || iso === rangeTo;
+        const inRange = rangeFrom && rangeTo && iso > rangeFrom && iso < rangeTo;
+        const classes = ['date-picker-day'];
+        if (isEndpoint) classes.push('date-picker-day--endpoint');
+        else if (inRange) classes.push('date-picker-day--in-range');
+        if (iso === todayIso) classes.push('date-picker-day--today');
+        daysHtml += `<button type="button" class="${classes.join(' ')}" data-testid="history-date-calendar-day-${iso}" data-date="${iso}" aria-pressed="${isEndpoint}">${day}</button>`;
+      }
+
+      container.innerHTML = `
+        <div class="date-picker" data-testid="history-date-calendar">
+          <div class="date-picker-header">
+            <button type="button" class="icon-button" data-testid="history-date-calendar-prev-button" aria-label="Mes anterior">${icon('caret-left')}</button>
+            <span data-testid="history-date-calendar-label">${MONTH_NAMES[viewMonth]} ${viewYear}</span>
+            <button type="button" class="icon-button" data-testid="history-date-calendar-next-button" aria-label="Mes siguiente">${icon('caret-right')}</button>
+          </div>
+          <div class="date-picker-weekdays">
+            ${WEEKDAY_LABELS.map((label) => `<span>${label}</span>`).join('')}
+          </div>
+          <div class="date-picker-grid">${daysHtml}</div>
+        </div>
+      `;
+
+      container.querySelectorAll('.date-picker-day[data-date]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const iso = button.dataset.date;
+          if (!rangeFrom || rangeTo) {
+            rangeFrom = iso;
+            rangeTo = null;
+          } else if (iso < rangeFrom) {
+            rangeTo = rangeFrom;
+            rangeFrom = iso;
+          } else {
+            rangeTo = iso;
+          }
+          onRangeChange(rangeFrom, rangeTo);
+          draw();
+        });
+      });
+
+      container.querySelector('[data-testid="history-date-calendar-prev-button"]').addEventListener('click', () => {
+        viewMonth -= 1;
+        if (viewMonth < 0) {
+          viewMonth = 11;
+          viewYear -= 1;
+        }
+        draw();
+      });
+      container.querySelector('[data-testid="history-date-calendar-next-button"]').addEventListener('click', () => {
+        viewMonth += 1;
+        if (viewMonth > 11) {
+          viewMonth = 0;
+          viewYear += 1;
+        }
+        draw();
+      });
+    }
+
+    draw();
   }
 
   dateChip.addEventListener('click', openDatePicker);

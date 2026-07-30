@@ -3,21 +3,22 @@
 import { openModal } from './modal.js';
 
 export function openConfirmModal({ title, message, confirmLabel = 'Confirmar', onConfirm }) {
-  const { body, close } = openModal({ title });
+  const { body, footer, close } = openModal({ title });
 
   body.innerHTML = `
     <p data-testid="confirm-modal-message">${escapeHtml(message)}</p>
     <div class="error-message" data-testid="confirm-modal-error" hidden></div>
-    <div class="confirm-modal-actions">
-      <button type="button" class="secondary" data-testid="confirm-modal-cancel-button">Cancelar</button>
-      <button type="button" data-testid="confirm-modal-confirm-button">${escapeHtml(confirmLabel)}</button>
-    </div>
+  `;
+
+  footer.innerHTML = `
+    <button type="button" class="secondary" data-testid="confirm-modal-cancel-button">Cancelar</button>
+    <button type="button" data-testid="confirm-modal-confirm-button">${escapeHtml(confirmLabel)}</button>
   `;
 
   const errorEl = body.querySelector('[data-testid="confirm-modal-error"]');
-  const confirmButton = body.querySelector('[data-testid="confirm-modal-confirm-button"]');
+  const confirmButton = footer.querySelector('[data-testid="confirm-modal-confirm-button"]');
 
-  body.querySelector('[data-testid="confirm-modal-cancel-button"]').addEventListener('click', close);
+  footer.querySelector('[data-testid="confirm-modal-cancel-button"]').addEventListener('click', close);
 
   confirmButton.addEventListener('click', async () => {
     errorEl.hidden = true;

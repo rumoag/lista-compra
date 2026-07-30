@@ -102,8 +102,11 @@ body {
   padding: 0.3rem 0.7rem;
   border-radius: var(--md-sys-shape-corner-small);
   border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--md-sys-typescale-label-medium-size);
   max-width: 10rem;
+  transition: border-color 0.15s ease;
 }
 
 .chip-remove {
@@ -141,9 +144,6 @@ body {
 }
 
 .custom-date-range {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
   margin-top: 0.75rem;
 }
 
@@ -151,10 +151,58 @@ body {
   display: none;
 }
 
-.custom-date-range input[type="date"] {
-  padding: 0.4rem;
-  border-radius: var(--md-sys-shape-corner-extra-small);
-  border: 1px solid var(--md-sys-color-outline);
+/* Calendario M3 (BR-16): sin componente web oficial de Google para esto, se construye
+   con los tokens del design system igual que el resto de componentes del proyecto. */
+.date-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-weight: var(--md-sys-typescale-title-medium-weight);
+}
+
+.date-picker-weekdays,
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.date-picker-weekdays {
+  margin-bottom: 0.25rem;
+  text-align: center;
+  font-size: var(--md-sys-typescale-label-medium-size);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.date-picker-day {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  color: inherit;
+  font-size: var(--md-sys-typescale-body-medium-size);
+  padding: 0;
+}
+
+.date-picker-day--empty {
+  background: none;
+}
+
+.date-picker-day--today {
+  border: 1px solid var(--md-sys-color-primary);
+}
+
+.date-picker-day--in-range {
+  border-radius: 0;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.date-picker-day--endpoint {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-weight: 600;
 }
 
 button {
@@ -323,15 +371,6 @@ button.danger {
   line-height: var(--md-sys-typescale-title-large-line-height);
 }
 
-.modal-close-button {
-  background: transparent;
-  color: inherit;
-  border: none;
-  border-radius: var(--md-sys-shape-corner-full);
-  font-size: 1.1rem;
-  padding: 0.25rem 0.5rem;
-}
-
 .form-label {
   display: block;
   font-size: var(--md-sys-typescale-label-large-size);
@@ -351,9 +390,51 @@ button.danger {
   transition: border-color 0.15s ease;
 }
 
-.text-input:focus {
+.text-input:focus,
+.chip-search-input:focus,
+.quantity-stepper input:focus {
   outline: none;
   border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent);
+}
+
+/* Checkbox M3: se oculta el control nativo (appearance: none) y se dibuja el cuadrado +
+   check a mano con CSS, sin depender de @material/web (Shadow DOM, theming propio) —
+   mismo enfoque que el resto de componentes del design system de este proyecto. */
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.checkbox:checked {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+
+.checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  width: 5px;
+  height: 10px;
+  border: solid var(--md-sys-color-on-primary);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox:focus-visible {
+  outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent);
 }
 
@@ -378,11 +459,16 @@ button.danger {
   color: var(--md-sys-color-on-secondary-container);
 }
 
-.confirm-modal-actions {
+.modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.modal-footer:not(:empty) {
   margin-top: var(--spacing);
+  padding-top: var(--spacing);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .modal-panel--fullscreen {
@@ -557,6 +643,11 @@ button.danger {
   gap: 0.5rem;
   cursor: pointer;
   flex: 1;
+  /* El long-press (BR-41, editar) dispara el menú nativo de selección/copia en
+     móvil antes de que llegue nuestro propio gesto — se desactiva aquí. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .product-item-category-icon {
@@ -613,6 +704,7 @@ button.danger {
   border: 1px solid var(--md-sys-color-outline);
   background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
+  transition: border-color 0.15s ease;
 }
 
 /* Header de selección múltiple: fijo al viewport, se superpone a la cabecera normal

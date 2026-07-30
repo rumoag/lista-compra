@@ -11,7 +11,7 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
     <div class="modal-panel ${fullScreen ? 'modal-panel--fullscreen' : ''}" data-testid="modal-panel" role="dialog" aria-modal="true">
       <div class="modal-header">
         <h2 data-testid="modal-title">${escapeHtml(title ?? '')}</h2>
-        <button type="button" class="modal-close-button" data-testid="modal-close-button" aria-label="Cerrar">${icon('x')}</button>
+        <button type="button" class="icon-button modal-close-button" data-testid="modal-close-button" aria-label="Cerrar">${icon('x')}</button>
       </div>
       <div class="modal-body" data-testid="modal-body"></div>
       <div class="modal-footer" data-testid="modal-footer"></div>

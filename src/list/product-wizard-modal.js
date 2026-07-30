@@ -195,6 +195,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
       </div>
       <input
         type="text"
+        class="text-input"
         data-testid="wizard-category-input"
         maxlength="40"
         placeholder="Escribe una categoría"

@@ -18,7 +18,7 @@ export function renderProductItem(product, { onEdit, onToggleSelect, selected = 
     <div class="product-item-body" data-testid="product-item-body">
       ${
         onToggleSelect
-          ? `<input type="checkbox" data-testid="product-item-select-checkbox" ${selected ? 'checked' : ''} />`
+          ? `<input type="checkbox" class="checkbox" data-testid="product-item-select-checkbox" ${selected ? 'checked' : ''} />`
           : ''
       }
       <span class="product-item-category-icon" data-testid="product-item-category-icon">${getCategoryIcon(product.category)}</span>
