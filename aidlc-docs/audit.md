@@ -1228,3 +1228,288 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: UNIDAD 5 (Pantalla 1) — seguimiento BR-66 completo
 
 ---
+
+## Inicio Ciclo 3 — Design System basado en Radix UI
+**Timestamp**: 2026-07-29T18:00:00Z
+**User Input**: "me gustaria generar un design system basado en https://www.radix-ui.com/"
+**AI Response**: Nueva solicitud tras Ciclo 2. Se reabre Requirements Analysis para el alcance de un design system inspirado en Radix UI (la app es vanilla JS/CSS, no React, por lo que el candidato natural es adoptar las escalas de color/radio/espaciado de Radix Colors/Radix Themes como tokens CSS, no los primitivos React). Se generan preguntas de aclaración antes de definir alcance.
+**Context**: Requirements Analysis, Ciclo 3
+**Estado**: Ciclo 3 iniciado — pendiente de respuestas del usuario
+
+---
+
+## Requirements Analysis — Design System basado en Radix UI (Ciclo 3)
+**Timestamp**: 2026-07-29T18:15:00Z
+**User Input**: Respuestas en radix-design-system-questions.md — Q1:B, Q2:Lime, Q3:C, Q4:A, Q5:A, Q6:A, Q7:A
+**AI Response**: Sin contradicciones detectadas entre respuestas. requirements.md ampliado con sección "CICLO 3 — Design System basado en Radix UI" (FR-24 a FR-28, NFR-12 a NFR-14): tokens de color Lime/Sand (12 pasos, claro+oscuro), modo oscuro automático por `prefers-color-scheme`, tipografía Inter + escala de 9 pasos, escala completa de radios, remaquetado de todos los componentes visuales existentes manteniendo estructura/tests.
+**Context**: Requirements Analysis, Ciclo 3
+**Estado**: Requirements Analysis (Ciclo 3) COMPLETA — pendiente aprobación del usuario
+
+---
+
+## Aprobación Requirements Analysis (Ciclo 3)
+**Timestamp**: 2026-07-29T18:20:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Requirements Analysis aprobado. Se procede a Workflow Planning.
+**Context**: Requirements Analysis, Ciclo 3 — GATE cerrado
+
+---
+
+## Workflow Planning (Ciclo 3)
+**Timestamp**: 2026-07-29T18:25:00Z
+**AI Prompt**: "Ready to proceed with this plan?"
+**AI Response**: Se crea `execution-plan-ciclo-3.md`: SKIP para User Stories/Application Design/Units Generation/Functional Design/NFR Requirements/NFR Design/Infrastructure Design (cambio puramente visual sin lógica de negocio ni infraestructura nueva); EXECUTE para Code Generation (en 5 lotes con checkpoint de verificación visual del usuario por lote) y Build and Test.
+**Context**: Workflow Planning, Ciclo 3
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Workflow Planning (Ciclo 3)
+**Timestamp**: 2026-07-29T18:30:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Plan aprobado. Se obtienen valores oficiales de Radix Colors (Lime/Sand, claro+oscuro) y Radix Themes (escala de radios, tipografía, line-height, letter-spacing) vía WebFetch a los paquetes npm publicados (`@radix-ui/colors`, `@radix-ui/themes`) para evitar valores inventados. Se procede a Code Generation, Lote 0 (Fundaciones).
+**Context**: Workflow Planning, Ciclo 3 — GATE cerrado
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 0 (Fundaciones)
+**Timestamp**: 2026-07-29T18:40:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-0-code-generation-plan.md`: 5 pasos (fuente Inter en index.html, `css/tokens.css` con escalas Lime/Sand claro+oscuro/radios/tipografía, import desde style.css, documentación). Ningún componente visual cambia todavía en este lote — solo se definen los tokens.
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 0
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 0
+**Timestamp**: 2026-07-29T18:42:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 0 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 0 (Fundaciones)
+**Timestamp**: 2026-07-29T18:50:00Z
+**AI Response**: 5 pasos ejecutados: `css/tokens.css` creado (tokens Lime/Sand claro+oscuro, radios, tipografía); `css/style.css` importa `tokens.css`; `index.html` carga Inter; documentación en `lote-0-fundaciones-summary.md`. `npm test`: 230/230 tests pasan. Ningún componente visual cambia todavía (solo se definen los tokens).
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 0
+**Estado**: Pendiente revisión/aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 0
+**Timestamp**: 2026-07-29T19:00:00Z
+**User Input**: "Continue to Next Stage — proceed to Lote 1" (tras crear y hacer push del PR #15)
+**AI Response**: Lote 0 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 1 (Componentes base: tarjetas, botones, chips, inputs).
+**Context**: Code Generation, Ciclo 3, Lote 0 — GATE cerrado
+**Estado**: LOTE 0 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 1 (Componentes base)
+**Timestamp**: 2026-07-29T19:05:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-1-code-generation-plan.md`: 6 pasos (tipografía/fondo globales, tarjetas, botones, chips, inputs/option-item, documentación). Decisiones de mapeo documentadas (radios por tipo de elemento, botón primario con texto oscuro sobre Lime-9 por contraste, botón danger mantiene rojo hardcodeado como excepción documentada — no se pidió escala roja de Radix).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 1
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 1
+**Timestamp**: 2026-07-29T19:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 1 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 1 (Componentes base)
+**Timestamp**: 2026-07-29T19:20:00Z
+**AI Response**: 6 pasos ejecutados en `css/style.css`: tipografía/fondo global (Inter, sand-1/sand-12), tarjetas (sand-2/sand-6/radius-4), botones (accent-9/accent-12, danger mantiene rojo hardcodeado como excepción), chips (sand-7/radius-full, seleccionado accent-9/accent-12), inputs/option-item/icon-picker-option (sand-7/radius-3, seleccionado accent-9/accent-3). Documentación en `lote-1-componentes-base-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 1
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Cambio de dirección — sistema de color (Ciclo 3)
+**Timestamp**: 2026-07-29T19:35:00Z
+**User Input**: "me gusta mas como funciona el color system de https://m3.material.io/styles/color/system/how-the-system-works"
+**AI Response**: Se detecta un cambio de alcance respecto a lo ya aprobado en Requirements Analysis (FR-24: escalas planas de Radix Colors Lime/Sand). Material Design 3 usa una arquitectura de color distinta (paleta tonal generada desde un color semilla + roles semánticos primary/secondary/tertiary/error/surface con pares on-*/*-container). Se reabre Requirements Analysis (alcance acotado al sistema de color) con preguntas de aclaración antes de tocar el código ya generado en Lotes 0-1.
+**Context**: Requirements Analysis (reapertura), Ciclo 3 — sistema de color
+**Estado**: Pendiente respuestas del usuario
+
+---
+
+## Respuestas — Cambio de dirección sistema de color (Ciclo 3)
+**Timestamp**: 2026-07-29T19:45:00Z
+**User Input**: Respuestas en m3-color-system-questions.md — Q1:B, Q2:A, Q3:A, Q4:A, Q5:C ("quiero cambiar como base a material io que me gusta más aunque la tipografia quiero la inter")
+**AI Response**: Contradicción detectada entre Q1 (alcance acotado solo a color) y Q5 (respuesta libre sugiere adoptar M3 como base general del sistema, no solo color). Se crea `m3-color-system-clarification-questions.md` con 2 preguntas para resolver el alcance real (solo color vs. color+forma vs. color+forma+tipografía) y si se adopta el sistema de elevación por superficies de M3 o se mantienen las sombras actuales.
+**Context**: Requirements Analysis (reapertura), Ciclo 3 — sistema de color
+**Estado**: Pendiente respuestas de clarificación
+
+---
+
+## Respuestas clarificación — sistema de color/forma (Ciclo 3)
+**Timestamp**: 2026-07-29T19:55:00Z
+**User Input**: Respuestas en m3-color-system-clarification-questions.md — CQ1:B, CQ2:A
+**AI Response**: Confirmado: el design system pasa a basarse por completo en Material Design 3 (color con paletas tonales HCT + roles semánticos, forma/shape scale de M3, elevación por superficies con tinte), manteniendo únicamente Inter como fuente (con la escala tipográfica de M3, no la de Radix). Se generan los valores oficiales: color con el paquete npm `@material/material-color-utilities` (algoritmo HCT real, semilla Lime `#bdee63`, esquema `SchemeTonalSpot` spec 2025, incluye niveles surface-container), forma y tipografía desde los tokens oficiales de `material-web` v0.192 (fetched vía curl a raw.githubusercontent.com). requirements.md ampliado con sección "REVISIÓN Ciclo 3" (FR-29 a FR-32, NFR-15/16), que supersede las decisiones de color/radios previas.
+**Context**: Requirements Analysis (revisión), Ciclo 3
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Requirements Analysis (revisión M3)
+**Timestamp**: 2026-07-29T20:00:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Revisión aprobada. Se procede a Code Generation Part 1 (Planning) del Lote 0-1 v2 (Fundaciones M3 + Componentes base, reemplaza Lotes 0-1 con Radix).
+**Context**: Requirements Analysis (revisión), Ciclo 3 — GATE cerrado
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 0-1 v2 (Fundaciones M3 + Componentes base)
+**Timestamp**: 2026-07-29T20:05:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-0-1-v2-code-generation-plan.md`: reemplaza tokens.css (color M3 completo, forma, tipografía) y remaquetea body/h1/tarjetas/botones/chips/option-item/inputs con los roles M3 (botones tipo píldora "Filled/Outlined", tarjetas "Outlined Card", chips con esquina 8px, inputs "Outlined Text Field"). El botón danger deja de ser una excepción (usa el rol error real de M3).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 0-1 v2
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 0-1 v2
+**Timestamp**: 2026-07-29T20:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 0-1 v2 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 0-1 v2 (Fundaciones M3 + Componentes base)
+**Timestamp**: 2026-07-29T20:25:00Z
+**AI Response**: 7 pasos ejecutados: `css/tokens.css` reescrito con 35 roles de color M3 (claro+oscuro, calculados con `@material/material-color-utilities` real), escala de forma y 15 roles tipográficos con Inter; `css/style.css` remigrado de tokens Radix a tokens M3 en body/h1/tarjetas/botones/chips/option-item/inputs. Botón danger deja de ser excepción (usa rol `error` real). Documentación en `lote-0-1-v2-fundaciones-m3-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 0-1 v2
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 0-1 v2
+**Timestamp**: 2026-07-29T20:35:00Z
+**User Input**: "sube pr" (tras revisar) + "continue con el Lote 2"
+**AI Response**: Lote 0-1 v2 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 2 (Componentes de listas).
+**Context**: Code Generation, Ciclo 3, Lote 0-1 v2 — GATE cerrado
+**Estado**: LOTE 0-1 v2 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 2 (Componentes de listas)
+**Timestamp**: 2026-07-29T20:45:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-2-code-generation-plan.md`: 7 pasos (texto secundario con `on-surface-variant` en vez de opacidad, list-card/menú desplegable, cabecera/avatar/tabs, filas de producto/FAB, stepper, barra de selección/icon-buttons, documentación). Decisión notable: el FAB pasa de circular a `corner-large` (forma oficial de M3, ya no circular).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 2
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 2
+**Timestamp**: 2026-07-29T20:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 2 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 2 (Componentes de listas)
+**Timestamp**: 2026-07-29T21:00:00Z
+**AI Response**: 7 pasos ejecutados en `css/style.css`: texto secundario a `on-surface-variant`, list-card/menú desplegable, cabecera/avatar/tabs, filas de producto seleccionadas, FAB (`corner-large`, ya no circular), stepper, barra de selección/icon-buttons. Documentación en `lote-2-componentes-listas-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 2
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 2
+**Timestamp**: 2026-07-29T21:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 2 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 3 (Modales e historial).
+**Context**: Code Generation, Ciclo 3, Lote 2 — GATE cerrado
+**Estado**: LOTE 2 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 3 (Modales e historial)
+**Timestamp**: 2026-07-29T21:15:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-3-code-generation-plan.md`: 4 pasos (overlay/panel con scrim y elevación por superficie reales, cabecera/controles, progreso de wizard migrado del último uso de `--color-primary` legacy, documentación). Se documentan como exclusión intencional el "receipt" (ticket con aspecto de recibo físico) y `.ticket-row-*`, por ser un componente deliberadamente skeuomórfico ajeno al sistema de superficies M3.
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 3
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 3
+**Timestamp**: 2026-07-29T21:20:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 3 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 3 (Modales e historial)
+**Timestamp**: 2026-07-29T21:30:00Z
+**AI Response**: 4 pasos ejecutados en `css/style.css`: scrim real de M3 (32% sobre `--md-sys-color-scrim`), `.modal-panel`/`.modal-panel--fullscreen` con `surface-container-high`/`corner-extra-large`, cabecera/controles/label con roles M3, progreso de wizard migrado (último uso de `--color-primary`). Se eliminaron `--radius`/`--color-primary`/`--color-secondary` de `:root` en `style.css` (confirmado sin usos restantes). Documentación en `lote-3-modales-historial-summary.md`, incluyendo la exclusión intencional del receipt/ticket-row. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 3
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 3
+**Timestamp**: 2026-07-29T21:40:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 3 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 4 (Onboarding/QR y detalles finales, revisión de modo oscuro end-to-end).
+**Context**: Code Generation, Ciclo 3, Lote 3 — GATE cerrado
+**Estado**: LOTE 3 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 4 (Onboarding/QR, detalles finales, modo oscuro)
+**Timestamp**: 2026-07-29T21:45:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-4-code-generation-plan.md`: activar `color-scheme: light dark` (FR-25, hasta ahora pisado por `style.css`), regla `.meta` genérica para `qr-view.js`, verificación final de que no quedan colores hardcodeados fuera de sombras/receipt, documentación y cierre del Ciclo 3.
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 4
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 4
+**Timestamp**: 2026-07-29T21:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 4 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 4 (Onboarding/QR, detalles finales, modo oscuro)
+**Timestamp**: 2026-07-29T22:00:00Z
+**AI Response**: 4 pasos ejecutados en `css/style.css`: `color-scheme: light dark` activado (FR-25 cerrado, la app ya recolorea de verdad con la preferencia del sistema), regla `.meta` genérica añadida, verificación final confirmando que no quedan colores hardcodeados fuera de sombras/receipt. Documentación en `lote-4-onboarding-modo-oscuro-summary.md`. `npm test`: 230/230 pasan. Con este lote se completan los 5 lotes planificados del Ciclo 3.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 4
+**Estado**: Pendiente revisión visual y aprobación del usuario — CICLO 3 (todos los lotes) pendiente de aprobación final antes de Build and Test
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 4 (cierre del ciclo)
+**Timestamp**: 2026-07-29T22:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 4 aprobado. CICLO 3 (Design System basado en Material Design 3) completo en sus 5 lotes. Se procede a Build and Test.
+**Context**: Code Generation, Ciclo 3, Lote 4 — GATE cerrado
+**Estado**: CICLO 3 — TODOS LOS LOTES COMPLETOS, pendiente Build and Test
+
+---
+
+## Build and Test Stage (incremental) — Ciclo 3: Design System M3
+**Timestamp**: 2026-07-29T22:20:00Z
+**Build Status**: Success (falla solo por variables de entorno Supabase locales, no relacionado)
+**Test Status**: Pass (230/230, sin tests nuevos — cambio puramente de CSS/HTML)
+**Files Updated**: `integration-test-instructions.md` (nuevo Scenario 9 — verificación visual manual del design system M3), `build-and-test-summary.md` (sección incremental Ciclo 3)
+**Otros**: `npm audit` sin hallazgos nuevos (misma excepción aceptada de la cadena vitest/vite/esbuild); sin dependencias npm nuevas en el proyecto
+
+---
+
+## Aprobación Build and Test — Ciclo 3: Design System M3
+**Timestamp**: 2026-07-29T22:30:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Build and Test aprobado. Ciclo 3 (Design System basado en Material Design 3) completo. Se procede a Operations (placeholder, sin trabajo activo).
+**Context**: Build and Test, Ciclo 3 — GATE cerrado
+**Estado**: CICLO 3 COMPLETO
+
+---

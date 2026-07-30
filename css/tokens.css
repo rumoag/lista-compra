@@ -1,0 +1,192 @@
+/* Design tokens basados en Material Design 3 (M3).
+   Color: paletas tonales HCT reales (algoritmo oficial de Google,
+   @material/material-color-utilities v0.4.0), semilla #bdee63 (verde Lime),
+   esquema SchemeTonalSpot, specVersion 2025, contrastLevel 0, claro + oscuro.
+   Forma y tipografía: tokens oficiales de material-web v0.192
+   (_md-sys-shape.scss, _md-sys-typescale.scss, _md-ref-typeface.scss).
+   Calculados el 2026-07-29; fuente = fuente/rol M3, sustituida por Inter. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Color — roles M3 (claro) */
+  --md-sys-color-primary: #506628;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d2ec9f;
+  --md-sys-color-on-primary-container: #394d12;
+  --md-sys-color-secondary: #596248;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #dde6c6;
+  --md-sys-color-on-secondary-container: #424a32;
+  --md-sys-color-tertiary: #396661;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #bcece5;
+  --md-sys-color-on-tertiary-container: #1f4e49;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #93000a;
+  --md-sys-color-surface: #fafaee;
+  --md-sys-color-on-surface: #1a1c15;
+  --md-sys-color-surface-variant: #e2e4d4;
+  --md-sys-color-on-surface-variant: #45483d;
+  --md-sys-color-surface-dim: #dadbcf;
+  --md-sys-color-surface-bright: #fafaee;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f4f4e8;
+  --md-sys-color-surface-container: #eeefe3;
+  --md-sys-color-surface-container-high: #e8e9dd;
+  --md-sys-color-surface-container-highest: #e3e3d8;
+  --md-sys-color-inverse-surface: #2f3129;
+  --md-sys-color-inverse-on-surface: #f1f1e6;
+  --md-sys-color-inverse-primary: #b6d086;
+  --md-sys-color-background: #fafaee;
+  --md-sys-color-on-background: #1a1c15;
+  --md-sys-color-outline: #75786b;
+  --md-sys-color-outline-variant: #c5c8b9;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+
+  /* Forma (M3 shape scale) */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* Tipografía (M3 type scale, fuente Inter en vez de Roboto) */
+  --font-family-base: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --md-sys-typescale-display-large-font: var(--font-family-base);
+  --md-sys-typescale-display-large-size: 3.5625rem;
+  --md-sys-typescale-display-large-line-height: 4rem;
+  --md-sys-typescale-display-large-tracking: -0.015625em;
+  --md-sys-typescale-display-large-weight: 400;
+
+  --md-sys-typescale-display-medium-font: var(--font-family-base);
+  --md-sys-typescale-display-medium-size: 2.8125rem;
+  --md-sys-typescale-display-medium-line-height: 3.25rem;
+  --md-sys-typescale-display-medium-tracking: 0em;
+  --md-sys-typescale-display-medium-weight: 400;
+
+  --md-sys-typescale-display-small-font: var(--font-family-base);
+  --md-sys-typescale-display-small-size: 2.25rem;
+  --md-sys-typescale-display-small-line-height: 2.75rem;
+  --md-sys-typescale-display-small-tracking: 0em;
+  --md-sys-typescale-display-small-weight: 400;
+
+  --md-sys-typescale-headline-large-font: var(--font-family-base);
+  --md-sys-typescale-headline-large-size: 2rem;
+  --md-sys-typescale-headline-large-line-height: 2.5rem;
+  --md-sys-typescale-headline-large-tracking: 0em;
+  --md-sys-typescale-headline-large-weight: 400;
+
+  --md-sys-typescale-headline-medium-font: var(--font-family-base);
+  --md-sys-typescale-headline-medium-size: 1.75rem;
+  --md-sys-typescale-headline-medium-line-height: 2.25rem;
+  --md-sys-typescale-headline-medium-tracking: 0em;
+  --md-sys-typescale-headline-medium-weight: 400;
+
+  --md-sys-typescale-headline-small-font: var(--font-family-base);
+  --md-sys-typescale-headline-small-size: 1.5rem;
+  --md-sys-typescale-headline-small-line-height: 2rem;
+  --md-sys-typescale-headline-small-tracking: 0em;
+  --md-sys-typescale-headline-small-weight: 400;
+
+  --md-sys-typescale-title-large-font: var(--font-family-base);
+  --md-sys-typescale-title-large-size: 1.375rem;
+  --md-sys-typescale-title-large-line-height: 1.75rem;
+  --md-sys-typescale-title-large-tracking: 0em;
+  --md-sys-typescale-title-large-weight: 400;
+
+  --md-sys-typescale-title-medium-font: var(--font-family-base);
+  --md-sys-typescale-title-medium-size: 1rem;
+  --md-sys-typescale-title-medium-line-height: 1.5rem;
+  --md-sys-typescale-title-medium-tracking: 0.009375em;
+  --md-sys-typescale-title-medium-weight: 500;
+
+  --md-sys-typescale-title-small-font: var(--font-family-base);
+  --md-sys-typescale-title-small-size: 0.875rem;
+  --md-sys-typescale-title-small-line-height: 1.25rem;
+  --md-sys-typescale-title-small-tracking: 0.00625em;
+  --md-sys-typescale-title-small-weight: 500;
+
+  --md-sys-typescale-body-large-font: var(--font-family-base);
+  --md-sys-typescale-body-large-size: 1rem;
+  --md-sys-typescale-body-large-line-height: 1.5rem;
+  --md-sys-typescale-body-large-tracking: 0.03125em;
+  --md-sys-typescale-body-large-weight: 400;
+
+  --md-sys-typescale-body-medium-font: var(--font-family-base);
+  --md-sys-typescale-body-medium-size: 0.875rem;
+  --md-sys-typescale-body-medium-line-height: 1.25rem;
+  --md-sys-typescale-body-medium-tracking: 0.015625em;
+  --md-sys-typescale-body-medium-weight: 400;
+
+  --md-sys-typescale-body-small-font: var(--font-family-base);
+  --md-sys-typescale-body-small-size: 0.75rem;
+  --md-sys-typescale-body-small-line-height: 1rem;
+  --md-sys-typescale-body-small-tracking: 0.025em;
+  --md-sys-typescale-body-small-weight: 400;
+
+  --md-sys-typescale-label-large-font: var(--font-family-base);
+  --md-sys-typescale-label-large-size: 0.875rem;
+  --md-sys-typescale-label-large-line-height: 1.25rem;
+  --md-sys-typescale-label-large-tracking: 0.00625em;
+  --md-sys-typescale-label-large-weight: 500;
+
+  --md-sys-typescale-label-medium-font: var(--font-family-base);
+  --md-sys-typescale-label-medium-size: 0.75rem;
+  --md-sys-typescale-label-medium-line-height: 1rem;
+  --md-sys-typescale-label-medium-tracking: 0.03125em;
+  --md-sys-typescale-label-medium-weight: 500;
+
+  --md-sys-typescale-label-small-font: var(--font-family-base);
+  --md-sys-typescale-label-small-size: 0.6875rem;
+  --md-sys-typescale-label-small-line-height: 1rem;
+  --md-sys-typescale-label-small-tracking: 0.03125em;
+  --md-sys-typescale-label-small-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-sys-color-primary: #b6d086;
+    --md-sys-color-on-primary: #243600;
+    --md-sys-color-primary-container: #394d12;
+    --md-sys-color-on-primary-container: #d2ec9f;
+    --md-sys-color-secondary: #c1caab;
+    --md-sys-color-on-secondary: #2b331d;
+    --md-sys-color-secondary-container: #424a32;
+    --md-sys-color-on-secondary-container: #dde6c6;
+    --md-sys-color-tertiary: #a0d0c9;
+    --md-sys-color-on-tertiary: #013733;
+    --md-sys-color-tertiary-container: #1f4e49;
+    --md-sys-color-on-tertiary-container: #bcece5;
+    --md-sys-color-error: #ffb4ab;
+    --md-sys-color-on-error: #690005;
+    --md-sys-color-error-container: #93000a;
+    --md-sys-color-on-error-container: #ffdad6;
+    --md-sys-color-surface: #12140d;
+    --md-sys-color-on-surface: #e3e3d8;
+    --md-sys-color-surface-variant: #45483d;
+    --md-sys-color-on-surface-variant: #c5c8b9;
+    --md-sys-color-surface-dim: #12140d;
+    --md-sys-color-surface-bright: #383a32;
+    --md-sys-color-surface-container-lowest: #0d0f09;
+    --md-sys-color-surface-container-low: #1a1c15;
+    --md-sys-color-surface-container: #1e2019;
+    --md-sys-color-surface-container-high: #292b23;
+    --md-sys-color-surface-container-highest: #34362e;
+    --md-sys-color-inverse-surface: #e3e3d8;
+    --md-sys-color-inverse-on-surface: #2f3129;
+    --md-sys-color-inverse-primary: #506628;
+    --md-sys-color-background: #12140d;
+    --md-sys-color-on-background: #e3e3d8;
+    --md-sys-color-outline: #8f9284;
+    --md-sys-color-outline-variant: #45483d;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+  }
+}

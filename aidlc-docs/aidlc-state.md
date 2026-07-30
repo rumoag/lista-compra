@@ -136,6 +136,31 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [ ] Code Generation
 - [ ] Build and Test (incremental)
 
+## CICLO 3 — Design System basado en Radix UI (iniciado 2026-07-29)
+
+**Contexto**: Nueva solicitud del usuario tras Ciclo 2, para adoptar el lenguaje visual de Radix UI (Radix Colors + Radix Themes) como design system: color de acento Lime, neutro Sand, modo oscuro completo, tipografía Inter + escala Radix, escala completa de radios, remaquetado de todos los componentes visuales existentes.
+
+- [x] Requirements Analysis — 7 preguntas de aclaración respondidas (alcance = remaquetar todo; acento Lime; neutro Sand; dark mode completo por `prefers-color-scheme`; tipografía Inter + escala Radix; escala completa de radios; verificación visual manual del usuario); requirements.md ampliado con sección "Ciclo 3"; aprobado
+- [x] Workflow Planning — User Stories/Application Design/Units Generation/Functional Design/NFR Requirements/NFR Design/Infrastructure Design SKIP (cambio puramente visual, sin lógica de negocio ni infraestructura nueva); Code Generation en 5 lotes con checkpoints visuales; aprobado
+- [x] Code Generation — Lote 0 (Fundaciones: tokens color/tipografía/radio) — `css/tokens.css` creado, `style.css`/`index.html` actualizados; 230/230 tests pasan; sin cambio visual todavía
+- [x] Code Generation — Lote 1 (Componentes base: tarjetas/botones/chips/inputs) — `style.css` remaquetado (tipografía/fondo global, tarjetas, botones, chips, inputs); botón danger mantiene rojo hardcodeado (excepción documentada); 230/230 tests pasan; pendiente revisión visual del usuario
+
+### REVISIÓN — Cambio de base a Material Design 3 (color + forma), Inter se mantiene
+- [x] Requirements Analysis (reapertura) — usuario prefiere el sistema de color de M3; contradicción detectada y resuelta (alcance ampliado a color+forma, no solo color); requirements.md ampliado con sección "REVISIÓN Ciclo 3" (FR-29 a FR-32); valores oficiales calculados (HCT real vía `@material/material-color-utilities`, semilla Lime; shape/type scale desde tokens de `material-web` v0.192); aprobado
+- [x] Code Generation — Lote 0-1 v2 (Fundaciones M3 + Componentes base, reemplaza Lotes 0-1 con Radix) — `css/tokens.css` reescrito (color/forma/tipografía M3), `style.css` remigrado; danger ya no es excepción (usa rol error M3); 230/230 tests pasan; pendiente revisión visual del usuario
+- [x] Code Generation — Lote 2 (Componentes de listas) — `style.css` remaquetado (list-card, menú, cabecera/avatar/tabs, filas seleccionadas, FAB ahora corner-large, stepper, barra de selección); 230/230 tests pasan; pendiente revisión visual del usuario
+- [x] Code Generation — Lote 3 (Modales e historial) — scrim y elevación por superficie reales de M3; último uso de tokens legacy (`--color-primary`/`--color-secondary`/`--radius`) eliminado; receipt/ticket-row excluidos (skeuomórfico, intencional); 230/230 tests pasan; pendiente revisión visual del usuario
+- [x] Code Generation — Lote 4 (Onboarding/QR, detalles finales, modo oscuro) — `color-scheme: light dark` activado (modo oscuro end-to-end, FR-25 cerrado); `.meta` genérico añadido; verificación final sin colores hardcodeados fuera de sombras/receipt; 230/230 tests pasan; pendiente revisión visual del usuario
+
+**CICLO 3 (Design System basado en Material Design 3): TODOS LOS LOTES COMPLETOS** — próximo paso: verificación visual final del usuario y Build and Test
+
+- [x] Build and Test (incremental) — build success (falla solo por falta de env vars Supabase locales, no relacionado), 230/230 tests (sin cambios, es un cambio puramente de CSS/HTML), `npm audit` sin hallazgos nuevos; Scenario 9 (verificación visual manual M3 claro/oscuro) añadido a `integration-test-instructions.md`; `build-and-test-summary.md` actualizado
+
+**CICLO 3: BUILD AND TEST COMPLETO** — pendiente: confirmación visual final del usuario (Scenario 9)
+
+**CICLO 3 (Design System basado en Material Design 3): COMPLETO Y APROBADO** — próximo paso del usuario: confirmar visualmente el Scenario 9 (modo claro/oscuro, botón danger, receipt) de `integration-test-instructions.md`.
+- [ ] Build and Test
+
 ### Unidad 5 — Seguimiento: tarjeta "Crear nueva lista" (BR-66)
 - [x] Petición del usuario: la "Crear nueva lista" pasa de botón de cabecera a tarjeta con forma de `list-card`, primera del listado, icono "+" en contenedor gris redondeado, subtítulo "Toca para empezar"; estado vacío se mantiene debajo. 3 dudas de diseño resueltas por el usuario antes de implementar (estado vacío, subtítulo, forma del icono). Implementado directamente en `home/list-card.js` (nueva función `renderCreateListCard`) y `home/home-screen.js` + estilos en `css/style.css`; 228/228 tests pasan (sin cambios de test necesarios, mismo `data-testid`); build verificado (falla únicamente por falta de variables de entorno Supabase locales, no relacionado). Documentado como BR-66 en `functional-design/business-rules.md` y reflejado en `frontend-components.md`.
 
