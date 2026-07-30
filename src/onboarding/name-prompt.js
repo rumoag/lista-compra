@@ -12,17 +12,29 @@ export function setLocalName(name) {
 }
 
 export function renderNameForm(container, { currentName = '', onSave, footer }) {
-  container.innerHTML = `
-    <div class="card" data-testid="name-prompt">
-      <p>¿Cómo te llamas? (ej. "Yo", "Mi pareja")</p>
-      <input type="text" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
-      <div class="error-message" data-testid="name-prompt-error" hidden></div>
-      ${footer ? '' : '<button type="button" data-testid="name-prompt-save-button">Guardar</button>'}
-    </div>
+  // Sin footer externo (flujo de primer uso, sin modal envolvente): la tarjeta
+  // reproduce la misma jerarquía header/body/footer que openModal() para que ambos
+  // flujos (onboarding y "Cambiar nombre") luzcan iguales.
+  const bodyHtml = `
+    <p>Ej. "Yo", "Mi pareja"</p>
+    <input type="text" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
+    <div class="error-message" data-testid="name-prompt-error" hidden></div>
   `;
+  const saveButtonHtml = `<button type="button" data-testid="name-prompt-save-button">Guardar</button>`;
 
   if (footer) {
-    footer.innerHTML = `<button type="button" data-testid="name-prompt-save-button">Guardar</button>`;
+    container.innerHTML = bodyHtml;
+    footer.innerHTML = saveButtonHtml;
+  } else {
+    container.innerHTML = `
+      <div class="card" data-testid="name-prompt">
+        <div class="modal-header">
+          <h2>¿Cómo te llamas?</h2>
+        </div>
+        <div class="modal-body">${bodyHtml}</div>
+        <div class="modal-footer">${saveButtonHtml}</div>
+      </div>
+    `;
   }
 
   const input = container.querySelector('[data-testid="name-prompt-input"]');
