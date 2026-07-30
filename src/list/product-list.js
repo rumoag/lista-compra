@@ -15,6 +15,7 @@ import { renderSelectionBar } from '../bulk-actions/selection-bar.js';
 import { createRealtimeSubscription } from '../common/realtime-subscription.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 import { openPurchaseTitleModal } from '../history/purchase-title-modal.js';
+import { renderSkeleton } from '../common/skeleton.js';
 
 const PAGE_SIZE = 20;
 
@@ -34,6 +35,8 @@ export async function renderProductList(container, { householdId }) {
   const itemsContainer = container.querySelector('#product-list-items');
   const emptyState = container.querySelector('#product-list-empty');
   const sentinel = container.querySelector('#product-list-sentinel');
+
+  renderSkeleton(itemsContainer, { variant: 'list-row', count: 5 });
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const selection = createSelectionState();
@@ -60,19 +63,38 @@ export async function renderProductList(container, { householdId }) {
     return data;
   }
 
+  // renderList() reconstruye todas las filas en cada cambio (seleccionar, editar, etc.),
+  // no solo cuando llega un producto nuevo — sin este registro, la animación de entrada
+  // se reproduciría en TODA la lista cada vez que se marca/desmarca un solo checkbox.
+  // Solo se anima un id la primera vez que aparece en la lista renderizada; para un id ya
+  // presente, se compara su estado de selección anterior con el nuevo y, si cambió, esa
+  // fila (solo esa) recibe un pulso individual en vez de la animación de entrada.
+  const enteredIds = new Set();
+  const lastSelectedById = new Map();
+
   function renderList() {
     const items = paginator.getItems();
     itemsContainer.innerHTML = '';
     emptyState.hidden = items.length > 0;
 
+    let newIndex = 0;
     items.forEach((product) => {
-      itemsContainer.appendChild(
-        renderProductItem(product, {
-          onEdit: handleEditRequest,
-          onToggleSelect: handleToggleSelect,
-          selected: selection.isSelected(product.id),
-        })
-      );
+      const selected = selection.isSelected(product.id);
+      const row = renderProductItem(product, {
+        onEdit: handleEditRequest,
+        onToggleSelect: handleToggleSelect,
+        selected,
+      });
+      if (!enteredIds.has(product.id)) {
+        enteredIds.add(product.id);
+        row.classList.add('motion-row-enter');
+        row.style.setProperty('--stagger-index', newIndex);
+        newIndex += 1;
+      } else if (lastSelectedById.get(product.id) !== selected) {
+        row.classList.add('motion-check-pulse');
+      }
+      lastSelectedById.set(product.id, selected);
+      itemsContainer.appendChild(row);
     });
 
     const selectedCount = selection.getSelection().size;
@@ -113,7 +135,16 @@ export async function renderProductList(container, { householdId }) {
 
   async function loadFirstPage() {
     isLoadingMore = true;
-    await paginator.loadNextPage(fetchPage);
+    try {
+      await paginator.loadNextPage(fetchPage);
+    } catch (err) {
+      // Sin esto, el skeleton de carga (Ciclo 4) se queda animando para siempre si
+      // la primera página falla — antes de los skeletons esto pasaba desapercibido
+      // porque no había ningún indicador de carga.
+      itemsContainer.innerHTML = '<p class="error-message" data-testid="product-list-load-error">No se pudo cargar la lista. Inténtalo de nuevo.</p>';
+      isLoadingMore = false;
+      return;
+    }
     if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
     isLoadingMore = false;
     renderList();

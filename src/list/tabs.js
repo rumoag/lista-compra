@@ -25,14 +25,26 @@ export function renderTabs(navContainer, viewContainer, { views, householdId, in
   // IntersectionObserver) queda huérfana al cambiar de tab — el canal de Realtime del
   // household sigue abierto y una nueva visita crea otro canal con el mismo topic, lo
   // que puede impedir que la nueva suscripción (o incluso la carga inicial) funcione.
+  //
+  // Motion (Ciclo 4, aproximación a "shared axis" de M3): la vista entrante arranca
+  // desplazada/desvanecida y se asienta en su sitio justo después de renderizarse. El
+  // render() en sí se lanza en el mismo tick que el click (sin retraso artificial) para
+  // no introducir una espera antes de la carga real de datos de la vista.
   async function activate(viewKey) {
     if (currentCleanup) {
       currentCleanup();
       currentCleanup = null;
     }
     renderNav(viewKey);
+
+    viewContainer.classList.add('view-transition-in');
     const cleanup = await views[viewKey].render(viewContainer, { householdId });
     if (typeof cleanup === 'function') currentCleanup = cleanup;
+
+    // Fuerza el layout con el estado "in" (desplazado) ya aplicado, para que quitar
+    // la clase en el siguiente frame dispare la transición hacia su posición final.
+    void viewContainer.offsetWidth;
+    requestAnimationFrame(() => viewContainer.classList.remove('view-transition-in'));
   }
 
   activate(initialView);

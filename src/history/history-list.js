@@ -10,6 +10,7 @@ import { renderHistoryFilters } from './history-filters.js';
 import { filterByDateRange, filterByName } from './filters.js';
 import { renderTicketRow } from './ticket-row.js';
 import { openTicketModal } from './ticket-modal.js';
+import { renderSkeleton } from '../common/skeleton.js';
 
 const PAGE_SIZE = 20;
 const FILTERED_FETCH_LIMIT = 2000;
@@ -28,6 +29,8 @@ export async function renderHistoryList(container, { householdId }) {
   const itemsContainer = container.querySelector('#history-items');
   const emptyState = container.querySelector('#history-empty');
   const sentinel = container.querySelector('#history-sentinel');
+
+  renderSkeleton(itemsContainer, { variant: 'list-row', count: 5 });
 
   const paginator = createPaginator({ pageSize: PAGE_SIZE });
   const realtime = createRealtimeSubscription({ householdId, table: 'purchases' });
@@ -77,6 +80,11 @@ export async function renderHistoryList(container, { householdId }) {
     return data ?? [];
   }
 
+  // Igual que en product-list.js: renderList() reconstruye todas las filas en cada
+  // cambio (abrir/cerrar un ticket, editar su título, etc.), así que solo se anima la
+  // entrada de un ticket la primera vez que aparece, no en cada re-render de la lista.
+  const enteredIds = new Set();
+
   function renderList() {
     const items = hasActiveFilters() ? filteredResults ?? [] : paginator.getItems();
     itemsContainer.innerHTML = '';
@@ -88,7 +96,17 @@ export async function renderHistoryList(container, { householdId }) {
         : 'Aún no hay compras registradas.';
     } else {
       emptyState.hidden = true;
-      items.forEach((purchase) => itemsContainer.appendChild(renderTicketRow(purchase, { onOpen: handleOpenTicket })));
+      let newIndex = 0;
+      items.forEach((purchase) => {
+        const row = renderTicketRow(purchase, { onOpen: handleOpenTicket });
+        if (!enteredIds.has(purchase.id)) {
+          enteredIds.add(purchase.id);
+          row.classList.add('motion-row-enter');
+          row.style.setProperty('--stagger-index', newIndex);
+          newIndex += 1;
+        }
+        itemsContainer.appendChild(row);
+      });
     }
   }
 
@@ -229,7 +247,15 @@ export async function renderHistoryList(container, { householdId }) {
   }
   window.addEventListener('pagehide', cleanup, { once: true });
 
-  await paginator.loadNextPage(fetchPage);
+  try {
+    await paginator.loadNextPage(fetchPage);
+  } catch (err) {
+    // Sin esto, el skeleton de carga (Ciclo 4) se queda animando para siempre si la
+    // primera página falla — antes de los skeletons esto pasaba desapercibido porque
+    // no había ningún indicador de carga.
+    itemsContainer.innerHTML = '<p class="error-message" data-testid="history-list-load-error">No se pudo cargar el historial. Inténtalo de nuevo.</p>';
+    return cleanup;
+  }
   if (paginator.getItems().length < PAGE_SIZE) hasMore = false;
   renderList();
   observer.observe(sentinel);

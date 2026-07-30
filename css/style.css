@@ -9,6 +9,28 @@
   box-sizing: border-box;
 }
 
+/* Transición nativa entre documentos (Chrome 126+, cross-document View Transitions):
+   al navegar de inicio a una lista (window.location.href), el navegador funde el
+   documento saliente con el entrante en vez del salto instantáneo por defecto.
+   Progressive enhancement puro — sin efecto alguno en navegadores sin soporte. */
+@view-transition {
+  navigation: auto;
+}
+
+/* Quien pida menos movimiento se lleva prácticamente ninguno, sin excepciones por
+   componente: todas las duraciones se comprimen a un instante y las animaciones de
+   una sola pasada (entradas de fila, etc.) se saltan directamente a su estado final. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .ph-icon {
   display: inline-block;
   vertical-align: -0.125em;
@@ -260,6 +282,115 @@ button.danger {
   padding: 2rem 1rem;
 }
 
+/* Ciclo 4 — motion system M3 (esquema Expressive) + skeletons de carga */
+
+/* Entrada escalonada de filas/tarjetas (BR-61ish): cada elemento recién insertado en una
+   lista (producto, ticket, tarjeta de lista) sube ligeramente mientras se funde, con un
+   pequeño retraso proporcional a su posición (--stagger-index, fijado en JS al crear el
+   nodo) para dar sensación de cascada física en vez de aparición simultánea. */
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.motion-row-enter {
+  animation: row-enter var(--motion-duration-medium2) var(--motion-easing-emphasized-decelerate) both;
+  animation-delay: calc(var(--stagger-index, 0) * 30ms);
+}
+
+/* Pulso individual al marcar/desmarcar un item (BR-41): solo la fila tocada rebota,
+   no el resto de la lista — product-list.js compara el estado de selección anterior
+   con el nuevo en cada render y añade esta clase únicamente a la fila que cambió. */
+@keyframes check-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.motion-check-pulse {
+  animation: check-pulse var(--motion-duration-short4) var(--motion-easing-emphasized-decelerate);
+}
+
+/* Skeletons M3: bloques de color surface-container con un barrido de brillo (shimmer)
+   que ocupan el espacio del contenido real mientras se resuelve el fetch inicial de cada
+   pantalla. Antes de esto no había ningún indicador de carga — el contenido aparecía de
+   golpe cuando el fetch resolvía. */
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-block {
+  border-radius: var(--md-sys-shape-corner-small);
+  background: linear-gradient(
+    90deg,
+    var(--md-sys-color-surface-container-high) 25%,
+    var(--md-sys-color-surface-container-highest) 50%,
+    var(--md-sys-color-surface-container-high) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s var(--motion-easing-standard) infinite;
+}
+
+.skeleton-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.skeleton-list-row .skeleton-block:first-child {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+.skeleton-list-row .skeleton-block:last-child {
+  flex: 1;
+  height: 1rem;
+}
+
+.skeleton-list-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.skeleton-list-card .skeleton-block:first-child {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: none;
+  border-radius: var(--md-sys-shape-corner-medium);
+}
+
+.skeleton-list-card .skeleton-block:last-child {
+  flex: 1;
+  height: 1.1rem;
+}
+
+.skeleton-stat-block {
+  height: 5rem;
+  margin-bottom: var(--spacing);
+}
+
 /* Unidad 5 — pantalla de inicio, tarjetas de lista y modales */
 
 .list-card {
@@ -346,6 +477,11 @@ button.danger {
   justify-content: center;
   z-index: 100;
   padding: var(--spacing);
+  animation: modal-scrim-in var(--motion-duration-short4) var(--motion-easing-standard-decelerate) both;
+}
+
+.modal-overlay--closing {
+  animation: modal-scrim-out var(--motion-duration-short2) var(--motion-easing-standard-accelerate) both;
 }
 
 .modal-panel {
@@ -356,6 +492,37 @@ button.danger {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  animation: modal-panel-in var(--motion-duration-medium3) var(--motion-easing-emphasized-decelerate) both;
+}
+
+.modal-overlay--closing .modal-panel {
+  animation: modal-panel-out var(--motion-duration-short3) var(--motion-easing-emphasized-accelerate) both;
+}
+
+@keyframes modal-scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-scrim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(12px);
+  }
+}
+
+@keyframes modal-panel-out {
+  to {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
 }
 
 .modal-header {
@@ -637,6 +804,29 @@ button.danger {
   padding-bottom: 4.5rem;
 }
 
+/* Cambio de tab (Lista/Historial/Estadísticas): aproximación a "shared axis" de M3 —
+   la vista saliente se funde y desplaza levemente hacia un lado, la entrante hace lo
+   simétrico desde el lado contrario. tabs.js alterna estas clases alrededor del render:
+   añade "out", espera la transición, renderiza la nueva vista con "in" ya puesta (estado
+   inicial desplazado) y la quita en el frame siguiente para que transicione a su lugar. */
+#app-view {
+  transition: opacity var(--motion-duration-short3) var(--motion-easing-emphasized-decelerate),
+    transform var(--motion-duration-short3) var(--motion-easing-emphasized-decelerate);
+}
+
+#app-view.view-transition-out {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition-timing-function: var(--motion-easing-standard-accelerate);
+  transition-duration: var(--motion-duration-short2);
+}
+
+#app-view.view-transition-in {
+  opacity: 0;
+  transform: translateX(8px);
+  transition: none;
+}
+
 .product-item-body {
   display: flex;
   align-items: center;
@@ -668,6 +858,31 @@ button.danger {
   line-height: 1;
   padding: 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
+}
+
+/* Feedback táctil físico en el FAB y botones interactivos: un pequeño hundimiento al
+   pulsar (accelerate, rápido) y un rebote suave de vuelta al soltar (decelerate, M3
+   Expressive). Cubre fab/button/icon-button/icon-text-button/tab/list-card por selector
+   compartido para no repetir la regla en cada componente. */
+.fab:active,
+button:active,
+.icon-button:active,
+.icon-text-button:active,
+.tab:active,
+.list-card-main:active {
+  transform: scale(0.94);
+}
+
+button,
+.icon-button,
+.icon-text-button,
+.tab {
+  transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
+}
+
+.list-card-main {
+  transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
 }
 
 .wizard-actions {
@@ -713,7 +928,6 @@ button.danger {
   position: fixed;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
   box-sizing: border-box;
@@ -724,6 +938,24 @@ button.danger {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transform: translateX(-50%);
+}
+
+/* Solo se anima la entrada al activar la selección (0 → N), no en cada cambio de
+   contador — selection-bar.js añade esta clase únicamente en esa transición. */
+.selection-header--entering {
+  animation: selection-header-in var(--motion-duration-medium1) var(--motion-easing-emphasized-decelerate) both;
+}
+
+@keyframes selection-header-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .selection-header-left,

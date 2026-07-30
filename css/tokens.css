@@ -148,6 +148,31 @@
   --md-sys-typescale-label-small-line-height: 1rem;
   --md-sys-typescale-label-small-tracking: 0.03125em;
   --md-sys-typescale-label-small-weight: 500;
+
+  /* Movimiento (M3, esquema Expressive — m3.material.io/styles/motion/overview/how-it-works).
+     Duraciones: escala oficial short/medium/long. Curvas "emphasized" (physics-inspired,
+     dos tramos: decelerate para entradas, accelerate para salidas) son las que M3 recomienda
+     para el esquema Expressive en transiciones espaciales; "standard" queda para transiciones
+     de efectos puros (fades de opacidad sin desplazamiento). */
+  --motion-duration-short1: 100ms;
+  --motion-duration-short2: 200ms;
+  --motion-duration-short3: 300ms;
+  --motion-duration-short4: 350ms;
+  --motion-duration-medium1: 400ms;
+  --motion-duration-medium2: 450ms;
+  --motion-duration-medium3: 500ms;
+  --motion-duration-medium4: 550ms;
+  --motion-duration-long1: 600ms;
+  --motion-duration-long2: 650ms;
+  --motion-duration-long3: 700ms;
+  --motion-duration-long4: 750ms;
+
+  --motion-easing-linear: linear;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
 }
 
 @media (prefers-color-scheme: dark) {
