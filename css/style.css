@@ -560,6 +560,11 @@ button.danger {
   gap: 0.5rem;
   cursor: pointer;
   flex: 1;
+  /* El long-press (BR-41, editar) dispara el menú nativo de selección/copia en
+     móvil antes de que llegue nuestro propio gesto — se desactiva aquí. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .product-item-category-icon {
