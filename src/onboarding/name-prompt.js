@@ -35,6 +35,9 @@ export function renderNameForm(container, { currentName = '', onSave, footer }) 
         <div class="modal-footer">${saveButtonHtml}</div>
       </div>
     `;
+    // Flujo de primer uso: es el único campo de la pantalla, así que se autoselecciona
+    // para que el usuario pueda escribir directamente sin tener que hacer clic.
+    container.querySelector('[data-testid="name-prompt-input"]').select();
   }
 
   const input = container.querySelector('[data-testid="name-prompt-input"]');
