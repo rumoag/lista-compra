@@ -328,15 +328,6 @@ button.danger {
   line-height: var(--md-sys-typescale-title-large-line-height);
 }
 
-.modal-close-button {
-  background: transparent;
-  color: inherit;
-  border: none;
-  border-radius: var(--md-sys-shape-corner-full);
-  font-size: 1.1rem;
-  padding: 0.25rem 0.5rem;
-}
-
 .form-label {
   display: block;
   font-size: var(--md-sys-typescale-label-large-size);
