@@ -63,19 +63,30 @@ export async function renderProductList(container, { householdId }) {
     return data;
   }
 
+  // renderList() reconstruye todas las filas en cada cambio (seleccionar, editar, etc.),
+  // no solo cuando llega un producto nuevo — sin este registro, la animación de entrada
+  // se reproduciría en TODA la lista cada vez que se marca/desmarca un solo checkbox.
+  // Solo se anima un id la primera vez que aparece en la lista renderizada.
+  const enteredIds = new Set();
+
   function renderList() {
     const items = paginator.getItems();
     itemsContainer.innerHTML = '';
     emptyState.hidden = items.length > 0;
 
-    items.forEach((product, index) => {
+    let newIndex = 0;
+    items.forEach((product) => {
       const row = renderProductItem(product, {
         onEdit: handleEditRequest,
         onToggleSelect: handleToggleSelect,
         selected: selection.isSelected(product.id),
       });
-      row.classList.add('motion-row-enter');
-      row.style.setProperty('--stagger-index', index);
+      if (!enteredIds.has(product.id)) {
+        enteredIds.add(product.id);
+        row.classList.add('motion-row-enter');
+        row.style.setProperty('--stagger-index', newIndex);
+        newIndex += 1;
+      }
       itemsContainer.appendChild(row);
     });
 

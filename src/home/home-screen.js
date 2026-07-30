@@ -19,6 +19,11 @@ export async function renderHomeScreen(container) {
 
   renderSkeleton(listContainer, { variant: 'list-card', count: 3 });
 
+  // refresh() reconstruye todas las tarjetas en cada cambio (crear/editar/eliminar
+  // cualquier lista), no solo cuando aparece una lista nueva — sin este registro, editar
+  // el título de una lista reproduciría la animación de entrada en TODAS las tarjetas.
+  const enteredIds = new Set();
+
   async function refresh() {
     loadError.hidden = true;
     let households;
@@ -38,7 +43,8 @@ export async function renderHomeScreen(container) {
 
     emptyState.hidden = households.length !== 0;
 
-    households.forEach((household, index) => {
+    let newIndex = 0;
+    households.forEach((household) => {
       const card = renderListCard(household, {
         onOpen: (householdId) => {
           window.location.href = `/${householdId}`;
@@ -56,8 +62,12 @@ export async function renderHomeScreen(container) {
             },
           }),
       });
-      card.classList.add('motion-row-enter');
-      card.style.setProperty('--stagger-index', index);
+      if (!enteredIds.has(household.id)) {
+        enteredIds.add(household.id);
+        card.classList.add('motion-row-enter');
+        card.style.setProperty('--stagger-index', newIndex);
+        newIndex += 1;
+      }
       listContainer.appendChild(card);
     });
   }

@@ -80,6 +80,11 @@ export async function renderHistoryList(container, { householdId }) {
     return data ?? [];
   }
 
+  // Igual que en product-list.js: renderList() reconstruye todas las filas en cada
+  // cambio (abrir/cerrar un ticket, editar su título, etc.), así que solo se anima la
+  // entrada de un ticket la primera vez que aparece, no en cada re-render de la lista.
+  const enteredIds = new Set();
+
   function renderList() {
     const items = hasActiveFilters() ? filteredResults ?? [] : paginator.getItems();
     itemsContainer.innerHTML = '';
@@ -91,10 +96,15 @@ export async function renderHistoryList(container, { householdId }) {
         : 'Aún no hay compras registradas.';
     } else {
       emptyState.hidden = true;
-      items.forEach((purchase, index) => {
+      let newIndex = 0;
+      items.forEach((purchase) => {
         const row = renderTicketRow(purchase, { onOpen: handleOpenTicket });
-        row.classList.add('motion-row-enter');
-        row.style.setProperty('--stagger-index', index);
+        if (!enteredIds.has(purchase.id)) {
+          enteredIds.add(purchase.id);
+          row.classList.add('motion-row-enter');
+          row.style.setProperty('--stagger-index', newIndex);
+          newIndex += 1;
+        }
         itemsContainer.appendChild(row);
       });
     }
