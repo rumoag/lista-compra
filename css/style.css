@@ -19,25 +19,28 @@
 
 body {
   margin: 0;
-  font-family: var(--font-family-base);
-  background: var(--sand-1);
-  color: var(--sand-12);
-  font-size: var(--font-size-3);
-  line-height: var(--line-height-3);
+  font-family: var(--md-sys-typescale-body-large-font);
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
   max-width: 480px;
   margin-inline: auto;
   padding: var(--spacing);
 }
 
 .app-header h1 {
-  font-size: var(--font-size-6);
+  font-size: var(--md-sys-typescale-title-large-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
   margin: 0.5rem 0 1rem;
 }
 
 .card {
-  border: 1px solid var(--sand-6);
-  border-radius: var(--radius-4);
-  background: var(--sand-2);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface);
   padding: var(--spacing);
   margin-bottom: var(--spacing);
 }
@@ -54,11 +57,11 @@ body {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  border-radius: var(--radius-3);
-  border: 1px solid var(--sand-7);
-  background: var(--sand-1);
-  color: var(--sand-12);
-  font-size: var(--font-size-3);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--md-sys-typescale-body-large-size);
 }
 
 .chip-group {
@@ -73,18 +76,18 @@ body {
   align-items: center;
   gap: 0.35rem;
   padding: 0.3rem 0.7rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--sand-7);
+  border-radius: var(--md-sys-shape-corner-small);
+  border: 1px solid var(--md-sys-color-outline);
   background: transparent;
   color: inherit;
   cursor: pointer;
-  font-size: var(--font-size-1);
+  font-size: var(--md-sys-typescale-label-medium-size);
 }
 
 .chip[aria-pressed="true"] {
-  background: var(--accent-9);
-  color: var(--accent-12);
-  border-color: var(--accent-9);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: transparent;
 }
 
 .chip--icon {
@@ -100,9 +103,9 @@ body {
 
 .chip-search-input {
   padding: 0.3rem 0.7rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--sand-7);
-  font-size: var(--font-size-1);
+  border-radius: var(--md-sys-shape-corner-small);
+  border: 1px solid var(--md-sys-color-outline);
+  font-size: var(--md-sys-typescale-label-medium-size);
   max-width: 10rem;
 }
 
@@ -113,7 +116,7 @@ body {
   width: 1.1rem;
   height: 1.1rem;
   border-radius: 50%;
-  background: var(--sand-5);
+  background: var(--md-sys-color-outline-variant);
   font-size: 0.65rem;
 }
 
@@ -127,15 +130,16 @@ body {
   text-align: left;
   background: transparent;
   color: inherit;
-  border: 1px solid var(--sand-6);
-  border-radius: var(--radius-3);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-small);
   padding: 0.6rem 0.8rem;
   font-size: 0.95rem;
 }
 
 .option-item[aria-pressed="true"] {
-  border-color: var(--accent-9);
-  background: var(--accent-3);
+  border-color: transparent;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
   font-weight: 600;
 }
 
@@ -152,36 +156,36 @@ body {
 
 .custom-date-range input[type="date"] {
   padding: 0.4rem;
-  border-radius: var(--radius-3);
-  border: 1px solid var(--sand-7);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  border: 1px solid var(--md-sys-color-outline);
 }
 
 button {
   cursor: pointer;
   border: none;
-  border-radius: var(--radius-3);
+  border-radius: var(--md-sys-shape-corner-full);
   padding: 0.55rem 1rem;
-  font-size: 1rem;
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: var(--md-sys-typescale-label-large-weight);
   font-family: inherit;
-  background: var(--accent-9);
-  color: var(--accent-12);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 
 button.secondary {
   background: transparent;
-  color: var(--sand-12);
-  border: 1px solid var(--sand-7);
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
 }
 
 button.danger {
-  border-radius: var(--radius-3);
-  background: #dc2626;
-  color: white;
+  background: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
 }
 
 .error-message {
-  color: #dc2626;
-  font-size: var(--font-size-1);
+  color: var(--md-sys-color-error);
+  font-size: var(--md-sys-typescale-body-small-size);
   margin: -0.25rem 0 0.5rem;
 }
 
@@ -334,18 +338,18 @@ button.danger {
   width: 100%;
   padding: 0.6rem 0.7rem;
   margin-bottom: 0.5rem;
-  border-radius: var(--radius-3);
-  border: 1px solid var(--sand-7);
-  background: var(--sand-1);
-  color: var(--sand-12);
-  font-size: var(--font-size-3);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--md-sys-typescale-body-large-size);
   transition: border-color 0.15s ease;
 }
 
 .text-input:focus {
   outline: none;
-  border-color: var(--accent-9);
-  box-shadow: 0 0 0 3px var(--accent-7);
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent);
 }
 
 .icon-picker {
@@ -357,15 +361,16 @@ button.danger {
 
 .icon-picker-option {
   background: transparent;
-  border: 1px solid var(--sand-7);
-  border-radius: var(--radius-3);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-small);
   font-size: 1.4rem;
   padding: 0.3rem 0.5rem;
 }
 
 .icon-picker-option[aria-pressed="true"] {
-  border-color: var(--accent-9);
-  background: var(--accent-3);
+  border-color: transparent;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
 
 .confirm-modal-actions {

@@ -1328,3 +1328,62 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: Pendiente revisión visual y aprobación del usuario
 
 ---
+
+## Cambio de dirección — sistema de color (Ciclo 3)
+**Timestamp**: 2026-07-29T19:35:00Z
+**User Input**: "me gusta mas como funciona el color system de https://m3.material.io/styles/color/system/how-the-system-works"
+**AI Response**: Se detecta un cambio de alcance respecto a lo ya aprobado en Requirements Analysis (FR-24: escalas planas de Radix Colors Lime/Sand). Material Design 3 usa una arquitectura de color distinta (paleta tonal generada desde un color semilla + roles semánticos primary/secondary/tertiary/error/surface con pares on-*/*-container). Se reabre Requirements Analysis (alcance acotado al sistema de color) con preguntas de aclaración antes de tocar el código ya generado en Lotes 0-1.
+**Context**: Requirements Analysis (reapertura), Ciclo 3 — sistema de color
+**Estado**: Pendiente respuestas del usuario
+
+---
+
+## Respuestas — Cambio de dirección sistema de color (Ciclo 3)
+**Timestamp**: 2026-07-29T19:45:00Z
+**User Input**: Respuestas en m3-color-system-questions.md — Q1:B, Q2:A, Q3:A, Q4:A, Q5:C ("quiero cambiar como base a material io que me gusta más aunque la tipografia quiero la inter")
+**AI Response**: Contradicción detectada entre Q1 (alcance acotado solo a color) y Q5 (respuesta libre sugiere adoptar M3 como base general del sistema, no solo color). Se crea `m3-color-system-clarification-questions.md` con 2 preguntas para resolver el alcance real (solo color vs. color+forma vs. color+forma+tipografía) y si se adopta el sistema de elevación por superficies de M3 o se mantienen las sombras actuales.
+**Context**: Requirements Analysis (reapertura), Ciclo 3 — sistema de color
+**Estado**: Pendiente respuestas de clarificación
+
+---
+
+## Respuestas clarificación — sistema de color/forma (Ciclo 3)
+**Timestamp**: 2026-07-29T19:55:00Z
+**User Input**: Respuestas en m3-color-system-clarification-questions.md — CQ1:B, CQ2:A
+**AI Response**: Confirmado: el design system pasa a basarse por completo en Material Design 3 (color con paletas tonales HCT + roles semánticos, forma/shape scale de M3, elevación por superficies con tinte), manteniendo únicamente Inter como fuente (con la escala tipográfica de M3, no la de Radix). Se generan los valores oficiales: color con el paquete npm `@material/material-color-utilities` (algoritmo HCT real, semilla Lime `#bdee63`, esquema `SchemeTonalSpot` spec 2025, incluye niveles surface-container), forma y tipografía desde los tokens oficiales de `material-web` v0.192 (fetched vía curl a raw.githubusercontent.com). requirements.md ampliado con sección "REVISIÓN Ciclo 3" (FR-29 a FR-32, NFR-15/16), que supersede las decisiones de color/radios previas.
+**Context**: Requirements Analysis (revisión), Ciclo 3
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Requirements Analysis (revisión M3)
+**Timestamp**: 2026-07-29T20:00:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Revisión aprobada. Se procede a Code Generation Part 1 (Planning) del Lote 0-1 v2 (Fundaciones M3 + Componentes base, reemplaza Lotes 0-1 con Radix).
+**Context**: Requirements Analysis (revisión), Ciclo 3 — GATE cerrado
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 0-1 v2 (Fundaciones M3 + Componentes base)
+**Timestamp**: 2026-07-29T20:05:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-0-1-v2-code-generation-plan.md`: reemplaza tokens.css (color M3 completo, forma, tipografía) y remaquetea body/h1/tarjetas/botones/chips/option-item/inputs con los roles M3 (botones tipo píldora "Filled/Outlined", tarjetas "Outlined Card", chips con esquina 8px, inputs "Outlined Text Field"). El botón danger deja de ser una excepción (usa el rol error real de M3).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 0-1 v2
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 0-1 v2
+**Timestamp**: 2026-07-29T20:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 0-1 v2 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 0-1 v2 (Fundaciones M3 + Componentes base)
+**Timestamp**: 2026-07-29T20:25:00Z
+**AI Response**: 7 pasos ejecutados: `css/tokens.css` reescrito con 35 roles de color M3 (claro+oscuro, calculados con `@material/material-color-utilities` real), escala de forma y 15 roles tipográficos con Inter; `css/style.css` remigrado de tokens Radix a tokens M3 en body/h1/tarjetas/botones/chips/option-item/inputs. Botón danger deja de ser excepción (usa rol `error` real). Documentación en `lote-0-1-v2-fundaciones-m3-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 0-1 v2
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---

@@ -144,6 +144,10 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 - [x] Workflow Planning — User Stories/Application Design/Units Generation/Functional Design/NFR Requirements/NFR Design/Infrastructure Design SKIP (cambio puramente visual, sin lógica de negocio ni infraestructura nueva); Code Generation en 5 lotes con checkpoints visuales; aprobado
 - [x] Code Generation — Lote 0 (Fundaciones: tokens color/tipografía/radio) — `css/tokens.css` creado, `style.css`/`index.html` actualizados; 230/230 tests pasan; sin cambio visual todavía
 - [x] Code Generation — Lote 1 (Componentes base: tarjetas/botones/chips/inputs) — `style.css` remaquetado (tipografía/fondo global, tarjetas, botones, chips, inputs); botón danger mantiene rojo hardcodeado (excepción documentada); 230/230 tests pasan; pendiente revisión visual del usuario
+
+### REVISIÓN — Cambio de base a Material Design 3 (color + forma), Inter se mantiene
+- [x] Requirements Analysis (reapertura) — usuario prefiere el sistema de color de M3; contradicción detectada y resuelta (alcance ampliado a color+forma, no solo color); requirements.md ampliado con sección "REVISIÓN Ciclo 3" (FR-29 a FR-32); valores oficiales calculados (HCT real vía `@material/material-color-utilities`, semilla Lime; shape/type scale desde tokens de `material-web` v0.192); aprobado
+- [x] Code Generation — Lote 0-1 v2 (Fundaciones M3 + Componentes base, reemplaza Lotes 0-1 con Radix) — `css/tokens.css` reescrito (color/forma/tipografía M3), `style.css` remigrado; danger ya no es excepción (usa rol error M3); 230/230 tests pasan; pendiente revisión visual del usuario
 - [ ] Code Generation — Lote 2 (Componentes de listas)
 - [ ] Code Generation — Lote 3 (Modales e historial)
 - [ ] Code Generation — Lote 4 (Onboarding/QR y detalles finales)

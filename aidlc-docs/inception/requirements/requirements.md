@@ -349,3 +349,39 @@ La app es HTML/CSS/JS vanilla (sin React ni bundler de UI), con un único `css/s
 
 ## Alcance de esta iteración (Ciclo 3)
 Dado que es un cambio transversal (afecta a todos los componentes visuales) pero sin ambigüedad de negocio ni nuevos flujos de usuario, se procede sin User Stories, directamente a Workflow Planning para definir cómo secuenciar el remaquetado (tokens primero, luego componentes por lotes, con puntos de verificación visual del usuario).
+
+---
+
+## REVISIÓN Ciclo 3 — Sistema de color y forma basado en Material Design 3
+
+### Contexto del cambio
+Tras generar y aprobar los Lotes 0-1 con Radix Colors (Lime/Sand planos), el usuario indicó preferir el **sistema de color de Material Design 3** (`https://m3.material.io/styles/color/system/how-the-system-works`). Se detectó y resolvió una ambigüedad (ver `m3-color-system-questions.md` y `m3-color-system-clarification-questions.md`): el cambio no se limita al color, sino que **sustituye la base del design system** por Material Design 3 para color y forma, manteniendo Inter como tipografía (con la escala de tamaños/pesos de M3, no la de Roboto).
+
+Esta revisión **supersede** las decisiones de color/radios de FR-24, FR-26.2 y FR-27 (mantiene FR-25 modo oscuro automático y FR-26.1 Inter como fuente).
+
+### FR-29: Paleta de color M3 (paletas tonales + roles semánticos)
+- FR-29.1: Color semilla: el mismo verde ya aprobado, Lime-9 de Radix (`#bdee63`), usado como `sourceColor` del algoritmo HCT de Material Color Utilities (`@material/material-color-utilities`, paquete oficial de Google).
+- FR-29.2: Se genera el esquema completo `SchemeTonalSpot` (variante por defecto de Material You), spec `2025`, `contrastLevel: 0`, para claro y oscuro, incluyendo: `primary`/`on-primary`/`primary-container`/`on-primary-container`, `secondary`/`on-secondary`/`secondary-container`/`on-secondary-container` (derivado automáticamente por armonía tonal), `tertiary`/`on-tertiary`/`tertiary-container`/`on-tertiary-container` (ídem), `error`/`on-error`/`error-container`/`on-error-container` (paleta de error fija de M3, ya no hardcodeada), `surface`/`on-surface`/`surface-variant`/`on-surface-variant`, niveles de superficie `surface-dim`/`surface-bright`/`surface-container-lowest`/`surface-container-low`/`surface-container`/`surface-container-high`/`surface-container-highest`, `outline`/`outline-variant`, `background`/`on-background`, `inverse-surface`/`inverse-on-surface`/`inverse-primary`, `shadow`/`scrim`.
+- FR-29.3: Los valores hex se calculan una vez (no en runtime — sin dependencia nueva de build/JS, consistente con NFR-13) y se hardcodean como variables CSS en `css/tokens.css`, documentando la fuente (script Node de un solo uso con el paquete oficial, valores verificables reproduciendo el cálculo).
+- FR-29.4: El botón "danger" (antes excepción con rojo hardcodeado) pasa a usar el rol `error`/`on-error` de M3 — ya no es una excepción.
+
+### FR-30: Forma (shape) — sustituye la escala de radios de Radix
+- FR-30.1: Se adopta la escala de "shape" de M3 (fuente: tokens oficiales de `material-web`, versión v0.192): `corner-none` (0px), `corner-extra-small` (4px), `corner-small` (8px), `corner-medium` (12px), `corner-large` (16px), `corner-extra-large` (28px), `corner-full` (9999px).
+- FR-30.2: Cada componente usa el corner que le corresponde por convención M3 (a definir por componente en Code Generation): botones → `corner-full` (pill, patrón de M3 desde su rediseño "expressive"), chips → `corner-small`, tarjetas → `corner-medium`, inputs de texto (outlined) → `corner-extra-small`, modales/hojas → `corner-large`/`corner-extra-large`.
+
+### FR-31: Tipografía — escala de M3 con Inter
+- FR-31.1: Se mantiene Inter (FR-26.1, sin cambios) como fuente, pero se sustituye la escala de tamaños/line-height de Radix Themes (FR-26.2) por la **escala tipográfica oficial de M3** (15 roles: `display-large/medium/small`, `headline-large/medium/small`, `title-large/medium/small`, `body-large/medium/small`, `label-large/medium/small`), con tamaño, line-height, tracking (letter-spacing) y peso (regular 400 / medium 500 / bold 700) oficiales por rol (fuente: tokens de `material-web` v0.192).
+- FR-31.2: Se mapea cada uso tipográfico ya existente en la app (título de app, títulos de sección, texto de cuerpo, metadatos, labels) al rol de M3 más adecuado, en Code Generation.
+
+### FR-32: Elevación mediante superficies con tinte de color
+- FR-32.1: Se sustituye el uso de `box-shadow` para elementos flotantes (modales, barra de tabs, FAB) por el sistema de elevación de M3 basado en variaciones de `surface-container-*` (superficie con más tinte de color = más elevada), en los lotes que toquen esos componentes (Lotes 2-4, aún no generados).
+- FR-32.2: Los Lotes 0-1 ya generados con Radix se **reharán** con esta arquitectura antes de continuar con el resto de componentes (decisión explícita del usuario), evitando dejar la app con dos sistemas de color mezclados.
+
+### Non-Functional Requirements (revisión)
+
+**NFR-15**: los valores de color/forma/tipografía de M3 deben ser trazables a una fuente oficial verificable (paquete npm `@material/material-color-utilities` para color, tokens de `material-web` para forma/tipografía) — mismo criterio de NFR-12/13 ya aplicado a Radix.
+
+**NFR-16**: el cambio de FR-29 a FR-32 no reintroduce dependencias de runtime nuevas (NFR-13 se mantiene): los valores se calculan una vez fuera de la app y se hardcodean como CSS.
+
+## Alcance de esta iteración (Revisión Ciclo 3)
+Se rehacen los Lotes 0 y 1 en un único lote combinado ("Lote 0-1 v2") con la nueva arquitectura M3, y se continúa después con los Lotes 2-4 ya planificados (ahora aplicando M3 en vez de Radix). Sin User Stories ni Functional/NFR/Infrastructure Design adicionales — mismo criterio que el resto del Ciclo 3 (cambio puramente visual, sin lógica de negocio).
