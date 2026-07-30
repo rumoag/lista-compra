@@ -1,6 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHistoryFilters } from '../../src/history/history-filters.js';
 
+function toIso(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 describe('renderHistoryFilters', () => {
   it('emite onChange al escribir en el nombre', () => {
     const container = document.createElement('div');
@@ -64,23 +71,53 @@ describe('renderHistoryFilters', () => {
     expect(document.querySelector('[data-testid="modal-overlay"]')).toBeNull();
   });
 
-  it('el periodo personalizado permite elegir un rango y aplica al confirmar', () => {
+  it('el periodo personalizado permite elegir un rango en el calendario M3 y aplica al confirmar', () => {
     const container = document.createElement('div');
     const onChange = vi.fn();
     renderHistoryFilters(container, { onChange });
 
     container.querySelector('[data-testid="history-filter-date-chip"]').click();
     document.querySelector('[data-testid="history-date-option-custom"]').click();
-    document.querySelector('[data-testid="history-filter-date-from-input"]').value = '2026-07-01';
-    document.querySelector('[data-testid="history-filter-date-to-input"]').value = '2026-07-15';
+
+    const today = new Date();
+    const fromIso = toIso(new Date(today.getFullYear(), today.getMonth(), 5));
+    const toIsoDate = toIso(new Date(today.getFullYear(), today.getMonth(), 20));
+
+    document.querySelector(`[data-testid="history-date-calendar-day-${fromIso}"]`).click();
+    document.querySelector(`[data-testid="history-date-calendar-day-${toIsoDate}"]`).click();
     document.querySelector('[data-testid="history-date-apply-button"]').click();
 
     expect(onChange).toHaveBeenLastCalledWith({
       nameQuery: '',
-      dateFrom: '2026-07-01',
-      dateTo: '2026-07-15T23:59:59.999Z',
+      dateFrom: fromIso,
+      dateTo: `${toIsoDate}T23:59:59.999Z`,
       sortAscending: false,
     });
+  });
+
+  it('el calendario navega al mes siguiente/anterior sin perder el rango en curso', () => {
+    const container = document.createElement('div');
+    const onChange = vi.fn();
+    renderHistoryFilters(container, { onChange });
+
+    container.querySelector('[data-testid="history-filter-date-chip"]').click();
+    document.querySelector('[data-testid="history-date-option-custom"]').click();
+
+    const initialLabel = document.querySelector('[data-testid="history-date-calendar-label"]').textContent;
+    const fromIso = toIso(new Date());
+    document.querySelector(`[data-testid="history-date-calendar-day-${fromIso}"]`).click();
+
+    document.querySelector('[data-testid="history-date-calendar-next-button"]').click();
+    const nextLabel = document.querySelector('[data-testid="history-date-calendar-label"]').textContent;
+    expect(nextLabel).not.toBe(initialLabel);
+
+    document.querySelector('[data-testid="history-date-calendar-prev-button"]').click();
+    const backLabel = document.querySelector('[data-testid="history-date-calendar-label"]').textContent;
+    expect(backLabel).toBe(initialLabel);
+    // El día ya elegido sigue marcado como extremo del rango tras volver al mes original.
+    expect(document.querySelector(`[data-testid="history-date-calendar-day-${fromIso}"]`).getAttribute('aria-pressed')).toBe(
+      'true'
+    );
   });
 
   it('el chip de orden abre un selector y aplica "más antiguo primero" al elegirlo', () => {
