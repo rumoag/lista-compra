@@ -169,6 +169,11 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 
 **UNIDAD 7 (Seguimiento — título de ticket): IMPLEMENTADA** — próximo paso del usuario: ejecutar el nuevo bloque de `supabase/schema.sql` ("Unidad 7 (seguimiento) — título de ticket") en el proyecto Supabase ya desplegado, y verificar manualmente el flujo (crear ticket con/sin título, editar título desde el modal, comprobar que se refleja en la fila y en vivo en otro dispositivo).
 
+### Unidad 7 — Seguimiento: mover la edición del título a la cabecera del modal
+- [x] Petición del usuario tras revisar la Unidad 7 (seguimiento) anterior: no editar el título dentro del "papel" del recibo — el recibo vuelve a mostrar siempre el texto fijo "TICKET DE COMPRA" (sin el título del ticket). La edición pasa a la cabecera del modal (el `<h2>` genérico de `common/modal.js`): click/tap sobre ella abre un input inline (Enter/blur guarda, Escape cancela). `common/modal.js` expone ahora `titleEl` (el nodo `<h2>`) en vez de `setTitle`, para que `ticket-modal.js` pueda hacerlo interactivo sin acoplar ese comportamiento al componente genérico. Eliminado el lápiz y el formulario que vivían dentro del recibo (`receipt-store-row`, CSS asociado). 250/250 tests pasan (7 tests de edición de título reescritos/añadidos en `ticket-modal.test.js`).
+
+**UNIDAD 7 (Seguimiento): AJUSTE COMPLETO** — próximo paso del usuario: verificación manual (click en la cabecera del modal para editar el título, Enter/blur guarda, Escape cancela, el recibo muestra siempre "TICKET DE COMPRA").
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.

@@ -39,10 +39,10 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
   return {
     body: overlay.querySelector('[data-testid="modal-body"]'),
     footer: overlay.querySelector('[data-testid="modal-footer"]'),
+    // Nodo <h2> del título — expuesto para que llamantes como ticket-modal.js puedan
+    // hacerlo interactivo (p.ej. click para editar) sin que openModal conozca ese caso de uso.
+    titleEl: overlay.querySelector('[data-testid="modal-title"]'),
     close,
-    setTitle: (newTitle) => {
-      overlay.querySelector('[data-testid="modal-title"]').textContent = newTitle ?? '';
-    },
   };
 }
 

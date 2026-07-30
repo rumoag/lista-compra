@@ -1522,3 +1522,12 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: IMPLEMENTADO — pendiente: (1) ejecutar el nuevo bloque de `supabase/schema.sql` ("Unidad 7 (seguimiento) — título de ticket") en el proyecto Supabase ya desplegado; (2) verificación manual del usuario (crear ticket con/sin título, editar título desde el modal, comprobar que se refleja en la fila y en otro dispositivo en vivo)
 
 ---
+
+## Unidad 7 — Seguimiento: mover la edición del título a la cabecera del modal
+**Timestamp**: 2026-07-30T01:00:00Z
+**User Input**: "No quiero que se edite el titulo en el ticket, quiero editarlo desde el header del modal que al pulsarlo abra el input para cambiarlo. El titulo en el ticket quiero que se cambie por el texto TICKET DE COMPRA Dudas?"
+**AI Response**: Sin dudas — cambio bien acotado. Revertido el lápiz/formulario dentro del recibo (`receipt-store-row`); `history/ticket-modal.js` ahora hace clicable/editable directamente el `<h2>` de la cabecera del modal genérico (`common/modal.js`), que pasa a exponer `titleEl` (el nodo del título) en vez de `setTitle`, para no acoplar el comportamiento de edición al componente genérico. Click o Enter/Espacio (accesible por teclado, `role="button"` + `tabindex`) abre un `<input>` inline dentro del propio `<h2>`; Enter o blur guardan (vía `updatePurchaseTitle`, con guard `settled` para evitar doble commit entre Enter+blur), Escape cancela sin guardar. El recibo (`renderHeader`) vuelve a mostrar siempre el texto fijo "🧾 TICKET DE COMPRA", sin repetir el título del ticket. CSS limpiado (`.receipt-store-row`, `.receipt-store-title`, `.receipt-header form` eliminados; añadidos `.modal-title--editable` y `.modal-title-input`). Tests de `ticket-modal.test.js` reescritos (7 tests: cabecera muestra título/placeholder, recibo siempre "TICKET DE COMPRA" y nunca el título, click abre input, Enter guarda, blur guarda, Escape cancela sin llamar a Supabase). `npm test`: 250/250 pass.
+**Context**: Ciclo 2, Unidad 7 — seguimiento sobre el seguimiento anterior (mismo día), corrección de diseño de interacción antes de verificación manual del usuario
+**Estado**: AJUSTADO — pendiente verificación manual del usuario (click en la cabecera del modal para editar, Enter/blur guardan, Escape cancela, recibo siempre "TICKET DE COMPRA")
+
+---

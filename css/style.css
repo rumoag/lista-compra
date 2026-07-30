@@ -806,41 +806,21 @@ body.has-selection [data-testid="list-topbar"] {
   opacity: 0.75;
 }
 
-/* Unidad 7 (seguimiento) — título editable del ticket (dónde se compró) */
-.receipt-store-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  margin: 0.2rem 0;
+/* Unidad 7 (seguimiento) — título del ticket editable desde la cabecera del modal */
+.modal-title--editable {
+  cursor: pointer;
+  border-radius: var(--md-sys-shape-corner-small, 4px);
 }
 
-.receipt-store-title {
-  font-weight: 700;
-  font-size: 0.95rem;
+.modal-title--editable:hover,
+.modal-title--editable:focus-visible {
+  text-decoration: underline;
 }
 
-.receipt-store-row .icon-button {
-  color: var(--receipt-ink);
-  font-size: 0.85rem;
-}
-
-.receipt-header form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  margin: 0.3rem 0;
-}
-
-.receipt-header .text-input {
+.modal-title-input {
+  width: 100%;
+  font-size: var(--md-sys-typescale-title-large-size);
   font-family: inherit;
-  max-width: 220px;
-}
-
-.receipt-title-form-actions {
-  display: flex;
-  gap: 0.5rem;
 }
 
 .receipt-divider {

@@ -20,7 +20,8 @@ import { validatePurchaseTitle } from '../common/validation.js';
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
   // (Seguimiento) la cabecera del modal muestra el título del ticket (dónde se compró) en
   // vez de la fecha/hora — la fecha/hora se sigue mostrando dentro del "papel" del recibo.
-  const { body, footer, close, setTitle } = openModal({ title: purchase.title || 'Sin título' });
+  // El título es editable haciendo click en la cabecera del modal (no dentro del recibo).
+  const { body, footer, close, titleEl } = openModal({ title: purchase.title || 'Sin título' });
 
   // BR-62 (seguimiento post-aprobación): el cuerpo del modal imita visualmente un ticket
   // de compra físico (papel, tipografía monoespaciada, líneas discontinuas, borde
@@ -61,78 +62,80 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     errorEl.hidden = false;
   }
 
-  // (Seguimiento) título editable dentro del recibo — modo lectura por defecto, con lápiz
-  // que abre un pequeño formulario inline (mismo patrón de validación que list-form-modal.js).
+  // El recibo siempre muestra el texto fijo "TICKET DE COMPRA" — ya no repite el título
+  // del ticket (ese vive solo en la cabecera del modal, ver renderModalTitle más abajo).
   function renderHeader() {
     headerEl.innerHTML = `
       <div class="receipt-title">🧾 TICKET DE COMPRA</div>
-      <div class="receipt-store-row">
-        <span class="receipt-store-title" data-testid="ticket-modal-purchase-title">${escapeHtml(
-          purchase.title || 'Sin título'
-        )}</span>
-        <button type="button" class="icon-button" data-testid="ticket-modal-edit-title-button" aria-label="Editar título">✏️</button>
-      </div>
       <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
       <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
     `;
-    headerEl
-      .querySelector('[data-testid="ticket-modal-edit-title-button"]')
-      .addEventListener('click', renderTitleForm);
   }
 
-  function renderTitleForm() {
-    headerEl.innerHTML = `
-      <div class="receipt-title">🧾 TICKET DE COMPRA</div>
-      <form data-testid="ticket-modal-title-form">
-        <input
-          type="text"
-          class="text-input"
-          data-testid="ticket-modal-title-input"
-          maxlength="50"
-          placeholder="¿Dónde compraste? (opcional)"
-          value="${escapeHtml(purchase.title ?? '')}"
-        />
-        <div class="error-message" data-testid="ticket-modal-title-error" hidden></div>
-        <div class="receipt-title-form-actions">
-          <button type="submit" data-testid="ticket-modal-title-save-button">Guardar</button>
-          <button type="button" class="secondary" data-testid="ticket-modal-title-cancel-button">Cancelar</button>
-        </div>
-      </form>
-      <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
-      <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
+  // (Seguimiento) el título es editable haciendo click en la cabecera del modal (no dentro
+  // del recibo): modo lectura por defecto, click abre un input inline en el propio <h2>.
+  function renderModalTitle() {
+    titleEl.textContent = purchase.title || 'Sin título';
+    titleEl.classList.add('modal-title--editable');
+    titleEl.setAttribute('tabindex', '0');
+    titleEl.setAttribute('role', 'button');
+    titleEl.setAttribute('aria-label', 'Editar título del ticket');
+    titleEl.onclick = openTitleEditor;
+    titleEl.onkeydown = (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openTitleEditor();
+      }
+    };
+  }
+
+  function openTitleEditor() {
+    titleEl.onclick = null;
+    titleEl.onkeydown = null;
+    titleEl.removeAttribute('tabindex');
+    titleEl.removeAttribute('role');
+    titleEl.innerHTML = `
+      <input
+        type="text"
+        class="text-input modal-title-input"
+        data-testid="modal-title-input"
+        maxlength="50"
+        placeholder="¿Dónde compraste? (opcional)"
+        value="${escapeHtml(purchase.title ?? '')}"
+      />
     `;
+    const input = titleEl.querySelector('[data-testid="modal-title-input"]');
+    input.focus();
+    input.select();
 
-    const form = headerEl.querySelector('[data-testid="ticket-modal-title-form"]');
-    const input = headerEl.querySelector('[data-testid="ticket-modal-title-input"]');
-    const titleErrorEl = headerEl.querySelector('[data-testid="ticket-modal-title-error"]');
-
-    headerEl
-      .querySelector('[data-testid="ticket-modal-title-cancel-button"]')
-      .addEventListener('click', renderHeader);
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      titleErrorEl.hidden = true;
-
+    let settled = false;
+    async function commit() {
+      if (settled) return;
+      settled = true;
       const result = validatePurchaseTitle(input.value);
-      if (!result.valid) {
-        titleErrorEl.textContent = result.error;
-        titleErrorEl.hidden = false;
+      const newTitle = result.valid ? result.value : purchase.title;
+      if (newTitle === purchase.title) {
+        renderModalTitle();
         return;
       }
-
-      const saveButton = form.querySelector('[data-testid="ticket-modal-title-save-button"]');
-      saveButton.disabled = true;
       try {
-        await updatePurchaseTitle(purchase.id, result.value);
-        purchase.title = result.value;
-        setTitle(purchase.title || 'Sin título');
-        renderHeader();
+        await updatePurchaseTitle(purchase.id, newTitle);
+        purchase.title = newTitle;
         onTicketChanged(purchase);
       } catch (err) {
-        titleErrorEl.textContent = 'No se pudo guardar el título. Inténtalo de nuevo.';
-        titleErrorEl.hidden = false;
-        saveButton.disabled = false;
+        showError('No se pudo guardar el título. Inténtalo de nuevo.');
+      }
+      renderModalTitle();
+    }
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        commit();
+      } else if (event.key === 'Escape') {
+        settled = true;
+        renderModalTitle();
       }
     });
   }
@@ -271,6 +274,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   footer.querySelector('[data-testid="ticket-modal-delete-button"]').addEventListener('click', handleDeleteTicket);
 
   renderHeader();
+  renderModalTitle();
   renderProducts();
 
   return { close };
