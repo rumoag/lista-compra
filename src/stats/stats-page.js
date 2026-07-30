@@ -5,6 +5,7 @@ import { groupByNormalizedName } from './calculations.js';
 import { renderStatsRanking } from './stats-ranking.js';
 import { renderStatsCadence } from './stats-cadence.js';
 import { renderStatsDistribution } from './stats-distribution.js';
+import { renderSkeleton } from '../common/skeleton.js';
 
 const STATS_FETCH_LIMIT = 2000;
 
@@ -14,6 +15,10 @@ export async function renderStatsPage(container, { householdId }) {
     <div id="stats-cadence-container"></div>
     <div id="stats-distribution-container"></div>
   `;
+
+  renderSkeleton(container.querySelector('#stats-ranking-container'), { variant: 'stat-block', count: 1 });
+  renderSkeleton(container.querySelector('#stats-cadence-container'), { variant: 'stat-block', count: 1 });
+  renderSkeleton(container.querySelector('#stats-distribution-container'), { variant: 'stat-block', count: 1 });
 
   const { data, error } = await supabase
     .from('products')

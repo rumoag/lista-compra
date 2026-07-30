@@ -9,6 +9,7 @@ export function renderSelectionBar(
   container,
   { selectedCount, onDeselectAll, onMarkAsBought, onDeleteSelected, onSelectAll, onEditSelected }
 ) {
+  const wasEmpty = container.hidden || container.innerHTML === '';
   document.body.classList.toggle('has-selection', selectedCount > 0);
 
   if (selectedCount === 0) {
@@ -18,8 +19,10 @@ export function renderSelectionBar(
   }
 
   container.hidden = false;
+  // La animación de entrada (BR-61ish, Ciclo 4) solo se reproduce al activarse la
+  // selección (0 → N); en cambios posteriores del contador no se vuelve a disparar.
   container.innerHTML = `
-    <div class="selection-header" data-testid="selection-bar">
+    <div class="selection-header ${wasEmpty ? 'selection-header--entering' : ''}" data-testid="selection-bar">
       <div class="selection-header-left">
         <button type="button" class="icon-button" data-testid="selection-bar-close-button" aria-label="Deseleccionar todos">${icon('x')}</button>
         <span data-testid="selection-bar-count">${selectedCount} seleccionados</span>

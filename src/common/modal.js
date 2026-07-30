@@ -18,10 +18,32 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
     </div>
   `;
 
+  // Salida animada (Ciclo 4, motion M3): en vez de quitar el overlay al instante, se marca
+  // como "cerrando" (dispara la animación de salida en CSS) y se espera a que las animaciones
+  // reales en curso terminen antes de eliminarlo del DOM. getAnimations() no existe en jsdom
+  // (entorno de tests), así que ahí la lista queda vacía y el remove() sigue siendo síncrono —
+  // sin esto los tests que comprueban la ausencia del modal justo tras hacer click fallarían.
+  // El timeout de seguridad cubre cualquier caso en que la animación no llegue a completarse
+  // (pestaña en segundo plano, reduced-motion con timings extremos, animación cancelada): sin
+  // él, un solo caso así dejaría el overlay bloqueando la pantalla para siempre.
   function close() {
-    overlay.remove();
     document.removeEventListener('keydown', onKeydown);
     if (onClose) onClose();
+    overlay.classList.add('modal-overlay--closing');
+    void overlay.offsetWidth; // fuerza el layout para que la animación ya esté en curso al leerla
+    const animations = typeof overlay.getAnimations === 'function' ? overlay.getAnimations() : [];
+    if (animations.length === 0) {
+      overlay.remove();
+      return;
+    }
+    let removed = false;
+    const remove = () => {
+      if (removed) return;
+      removed = true;
+      overlay.remove();
+    };
+    Promise.allSettled(animations.map((anim) => anim.finished)).finally(remove);
+    setTimeout(remove, 500);
   }
 
   function onKeydown(event) {
