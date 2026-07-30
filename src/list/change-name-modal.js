@@ -3,10 +3,11 @@ import { openModal } from '../common/modal.js';
 import { renderNameForm, getLocalName } from '../onboarding/name-prompt.js';
 
 export function openChangeNameModal({ onSaved }) {
-  const { body, close } = openModal({ title: 'Cambiar nombre' });
+  const { body, footer, close } = openModal({ title: 'Cambiar nombre' });
 
   renderNameForm(body, {
     currentName: getLocalName() ?? '',
+    footer,
     onSave: (name) => {
       close();
       onSaved(name);

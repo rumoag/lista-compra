@@ -11,19 +11,23 @@ export function setLocalName(name) {
   localStorage.setItem(LOCAL_NAME_KEY, name);
 }
 
-export function renderNameForm(container, { currentName = '', onSave }) {
+export function renderNameForm(container, { currentName = '', onSave, footer }) {
   container.innerHTML = `
     <div class="card" data-testid="name-prompt">
       <p>¿Cómo te llamas? (ej. "Yo", "Mi pareja")</p>
       <input type="text" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
       <div class="error-message" data-testid="name-prompt-error" hidden></div>
-      <button type="button" data-testid="name-prompt-save-button">Guardar</button>
+      ${footer ? '' : '<button type="button" data-testid="name-prompt-save-button">Guardar</button>'}
     </div>
   `;
 
+  if (footer) {
+    footer.innerHTML = `<button type="button" data-testid="name-prompt-save-button">Guardar</button>`;
+  }
+
   const input = container.querySelector('[data-testid="name-prompt-input"]');
   const errorEl = container.querySelector('[data-testid="name-prompt-error"]');
-  const saveButton = container.querySelector('[data-testid="name-prompt-save-button"]');
+  const saveButton = (footer ?? container).querySelector('[data-testid="name-prompt-save-button"]');
 
   saveButton.addEventListener('click', () => {
     const name = input.value.trim();
