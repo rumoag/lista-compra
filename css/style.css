@@ -378,13 +378,6 @@ button.danger {
   color: var(--md-sys-color-on-secondary-container);
 }
 
-.confirm-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: var(--spacing);
-}
-
 .modal-footer {
   display: flex;
   justify-content: flex-end;

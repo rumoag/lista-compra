@@ -16,7 +16,7 @@ import { applyOptimistic } from '../common/optimistic.js';
 import { renderTicketProductRow } from './ticket-product-row.js';
 
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
-  const { body, close } = openModal({ title: new Date(purchase.bought_at).toLocaleString('es-ES') });
+  const { body, footer, close } = openModal({ title: new Date(purchase.bought_at).toLocaleString('es-ES') });
 
   // BR-62 (seguimiento post-aprobación): el cuerpo del modal imita visualmente un ticket
   // de compra físico (papel, tipografía monoespaciada, líneas discontinuas, borde
@@ -44,10 +44,11 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
       </div>
       <div class="receipt-zigzag receipt-zigzag--bottom" aria-hidden="true"></div>
     </div>
-    <div class="confirm-modal-actions">
-      <button type="button" class="secondary" data-testid="ticket-modal-undo-button">Deshacer ticket</button>
-      <button type="button" class="danger" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
-    </div>
+  `;
+
+  footer.innerHTML = `
+    <button type="button" class="secondary" data-testid="ticket-modal-undo-button">Deshacer ticket</button>
+    <button type="button" class="danger" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
   `;
 
   const productsContainer = body.querySelector('[data-testid="ticket-modal-products"]');
@@ -189,8 +190,8 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     });
   }
 
-  body.querySelector('[data-testid="ticket-modal-undo-button"]').addEventListener('click', handleUndoTicket);
-  body.querySelector('[data-testid="ticket-modal-delete-button"]').addEventListener('click', handleDeleteTicket);
+  footer.querySelector('[data-testid="ticket-modal-undo-button"]').addEventListener('click', handleUndoTicket);
+  footer.querySelector('[data-testid="ticket-modal-delete-button"]').addEventListener('click', handleDeleteTicket);
 
   renderProducts();
 

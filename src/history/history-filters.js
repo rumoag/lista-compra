@@ -129,13 +129,12 @@ export function renderHistoryFilters(container, { onChange }) {
   }
 
   function openDatePicker() {
-    const { body, close } = openModal({ title: 'Fecha' });
+    const { body, footer, close } = openModal({ title: 'Fecha' });
     body.innerHTML = `
       <div class="option-list" data-testid="history-date-options"></div>
       <div class="custom-date-range" data-testid="history-date-custom-range" hidden>
         <input type="date" data-testid="history-filter-date-from-input" />
         <input type="date" data-testid="history-filter-date-to-input" />
-        <button type="button" data-testid="history-date-apply-button">Aplicar</button>
       </div>
     `;
 
@@ -143,7 +142,18 @@ export function renderHistoryFilters(container, { onChange }) {
     const customRange = body.querySelector('[data-testid="history-date-custom-range"]');
     const fromInput = body.querySelector('[data-testid="history-filter-date-from-input"]');
     const toInput = body.querySelector('[data-testid="history-filter-date-to-input"]');
-    const applyButton = body.querySelector('[data-testid="history-date-apply-button"]');
+
+    function showApplyButton() {
+      footer.innerHTML = `<button type="button" data-testid="history-date-apply-button">Aplicar</button>`;
+      footer.querySelector('[data-testid="history-date-apply-button"]').addEventListener('click', () => {
+        dateFrom = fromInput.value || null;
+        dateToRaw = toInput.value || null;
+        currentDatePreset = 'custom';
+        dateChip.textContent = dateChipLabel();
+        close();
+        emitChange();
+      });
+    }
 
     DATE_PRESETS.forEach((option) => {
       const button = document.createElement('button');
@@ -157,6 +167,7 @@ export function renderHistoryFilters(container, { onChange }) {
           customRange.hidden = false;
           fromInput.value = dateFrom ?? '';
           toInput.value = dateToRaw ?? '';
+          showApplyButton();
           return;
         }
         applyDatePreset(option.value);
@@ -166,15 +177,6 @@ export function renderHistoryFilters(container, { onChange }) {
         emitChange();
       });
       optionsList.appendChild(button);
-    });
-
-    applyButton.addEventListener('click', () => {
-      dateFrom = fromInput.value || null;
-      dateToRaw = toInput.value || null;
-      currentDatePreset = 'custom';
-      dateChip.textContent = dateChipLabel();
-      close();
-      emitChange();
     });
   }
 
