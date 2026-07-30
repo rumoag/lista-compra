@@ -17,7 +17,7 @@ export function renderNameForm(container, { currentName = '', onSave, footer }) 
   // flujos (onboarding y "Cambiar nombre") luzcan iguales.
   const bodyHtml = `
     <p>Ej. "Yo", "Mi pareja"</p>
-    <input type="text" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
+    <input type="text" class="text-input" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
     <div class="error-message" data-testid="name-prompt-error" hidden></div>
   `;
   const saveButtonHtml = `<button type="button" data-testid="name-prompt-save-button">Guardar</button>`;

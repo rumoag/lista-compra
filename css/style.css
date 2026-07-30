@@ -151,10 +151,12 @@ body {
   display: none;
 }
 
-.custom-date-range input[type="date"] {
-  padding: 0.4rem;
-  border-radius: var(--md-sys-shape-corner-extra-small);
-  border: 1px solid var(--md-sys-color-outline);
+/* .text-input es 100% ancho por defecto (pensado para formularios de una columna);
+   aquí conviven dos campos lado a lado, así que se reparten el espacio. */
+.custom-date-range .text-input {
+  width: auto;
+  flex: 1;
+  margin-bottom: 0;
 }
 
 button {

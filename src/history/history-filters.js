@@ -133,8 +133,8 @@ export function renderHistoryFilters(container, { onChange }) {
     body.innerHTML = `
       <div class="option-list" data-testid="history-date-options"></div>
       <div class="custom-date-range" data-testid="history-date-custom-range" hidden>
-        <input type="date" data-testid="history-filter-date-from-input" />
-        <input type="date" data-testid="history-filter-date-to-input" />
+        <input type="date" class="text-input" data-testid="history-filter-date-from-input" />
+        <input type="date" class="text-input" data-testid="history-filter-date-to-input" />
       </div>
     `;
 
