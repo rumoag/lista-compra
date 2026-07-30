@@ -5,6 +5,7 @@ import {
   validateCategory,
   validateQuantityNumber,
   validateQuantityUnit,
+  validatePurchaseTitle,
   normalizeWhitespace,
 } from '../../src/common/validation.js';
 
@@ -159,5 +160,26 @@ describe('validateCategory', () => {
 
   it('rechaza más de 40 caracteres', () => {
     expect(validateCategory('a'.repeat(41)).valid).toBe(false);
+  });
+});
+
+describe('validatePurchaseTitle (seguimiento — título opcional de ticket)', () => {
+  it('acepta valores vacíos/nulos como opcionales, normalizados a null', () => {
+    expect(validatePurchaseTitle(null)).toEqual({ valid: true, value: null });
+    expect(validatePurchaseTitle(undefined)).toEqual({ valid: true, value: null });
+    expect(validatePurchaseTitle('')).toEqual({ valid: true, value: null });
+    expect(validatePurchaseTitle('   ')).toEqual({ valid: true, value: null });
+  });
+
+  it('recorta espacios y colapsa espacios repetidos', () => {
+    expect(validatePurchaseTitle('  Mercadona   Centro  ')).toEqual({ valid: true, value: 'Mercadona Centro' });
+  });
+
+  it('acepta hasta 50 caracteres', () => {
+    expect(validatePurchaseTitle('a'.repeat(50)).valid).toBe(true);
+  });
+
+  it('rechaza más de 50 caracteres', () => {
+    expect(validatePurchaseTitle('a'.repeat(51)).valid).toBe(false);
   });
 });

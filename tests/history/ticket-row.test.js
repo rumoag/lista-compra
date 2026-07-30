@@ -25,6 +25,19 @@ describe('renderTicketRow (BR-55)', () => {
     expect(el.querySelector('[data-testid="ticket-row-meta"]').textContent).toContain('2 productos');
   });
 
+  it('muestra el título del ticket delante de la fecha (seguimiento)', () => {
+    const el = renderTicketRow(makePurchase({ title: 'Mercadona' }), { onOpen: vi.fn() });
+
+    expect(el.querySelector('[data-testid="ticket-row-shop-title"]').textContent).toBe('Mercadona');
+    expect(el.querySelector('[data-testid="ticket-row-date"]').textContent).toContain('Mercadona');
+  });
+
+  it('muestra un placeholder "Sin título" cuando el ticket no tiene título (seguimiento)', () => {
+    const el = renderTicketRow(makePurchase({ title: null }), { onOpen: vi.fn() });
+
+    expect(el.querySelector('[data-testid="ticket-row-shop-title"]').textContent).toBe('Sin título');
+  });
+
   it('usa singular cuando hay exactamente 1 producto', () => {
     const el = renderTicketRow(makePurchase({ products: [{ id: 'p1' }] }), { onOpen: vi.fn() });
 

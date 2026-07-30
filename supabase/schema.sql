@@ -159,3 +159,10 @@ alter publication supabase_realtime add table purchases;
 -- ---------------------------------------------------------------------------
 alter table products add column if not exists note text;
 alter table products add constraint products_note_length check (note is null or char_length(note) <= 200);
+
+-- ---------------------------------------------------------------------------
+-- Unidad 7 (seguimiento) — título de ticket (dónde se compró), opcional.
+-- Migración puramente aditiva: columna nueva nullable, sin backfill.
+-- ---------------------------------------------------------------------------
+alter table purchases add column if not exists title text;
+alter table purchases add constraint purchases_title_length check (title is null or char_length(title) between 1 and 50);

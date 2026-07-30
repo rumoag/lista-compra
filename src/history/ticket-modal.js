@@ -14,9 +14,13 @@ import { openModal } from '../common/modal.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 import { applyOptimistic } from '../common/optimistic.js';
 import { renderTicketProductRow } from './ticket-product-row.js';
+import { updatePurchaseTitle } from './purchases-api.js';
+import { validatePurchaseTitle } from '../common/validation.js';
 
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
-  const { body, footer, close } = openModal({ title: new Date(purchase.bought_at).toLocaleString('es-ES') });
+  // (Seguimiento) la cabecera del modal muestra el título del ticket (dónde se compró) en
+  // vez de la fecha/hora — la fecha/hora se sigue mostrando dentro del "papel" del recibo.
+  const { body, footer, close, setTitle } = openModal({ title: purchase.title || 'Sin título' });
 
   // BR-62 (seguimiento post-aprobación): el cuerpo del modal imita visualmente un ticket
   // de compra físico (papel, tipografía monoespaciada, líneas discontinuas, borde
@@ -26,11 +30,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     <div class="receipt" data-testid="ticket-modal-receipt">
       <div class="receipt-zigzag receipt-zigzag--top" aria-hidden="true"></div>
       <div class="receipt-content">
-        <div class="receipt-header">
-          <div class="receipt-title">🧾 TICKET DE COMPRA</div>
-          <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
-          <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
-        </div>
+        <div class="receipt-header" data-testid="ticket-modal-header"></div>
         <div class="receipt-divider"></div>
         <div class="error-message" data-testid="ticket-modal-error" hidden></div>
         <div class="receipt-items" data-testid="ticket-modal-products"></div>
@@ -51,6 +51,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     <button type="button" class="danger" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
   `;
 
+  const headerEl = body.querySelector('[data-testid="ticket-modal-header"]');
   const productsContainer = body.querySelector('[data-testid="ticket-modal-products"]');
   const totalEl = body.querySelector('[data-testid="ticket-modal-total"]');
   const errorEl = body.querySelector('[data-testid="ticket-modal-error"]');
@@ -58,6 +59,82 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   function showError(message) {
     errorEl.textContent = message;
     errorEl.hidden = false;
+  }
+
+  // (Seguimiento) título editable dentro del recibo — modo lectura por defecto, con lápiz
+  // que abre un pequeño formulario inline (mismo patrón de validación que list-form-modal.js).
+  function renderHeader() {
+    headerEl.innerHTML = `
+      <div class="receipt-title">🧾 TICKET DE COMPRA</div>
+      <div class="receipt-store-row">
+        <span class="receipt-store-title" data-testid="ticket-modal-purchase-title">${escapeHtml(
+          purchase.title || 'Sin título'
+        )}</span>
+        <button type="button" class="icon-button" data-testid="ticket-modal-edit-title-button" aria-label="Editar título">✏️</button>
+      </div>
+      <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
+      <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
+    `;
+    headerEl
+      .querySelector('[data-testid="ticket-modal-edit-title-button"]')
+      .addEventListener('click', renderTitleForm);
+  }
+
+  function renderTitleForm() {
+    headerEl.innerHTML = `
+      <div class="receipt-title">🧾 TICKET DE COMPRA</div>
+      <form data-testid="ticket-modal-title-form">
+        <input
+          type="text"
+          class="text-input"
+          data-testid="ticket-modal-title-input"
+          maxlength="50"
+          placeholder="¿Dónde compraste? (opcional)"
+          value="${escapeHtml(purchase.title ?? '')}"
+        />
+        <div class="error-message" data-testid="ticket-modal-title-error" hidden></div>
+        <div class="receipt-title-form-actions">
+          <button type="submit" data-testid="ticket-modal-title-save-button">Guardar</button>
+          <button type="button" class="secondary" data-testid="ticket-modal-title-cancel-button">Cancelar</button>
+        </div>
+      </form>
+      <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
+      <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
+    `;
+
+    const form = headerEl.querySelector('[data-testid="ticket-modal-title-form"]');
+    const input = headerEl.querySelector('[data-testid="ticket-modal-title-input"]');
+    const titleErrorEl = headerEl.querySelector('[data-testid="ticket-modal-title-error"]');
+
+    headerEl
+      .querySelector('[data-testid="ticket-modal-title-cancel-button"]')
+      .addEventListener('click', renderHeader);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      titleErrorEl.hidden = true;
+
+      const result = validatePurchaseTitle(input.value);
+      if (!result.valid) {
+        titleErrorEl.textContent = result.error;
+        titleErrorEl.hidden = false;
+        return;
+      }
+
+      const saveButton = form.querySelector('[data-testid="ticket-modal-title-save-button"]');
+      saveButton.disabled = true;
+      try {
+        await updatePurchaseTitle(purchase.id, result.value);
+        purchase.title = result.value;
+        setTitle(purchase.title || 'Sin título');
+        renderHeader();
+        onTicketChanged(purchase);
+      } catch (err) {
+        titleErrorEl.textContent = 'No se pudo guardar el título. Inténtalo de nuevo.';
+        titleErrorEl.hidden = false;
+        saveButton.disabled = false;
+      }
+    });
   }
 
   function renderProducts() {
@@ -193,6 +270,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   footer.querySelector('[data-testid="ticket-modal-undo-button"]').addEventListener('click', handleUndoTicket);
   footer.querySelector('[data-testid="ticket-modal-delete-button"]').addEventListener('click', handleDeleteTicket);
 
+  renderHeader();
   renderProducts();
 
   return { close };

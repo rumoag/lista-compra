@@ -40,6 +40,9 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
     body: overlay.querySelector('[data-testid="modal-body"]'),
     footer: overlay.querySelector('[data-testid="modal-footer"]'),
     close,
+    setTitle: (newTitle) => {
+      overlay.querySelector('[data-testid="modal-title"]').textContent = newTitle ?? '';
+    },
   };
 }
 

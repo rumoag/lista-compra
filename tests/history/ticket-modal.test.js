@@ -37,6 +37,7 @@ function makePurchase(overrides = {}) {
     household_id: 'h1',
     bought_by: 'Ana',
     bought_at: '2026-07-27T18:30:00.000Z',
+    title: null,
     products: [
       { id: 'p1', name: 'Leche', quantity_number: 1, quantity_unit: null },
       { id: 'p2', name: 'Pan', quantity_number: 1, quantity_unit: null },
@@ -208,5 +209,53 @@ describe('openTicketModal', () => {
     await openConfirmModal.mock.calls[0][0].onConfirm();
 
     expect(onTicketRestored).toHaveBeenCalledWith(purchase);
+  });
+
+  it('la cabecera del modal muestra el título del ticket en vez de la fecha/hora (seguimiento)', () => {
+    const purchase = makePurchase({ title: 'Mercadona' });
+    openTicketModal(purchase, { onTicketChanged: vi.fn(), onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    expect(document.querySelector('[data-testid="modal-title"]').textContent).toBe('Mercadona');
+    expect(document.querySelector('[data-testid="ticket-modal-purchase-title"]').textContent).toBe('Mercadona');
+  });
+
+  it('muestra un placeholder "Sin título" cuando el ticket no tiene título (seguimiento)', () => {
+    const purchase = makePurchase({ title: null });
+    openTicketModal(purchase, { onTicketChanged: vi.fn(), onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    expect(document.querySelector('[data-testid="modal-title"]').textContent).toBe('Sin título');
+    expect(document.querySelector('[data-testid="ticket-modal-purchase-title"]').textContent).toBe('Sin título');
+  });
+
+  it('editar el título del ticket lo guarda y actualiza la cabecera y el título del modal (seguimiento)', async () => {
+    queueResponse({ error: null }); // update purchases (title)
+    const purchase = makePurchase({ title: null });
+    const onTicketChanged = vi.fn();
+    openTicketModal(purchase, { onTicketChanged, onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    document.querySelector('[data-testid="ticket-modal-edit-title-button"]').click();
+    const input = document.querySelector('[data-testid="ticket-modal-title-input"]');
+    input.value = 'Lidl';
+    document.querySelector('[data-testid="ticket-modal-title-form"]').dispatchEvent(new Event('submit'));
+    await new Promise((r) => setTimeout(r, 0));
+
+    const updateBuilder = createdBuilders.find((b) => b.update.mock.calls.length > 0);
+    expect(updateBuilder.update).toHaveBeenCalledWith({ title: 'Lidl' });
+    expect(updateBuilder.eq).toHaveBeenCalledWith('id', 't1');
+    expect(purchase.title).toBe('Lidl');
+    expect(document.querySelector('[data-testid="modal-title"]').textContent).toBe('Lidl');
+    expect(document.querySelector('[data-testid="ticket-modal-purchase-title"]').textContent).toBe('Lidl');
+    expect(onTicketChanged).toHaveBeenCalledWith(purchase);
+  });
+
+  it('cancelar la edición del título vuelve a la vista de lectura sin guardar (seguimiento)', () => {
+    const purchase = makePurchase({ title: 'Mercadona' });
+    openTicketModal(purchase, { onTicketChanged: vi.fn(), onTicketRemoved: vi.fn(), onTicketRestored: vi.fn() });
+
+    document.querySelector('[data-testid="ticket-modal-edit-title-button"]').click();
+    document.querySelector('[data-testid="ticket-modal-title-cancel-button"]').click();
+
+    expect(document.querySelector('[data-testid="ticket-modal-purchase-title"]').textContent).toBe('Mercadona');
+    expect(document.querySelector('[data-testid="ticket-modal-title-form"]')).toBeNull();
   });
 });

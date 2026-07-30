@@ -14,6 +14,7 @@ import { createSelectionState } from '../bulk-actions/selection-state.js';
 import { renderSelectionBar } from '../bulk-actions/selection-bar.js';
 import { createRealtimeSubscription } from '../common/realtime-subscription.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
+import { openPurchaseTitleModal } from '../history/purchase-title-modal.js';
 
 const PAGE_SIZE = 20;
 
@@ -226,10 +227,15 @@ export async function renderProductList(container, { householdId }) {
   // BR-11: marcar en lote como una única transacción lógica (revert total ante cualquier fallo).
   // BR-50 (Unidad 7): la acción crea un único ticket (purchases) y enlaza todos los
   // productos seleccionados a ese ticket, en la misma operación optimista.
-  async function handleMarkAsBought() {
+  // (Seguimiento) pide antes el título opcional del ticket ("¿Dónde has comprado?").
+  function handleMarkAsBought() {
     const ids = [...selection.getSelection()];
     if (ids.length === 0) return;
 
+    openPurchaseTitleModal({ onConfirm: (title) => performMarkAsBought(ids, title) });
+  }
+
+  async function performMarkAsBought(ids, title) {
     const removedItems = paginator.getItems().filter((item) => ids.includes(item.id));
     const boughtBy = getLocalName();
     const boughtAt = new Date().toISOString();
@@ -248,7 +254,7 @@ export async function renderProductList(container, { householdId }) {
       remoteOperation: async () => {
         const { data: purchase, error: purchaseError } = await supabase
           .from('purchases')
-          .insert({ household_id: householdId, bought_by: boughtBy, bought_at: boughtAt })
+          .insert({ household_id: householdId, bought_by: boughtBy, bought_at: boughtAt, title })
           .select()
           .single();
         if (purchaseError) throw purchaseError;

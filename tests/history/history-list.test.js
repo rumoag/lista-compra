@@ -237,6 +237,19 @@ describe('renderHistoryList (Unidad 7 — tickets)', () => {
     expect(container.querySelector('.error-message')).not.toBeNull();
   });
 
+  it('historial en vivo: UPDATE remoto actualiza el título del ticket ya cargado (seguimiento)', async () => {
+    const purchase = makePurchase({ title: null });
+    queueResponse({ data: [purchase], error: null });
+    const container = mount();
+    await renderHistoryList(container, { householdId: 'h1' });
+
+    realtimeHandlers.onUpdate({ id: 't1', title: 'Mercadona' });
+
+    expect(container.querySelector('[data-testid="ticket-row-t1"] [data-testid="ticket-row-shop-title"]').textContent).toBe(
+      'Mercadona'
+    );
+  });
+
   it('historial en vivo: los eventos se ignoran mientras hay un filtro activo (BR-59)', async () => {
     queueResponse({ data: [], error: null }); // primera página inicial
     const container = mount();
