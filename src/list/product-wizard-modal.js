@@ -66,6 +66,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         maxlength="50"
         placeholder="Nombre del producto"
         value="${escapeAttr(state.name)}"
+        autocomplete="off"
       />
       <div class="chip-group" data-testid="wizard-product-chips">
         ${suggestedProducts
@@ -120,6 +121,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
           min="${QUANTITY_MIN}"
           max="${QUANTITY_MAX}"
           value="${state.quantityNumber}"
+          autocomplete="off"
         />
         <button type="button" data-testid="wizard-quantity-increment" aria-label="Más">+</button>
       </div>
@@ -130,6 +132,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         maxlength="20"
         placeholder="Unidad (opcional, ej. litros)"
         value="${escapeAttr(state.quantityUnit)}"
+        autocomplete="off"
       />
       <div class="error-message" data-testid="wizard-step2-error" hidden></div>
     `;
@@ -200,6 +203,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         maxlength="40"
         placeholder="Escribe una categoría"
         value="${escapeAttr(state.isCustomCategory ? state.category : '')}"
+        autocomplete="off"
         ${state.isCustomCategory ? '' : 'hidden'}
       />
       <div class="error-message" data-testid="wizard-step3-error" hidden></div>
@@ -254,6 +258,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         maxlength="200"
         rows="4"
         placeholder="Añade una nota, ej. marca preferida"
+        autocomplete="off"
       >${escapeHtml(state.note)}</textarea>
       <div class="error-message" data-testid="wizard-step4-error" hidden></div>
     `;
