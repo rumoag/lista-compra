@@ -7,7 +7,7 @@ import { icon } from './icon.js';
 
 export function renderDropdownMenu(
   container,
-  { actions, toggleClass = 'secondary', toggleContent = icon('dots-three-vertical'), toggleLabel = 'Más opciones' }
+  { actions, toggleClass = 'icon-button', toggleContent = icon('dots-three-vertical'), toggleLabel = 'Más opciones' }
 ) {
   container.innerHTML = `
     <div class="dropdown-menu" data-testid="dropdown-menu">
