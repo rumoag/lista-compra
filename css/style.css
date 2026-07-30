@@ -304,6 +304,25 @@ button.danger {
   animation-delay: calc(var(--stagger-index, 0) * 30ms);
 }
 
+/* Pulso individual al marcar/desmarcar un item (BR-41): solo la fila tocada rebota,
+   no el resto de la lista — product-list.js compara el estado de selección anterior
+   con el nuevo en cada render y añade esta clase únicamente a la fila que cambió. */
+@keyframes check-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.motion-check-pulse {
+  animation: check-pulse var(--motion-duration-short4) var(--motion-easing-emphasized-decelerate);
+}
+
 /* Skeletons M3: bloques de color surface-container con un barrido de brillo (shimmer)
    que ocupan el espacio del contenido real mientras se resuelve el fetch inicial de cada
    pantalla. Antes de esto no había ningún indicador de carga — el contenido aparecía de

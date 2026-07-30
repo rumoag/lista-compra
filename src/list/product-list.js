@@ -66,8 +66,11 @@ export async function renderProductList(container, { householdId }) {
   // renderList() reconstruye todas las filas en cada cambio (seleccionar, editar, etc.),
   // no solo cuando llega un producto nuevo — sin este registro, la animación de entrada
   // se reproduciría en TODA la lista cada vez que se marca/desmarca un solo checkbox.
-  // Solo se anima un id la primera vez que aparece en la lista renderizada.
+  // Solo se anima un id la primera vez que aparece en la lista renderizada; para un id ya
+  // presente, se compara su estado de selección anterior con el nuevo y, si cambió, esa
+  // fila (solo esa) recibe un pulso individual en vez de la animación de entrada.
   const enteredIds = new Set();
+  const lastSelectedById = new Map();
 
   function renderList() {
     const items = paginator.getItems();
@@ -76,17 +79,21 @@ export async function renderProductList(container, { householdId }) {
 
     let newIndex = 0;
     items.forEach((product) => {
+      const selected = selection.isSelected(product.id);
       const row = renderProductItem(product, {
         onEdit: handleEditRequest,
         onToggleSelect: handleToggleSelect,
-        selected: selection.isSelected(product.id),
+        selected,
       });
       if (!enteredIds.has(product.id)) {
         enteredIds.add(product.id);
         row.classList.add('motion-row-enter');
         row.style.setProperty('--stagger-index', newIndex);
         newIndex += 1;
+      } else if (lastSelectedById.get(product.id) !== selected) {
+        row.classList.add('motion-check-pulse');
       }
+      lastSelectedById.set(product.id, selected);
       itemsContainer.appendChild(row);
     });
 
