@@ -1387,3 +1387,129 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: Pendiente revisión visual y aprobación del usuario
 
 ---
+
+## Aprobación Code Generation — Ciclo 3, Lote 0-1 v2
+**Timestamp**: 2026-07-29T20:35:00Z
+**User Input**: "sube pr" (tras revisar) + "continue con el Lote 2"
+**AI Response**: Lote 0-1 v2 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 2 (Componentes de listas).
+**Context**: Code Generation, Ciclo 3, Lote 0-1 v2 — GATE cerrado
+**Estado**: LOTE 0-1 v2 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 2 (Componentes de listas)
+**Timestamp**: 2026-07-29T20:45:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-2-code-generation-plan.md`: 7 pasos (texto secundario con `on-surface-variant` en vez de opacidad, list-card/menú desplegable, cabecera/avatar/tabs, filas de producto/FAB, stepper, barra de selección/icon-buttons, documentación). Decisión notable: el FAB pasa de circular a `corner-large` (forma oficial de M3, ya no circular).
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 2
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 2
+**Timestamp**: 2026-07-29T20:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 2 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 2 (Componentes de listas)
+**Timestamp**: 2026-07-29T21:00:00Z
+**AI Response**: 7 pasos ejecutados en `css/style.css`: texto secundario a `on-surface-variant`, list-card/menú desplegable, cabecera/avatar/tabs, filas de producto seleccionadas, FAB (`corner-large`, ya no circular), stepper, barra de selección/icon-buttons. Documentación en `lote-2-componentes-listas-summary.md`. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 2
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 2
+**Timestamp**: 2026-07-29T21:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 2 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 3 (Modales e historial).
+**Context**: Code Generation, Ciclo 3, Lote 2 — GATE cerrado
+**Estado**: LOTE 2 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 3 (Modales e historial)
+**Timestamp**: 2026-07-29T21:15:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-3-code-generation-plan.md`: 4 pasos (overlay/panel con scrim y elevación por superficie reales, cabecera/controles, progreso de wizard migrado del último uso de `--color-primary` legacy, documentación). Se documentan como exclusión intencional el "receipt" (ticket con aspecto de recibo físico) y `.ticket-row-*`, por ser un componente deliberadamente skeuomórfico ajeno al sistema de superficies M3.
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 3
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 3
+**Timestamp**: 2026-07-29T21:20:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 3 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 3 (Modales e historial)
+**Timestamp**: 2026-07-29T21:30:00Z
+**AI Response**: 4 pasos ejecutados en `css/style.css`: scrim real de M3 (32% sobre `--md-sys-color-scrim`), `.modal-panel`/`.modal-panel--fullscreen` con `surface-container-high`/`corner-extra-large`, cabecera/controles/label con roles M3, progreso de wizard migrado (último uso de `--color-primary`). Se eliminaron `--radius`/`--color-primary`/`--color-secondary` de `:root` en `style.css` (confirmado sin usos restantes). Documentación en `lote-3-modales-historial-summary.md`, incluyendo la exclusión intencional del receipt/ticket-row. `npm test`: 230/230 pasan.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 3
+**Estado**: Pendiente revisión visual y aprobación del usuario
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 3
+**Timestamp**: 2026-07-29T21:40:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 3 aprobado. Se procede a Code Generation Part 1 (Planning) del Lote 4 (Onboarding/QR y detalles finales, revisión de modo oscuro end-to-end).
+**Context**: Code Generation, Ciclo 3, Lote 3 — GATE cerrado
+**Estado**: LOTE 3 COMPLETO
+
+---
+
+## Code Generation Plan (Planning) — Ciclo 3, Lote 4 (Onboarding/QR, detalles finales, modo oscuro)
+**Timestamp**: 2026-07-29T21:45:00Z
+**AI Response**: Plan creado en `ciclo-3-lote-4-code-generation-plan.md`: activar `color-scheme: light dark` (FR-25, hasta ahora pisado por `style.css`), regla `.meta` genérica para `qr-view.js`, verificación final de que no quedan colores hardcodeados fuera de sombras/receipt, documentación y cierre del Ciclo 3.
+**Context**: Code Generation Part 1 (Planning), Ciclo 3, Lote 4
+**Estado**: Pendiente aprobación del usuario
+
+---
+
+## Aprobación Code Generation Plan — Ciclo 3, Lote 4
+**Timestamp**: 2026-07-29T21:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Plan aprobado. Se procede a Code Generation Part 2 (Generation).
+**Context**: Code Generation, Ciclo 3, Lote 4 — GATE cerrado
+
+---
+
+## Code Generation (Generation) — Ciclo 3, Lote 4 (Onboarding/QR, detalles finales, modo oscuro)
+**Timestamp**: 2026-07-29T22:00:00Z
+**AI Response**: 4 pasos ejecutados en `css/style.css`: `color-scheme: light dark` activado (FR-25 cerrado, la app ya recolorea de verdad con la preferencia del sistema), regla `.meta` genérica añadida, verificación final confirmando que no quedan colores hardcodeados fuera de sombras/receipt. Documentación en `lote-4-onboarding-modo-oscuro-summary.md`. `npm test`: 230/230 pasan. Con este lote se completan los 5 lotes planificados del Ciclo 3.
+**Context**: Code Generation Part 2 (Generation), Ciclo 3, Lote 4
+**Estado**: Pendiente revisión visual y aprobación del usuario — CICLO 3 (todos los lotes) pendiente de aprobación final antes de Build and Test
+
+---
+
+## Aprobación Code Generation — Ciclo 3, Lote 4 (cierre del ciclo)
+**Timestamp**: 2026-07-29T22:10:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: Lote 4 aprobado. CICLO 3 (Design System basado en Material Design 3) completo en sus 5 lotes. Se procede a Build and Test.
+**Context**: Code Generation, Ciclo 3, Lote 4 — GATE cerrado
+**Estado**: CICLO 3 — TODOS LOS LOTES COMPLETOS, pendiente Build and Test
+
+---
+
+## Build and Test Stage (incremental) — Ciclo 3: Design System M3
+**Timestamp**: 2026-07-29T22:20:00Z
+**Build Status**: Success (falla solo por variables de entorno Supabase locales, no relacionado)
+**Test Status**: Pass (230/230, sin tests nuevos — cambio puramente de CSS/HTML)
+**Files Updated**: `integration-test-instructions.md` (nuevo Scenario 9 — verificación visual manual del design system M3), `build-and-test-summary.md` (sección incremental Ciclo 3)
+**Otros**: `npm audit` sin hallazgos nuevos (misma excepción aceptada de la cadena vitest/vite/esbuild); sin dependencias npm nuevas en el proyecto
+
+---
+
+## Aprobación Build and Test — Ciclo 3: Design System M3
+**Timestamp**: 2026-07-29T22:30:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Build and Test aprobado. Ciclo 3 (Design System basado en Material Design 3) completo. Se procede a Operations (placeholder, sin trabajo activo).
+**Context**: Build and Test, Ciclo 3 — GATE cerrado
+**Estado**: CICLO 3 COMPLETO
+
+---

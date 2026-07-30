@@ -80,6 +80,17 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - **Expected Results**: todos los pasos anteriores funcionan sin errores; el historial en vivo sincroniza entre ambas pestañas solo en modo paginado (sin filtro); el scroll infinito no se dispara mientras hay un filtro activo.
 - **Cleanup**: eliminar cualquier producto/ticket de prueba restante.
 
+### Scenario 9: Design System basado en Material Design 3 (Ciclo 3) — verificación visual, no funcional
+- **Description**: los Lotes 0 a 4 del Ciclo 3 remaquetaron toda la app (tokens de color/forma/tipografía M3, modo oscuro real) sin cambiar estructura HTML, `data-testid` ni lógica de negocio. No hay lógica nueva que testear automáticamente; la verificación es visual (NFR-12).
+- **Setup**: abrir la app (localmente con `npx serve .` tras `npm run build`, o desplegada).
+- **Test Steps**:
+  1. Recorrer las pantallas principales (Inicio, Lista, Historial, Estadísticas, modales de producto/ticket/confirmación, onboarding/QR) en modo claro.
+  2. Cambiar la preferencia de tema del sistema operativo/navegador a oscuro y repetir el recorrido — la app debe recolorear por completo (incluyendo controles nativos: inputs, scrollbars), sin quedar ningún elemento con el verde/tonos de Radix Lime de una iteración anterior ni con colores del azul/violeta originales previos al Ciclo 3.
+  3. Verificar que el botón "danger" (desmarcar/eliminar en historial y tickets) se ve en rojo (rol `error` de M3), no en el verde primario.
+  4. Verificar que el receipt (ticket de compra, modal de detalle de ticket) mantiene su aspecto de recibo físico (papel crema, tinta oscura) sin cambios, en ambos modos claro/oscuro (es una exclusión intencional del sistema de tokens).
+- **Expected Results**: paleta M3 consistente en toda la app en ambos modos; sin regresiones visuales en el receipt; sin colores de iteraciones anteriores (azul/violeta original, o Lime/Sand de Radix) visibles en ningún componente.
+- **Cleanup**: ninguno (solo inspección visual).
+
 ## Setup Integration Test Environment
 
 ### 1. Requisitos

@@ -46,3 +46,35 @@
 
 ## Next Steps
 Desplegar la Unidad 7 según `README.md`: reejecutar el bloque `-- Unidad 7 — Historial en tickets` de `supabase/schema.sql` sobre el proyecto Supabase existente (aditivo, sin riesgo de pérdida de datos) y volver a desplegar en Vercel. Ejecutar manualmente los 8 escenarios de `integration-test-instructions.md` (especialmente el Scenario 8, nuevo) antes de considerar el historial en tickets listo para uso real por la pareja.
+
+---
+
+## Build and Test (incremental) — Ciclo 3: Design System basado en Material Design 3
+
+### Alcance
+Remaquetado visual completo de la app (Lotes 0 a 4): tokens de color/forma/tipografía de Material Design 3 (paletas tonales HCT reales, semilla verde Lime), modo oscuro activado end-to-end, sin cambios de estructura HTML, `data-testid`, esquema de base de datos ni lógica de negocio.
+
+### Unit Tests
+- **Total Tests**: 230 (sin tests nuevos ni modificados — cambio puramente de CSS/HTML, ningún archivo bajo `tests/` se tocó)
+- **Passed**: 230
+- **Failed**: 0
+- **Status**: Pass
+
+### Integration Tests
+- **Nuevo**: Scenario 9 en `integration-test-instructions.md` — verificación visual manual del design system M3 en modo claro/oscuro, botón danger, y exclusión del receipt. **No ejecutable automáticamente** (es una verificación visual, no funcional); pendiente de confirmación del usuario.
+- Escenarios 1-8 (funcionalidad de negocio) sin cambios de comportamiento esperado — el remaquetado no debería alterar ningún flujo, solo su aspecto.
+
+### Build
+- `npm run build`: falla únicamente por falta de variables de entorno Supabase en local (`SUPABASE_URL`/`SUPABASE_ANON_KEY`), mismo comportamiento que en ciclos anteriores — no relacionado con este cambio.
+
+### Security Tests
+- `npm audit`: mismo resultado que en ciclos anteriores — 5 vulnerabilidades en la cadena `vitest`/`vite`/`esbuild` (solo afectan al servidor de desarrollo local), excepción ya aceptada (SECURITY-08 y notas de ciclos previos). Sin dependencias npm nuevas añadidas en este ciclo (los cálculos de la paleta M3 se hicieron con un script de un solo uso fuera del repositorio, no como dependencia del proyecto).
+
+### Overall Status
+- **Build**: Success (aparte de la limitación conocida de env vars locales)
+- **All Automated Tests**: Pass (230/230)
+- **Manual Visual Verification**: Pendiente de confirmación del usuario (Scenario 9)
+- **Ready for Operations**: Sí, condicionado a que el usuario confirme visualmente el resultado (modo claro/oscuro, botón danger, receipt sin cambios) antes de dar por cerrado el Ciclo 3
+
+### Next Steps (Ciclo 3)
+El usuario revisa visualmente la app (Scenario 9) en modo claro y oscuro. No requiere ninguna migración de base de datos ni redeploy de infraestructura — es un cambio de frontend únicamente (CSS/HTML), desplegable igual que cualquier otro cambio de UI ya hecho en ciclos anteriores.
