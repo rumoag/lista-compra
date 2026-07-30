@@ -284,7 +284,7 @@ describe('renderProductList (Unidad 6)', () => {
     expect(container.querySelector('[data-testid="selection-bar-count"]').textContent).toContain('41');
   });
 
-  it('marcar como comprados crea un ticket (purchases) y enlaza los productos seleccionados (BR-50)', async () => {
+  it('marcar como comprados pide el título del ticket y, al confirmar, crea el ticket (purchases) enlazando los productos seleccionados (BR-50)', async () => {
     queueResponse({ data: [makeProduct({ id: 'p1' }), makeProduct({ id: 'p2' })], error: null }); // primera página
     queueResponse({ data: { id: 'ticket-1' }, error: null }); // insert purchases -> select().single()
     queueResponse({ error: null }); // update products
@@ -294,11 +294,16 @@ describe('renderProductList (Unidad 6)', () => {
     container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
     container.querySelector('[data-testid="product-item-p2"] [data-testid="product-item-body"]').click();
     container.querySelector('[data-testid="selection-bar-mark-bought-button"]').click();
+
+    const titleInput = document.querySelector('[data-testid="purchase-title-input"]');
+    expect(titleInput).not.toBeNull();
+    titleInput.value = 'Mercadona';
+    document.querySelector('[data-testid="purchase-title-form"]').dispatchEvent(new Event('submit'));
     await new Promise((r) => setTimeout(r, 0));
 
     const purchasesBuilder = createdBuilders.find((b) => b.insert.mock.calls.length > 0);
     expect(purchasesBuilder.insert).toHaveBeenCalledWith(
-      expect.objectContaining({ household_id: 'h1', bought_by: 'Ana' })
+      expect.objectContaining({ household_id: 'h1', bought_by: 'Ana', title: 'Mercadona' })
     );
 
     const updateBuilder = createdBuilders.find((b) => b.update.mock.calls.length > 0);
@@ -308,5 +313,22 @@ describe('renderProductList (Unidad 6)', () => {
     expect(updateBuilder.in).toHaveBeenCalledWith('id', ['p1', 'p2']);
     expect(container.querySelector('[data-testid="product-item-p1"]')).toBeNull();
     expect(container.querySelector('[data-testid="product-item-p2"]')).toBeNull();
+    expect(document.querySelector('[data-testid="modal-overlay"]')).toBeNull();
+  });
+
+  it('marcar como comprados sin título deja title en null (BR-6x, opcional)', async () => {
+    queueResponse({ data: [makeProduct({ id: 'p1' })], error: null }); // primera página
+    queueResponse({ data: { id: 'ticket-1' }, error: null }); // insert purchases -> select().single()
+    queueResponse({ error: null }); // update products
+    const container = mount();
+    await renderProductList(container, { householdId: 'h1' });
+
+    container.querySelector('[data-testid="product-item-p1"] [data-testid="product-item-body"]').click();
+    container.querySelector('[data-testid="selection-bar-mark-bought-button"]').click();
+    document.querySelector('[data-testid="purchase-title-form"]').dispatchEvent(new Event('submit'));
+    await new Promise((r) => setTimeout(r, 0));
+
+    const purchasesBuilder = createdBuilders.find((b) => b.insert.mock.calls.length > 0);
+    expect(purchasesBuilder.insert).toHaveBeenCalledWith(expect.objectContaining({ title: null }));
   });
 });

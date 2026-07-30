@@ -193,6 +193,15 @@ export async function renderHistoryList(container, { householdId }) {
 
   // BR-59: historial en vivo — solo mientras el modo paginado (sin filtro) está activo.
   realtime.subscribe({
+    // (Seguimiento) editar el título de un ticket desde otro dispositivo actualiza la fila
+    // sin refetch — muta el item existente para no perder la referencia del ticket abierto.
+    onUpdate: (purchase) => {
+      if (hasActiveFilters()) return;
+      const existing = paginator.getItems().find((item) => item.id === purchase.id);
+      if (!existing) return;
+      existing.title = purchase.title;
+      renderList();
+    },
     onInsert: async (purchase) => {
       if (hasActiveFilters()) return;
       if (paginator.getItems().some((item) => item.id === purchase.id)) return;

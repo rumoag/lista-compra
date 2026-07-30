@@ -806,6 +806,23 @@ body.has-selection [data-testid="list-topbar"] {
   opacity: 0.75;
 }
 
+/* Unidad 7 (seguimiento) — título del ticket editable desde la cabecera del modal */
+.modal-title--editable {
+  cursor: pointer;
+  border-radius: var(--md-sys-shape-corner-small, 4px);
+}
+
+.modal-title--editable:hover,
+.modal-title--editable:focus-visible {
+  text-decoration: underline;
+}
+
+.modal-title-input {
+  width: 100%;
+  font-size: var(--md-sys-typescale-title-large-size);
+  font-family: inherit;
+}
+
 .receipt-divider {
   border-top: 1px dashed rgba(31, 31, 31, 0.35);
   margin: 0.6rem 0;

@@ -104,6 +104,23 @@ export function validateNote(note) {
   return { valid: true, value: normalized || null };
 }
 
+// Unidad 7 (seguimiento) — título de ticket opcional (dónde se compró), BR-6x.
+const PURCHASE_TITLE_MAX_LENGTH = 50;
+
+export function validatePurchaseTitle(title) {
+  if (title === null || title === undefined || title === '') {
+    return { valid: true, value: null };
+  }
+  if (typeof title !== 'string') {
+    return { valid: false, error: 'El título no es válido.' };
+  }
+  const normalized = normalizeWhitespace(title);
+  if (normalized.length > PURCHASE_TITLE_MAX_LENGTH) {
+    return { valid: false, error: `El título no puede superar los ${PURCHASE_TITLE_MAX_LENGTH} caracteres.` };
+  }
+  return { valid: true, value: normalized || null };
+}
+
 export function validateQuantityUnit(unit) {
   if (unit === null || unit === undefined || unit === '') {
     return { valid: true, value: null };

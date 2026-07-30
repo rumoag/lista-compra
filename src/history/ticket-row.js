@@ -1,6 +1,7 @@
-// Fila de la lista principal de historial (BR-55) — icono de ticket, fecha corta
-// ("Sáb, 18 jul 2024", BR-63) y número total de productos. Click abre el modal de
-// detalle (Unidad 7). Sin borde propio (BR-63) — se apoya en el contenedor de la lista.
+// Fila de la lista principal de historial (BR-55) — icono de ticket, título del ticket
+// (dónde se compró, seguimiento) seguido de la fecha corta ("Sáb, 18 jul 2024", BR-63) en
+// la misma línea, y número total de productos. Click abre el modal de detalle (Unidad 7).
+// Sin borde propio (BR-63) — se apoya en el contenedor de la lista.
 import { icon } from '../common/icon.js';
 
 export function renderTicketRow(purchase, { onOpen }) {
@@ -12,7 +13,9 @@ export function renderTicketRow(purchase, { onOpen }) {
     <div class="ticket-row-open-area" data-testid="ticket-row-open-area">
       <div class="ticket-row-icon" aria-hidden="true">${icon('receipt')}</div>
       <div>
-        <div data-testid="ticket-row-date">${formatShortDate(purchase.bought_at)}</div>
+        <div data-testid="ticket-row-date"><span data-testid="ticket-row-shop-title">${escapeHtml(
+          purchase.title || 'Sin título'
+        )}</span> · ${formatShortDate(purchase.bought_at)}</div>
         <div class="meta" data-testid="ticket-row-meta">${escapeHtml(purchase.bought_by ?? '')} · ${
           purchase.products.length
         } producto${purchase.products.length === 1 ? '' : 's'}</div>

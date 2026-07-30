@@ -14,9 +14,14 @@ import { openModal } from '../common/modal.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 import { applyOptimistic } from '../common/optimistic.js';
 import { renderTicketProductRow } from './ticket-product-row.js';
+import { updatePurchaseTitle } from './purchases-api.js';
+import { validatePurchaseTitle } from '../common/validation.js';
 
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
-  const { body, footer, close } = openModal({ title: new Date(purchase.bought_at).toLocaleString('es-ES') });
+  // (Seguimiento) la cabecera del modal muestra el título del ticket (dónde se compró) en
+  // vez de la fecha/hora — la fecha/hora se sigue mostrando dentro del "papel" del recibo.
+  // El título es editable haciendo click en la cabecera del modal (no dentro del recibo).
+  const { body, footer, close, titleEl } = openModal({ title: purchase.title || 'Sin título' });
 
   // BR-62 (seguimiento post-aprobación): el cuerpo del modal imita visualmente un ticket
   // de compra físico (papel, tipografía monoespaciada, líneas discontinuas, borde
@@ -26,11 +31,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     <div class="receipt" data-testid="ticket-modal-receipt">
       <div class="receipt-zigzag receipt-zigzag--top" aria-hidden="true"></div>
       <div class="receipt-content">
-        <div class="receipt-header">
-          <div class="receipt-title">🧾 TICKET DE COMPRA</div>
-          <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
-          <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
-        </div>
+        <div class="receipt-header" data-testid="ticket-modal-header"></div>
         <div class="receipt-divider"></div>
         <div class="error-message" data-testid="ticket-modal-error" hidden></div>
         <div class="receipt-items" data-testid="ticket-modal-products"></div>
@@ -51,6 +52,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
     <button type="button" class="danger" data-testid="ticket-modal-delete-button">Eliminar ticket</button>
   `;
 
+  const headerEl = body.querySelector('[data-testid="ticket-modal-header"]');
   const productsContainer = body.querySelector('[data-testid="ticket-modal-products"]');
   const totalEl = body.querySelector('[data-testid="ticket-modal-total"]');
   const errorEl = body.querySelector('[data-testid="ticket-modal-error"]');
@@ -58,6 +60,84 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   function showError(message) {
     errorEl.textContent = message;
     errorEl.hidden = false;
+  }
+
+  // El recibo siempre muestra el texto fijo "TICKET DE COMPRA" — ya no repite el título
+  // del ticket (ese vive solo en la cabecera del modal, ver renderModalTitle más abajo).
+  function renderHeader() {
+    headerEl.innerHTML = `
+      <div class="receipt-title">🧾 TICKET DE COMPRA</div>
+      <div class="receipt-meta">${new Date(purchase.bought_at).toLocaleString('es-ES')}</div>
+      <div class="receipt-meta">${escapeHtml(purchase.bought_by ?? '')}</div>
+    `;
+  }
+
+  // (Seguimiento) el título es editable haciendo click en la cabecera del modal (no dentro
+  // del recibo): modo lectura por defecto, click abre un input inline en el propio <h2>.
+  function renderModalTitle() {
+    titleEl.textContent = purchase.title || 'Sin título';
+    titleEl.classList.add('modal-title--editable');
+    titleEl.setAttribute('tabindex', '0');
+    titleEl.setAttribute('role', 'button');
+    titleEl.setAttribute('aria-label', 'Editar título del ticket');
+    titleEl.onclick = openTitleEditor;
+    titleEl.onkeydown = (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openTitleEditor();
+      }
+    };
+  }
+
+  function openTitleEditor() {
+    titleEl.onclick = null;
+    titleEl.onkeydown = null;
+    titleEl.removeAttribute('tabindex');
+    titleEl.removeAttribute('role');
+    titleEl.innerHTML = `
+      <input
+        type="text"
+        class="text-input modal-title-input"
+        data-testid="modal-title-input"
+        maxlength="50"
+        placeholder="¿Dónde compraste? (opcional)"
+        value="${escapeHtml(purchase.title ?? '')}"
+      />
+    `;
+    const input = titleEl.querySelector('[data-testid="modal-title-input"]');
+    input.focus();
+    input.select();
+
+    let settled = false;
+    async function commit() {
+      if (settled) return;
+      settled = true;
+      const result = validatePurchaseTitle(input.value);
+      const newTitle = result.valid ? result.value : purchase.title;
+      if (newTitle === purchase.title) {
+        renderModalTitle();
+        return;
+      }
+      try {
+        await updatePurchaseTitle(purchase.id, newTitle);
+        purchase.title = newTitle;
+        onTicketChanged(purchase);
+      } catch (err) {
+        showError('No se pudo guardar el título. Inténtalo de nuevo.');
+      }
+      renderModalTitle();
+    }
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        commit();
+      } else if (event.key === 'Escape') {
+        settled = true;
+        renderModalTitle();
+      }
+    });
   }
 
   function renderProducts() {
@@ -193,6 +273,8 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   footer.querySelector('[data-testid="ticket-modal-undo-button"]').addEventListener('click', handleUndoTicket);
   footer.querySelector('[data-testid="ticket-modal-delete-button"]').addEventListener('click', handleDeleteTicket);
 
+  renderHeader();
+  renderModalTitle();
   renderProducts();
 
   return { close };
