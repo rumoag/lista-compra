@@ -484,6 +484,17 @@ button.danger {
   animation: modal-scrim-out var(--motion-duration-short2) var(--motion-easing-standard-accelerate) both;
 }
 
+/* Teclado virtual (ver modal.js): el overlay se ancla arriba del área visible en vez de
+   centrarse, y el panel se limita a esa altura para que su footer quede siempre por encima
+   del teclado en lugar de detrás de él. */
+.modal-overlay--keyboard-open {
+  align-items: flex-start;
+}
+
+.modal-overlay--keyboard-open .modal-panel {
+  max-height: 100%;
+}
+
 .modal-panel {
   background: var(--md-sys-color-surface-container-high);
   border-radius: var(--md-sys-shape-corner-extra-large);

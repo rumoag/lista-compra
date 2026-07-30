@@ -196,6 +196,11 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 
 **UNIDAD 6 (Seguimiento): COMPLETA** — próximo paso del usuario: verificación manual (abrir el menú del avatar, pulsar "Editar lista de la compra", cambiar título/icono, comprobar que la topbar se actualiza).
 
+### Common — Seguimiento: modal y teclado virtual en móvil
+- [x] Petición del usuario: al enfocar un input dentro de un modal en móvil, el modal debe subir al tope de la pantalla y el footer con los botones debe quedar siempre por encima del teclado virtual (antes, `position: fixed` con `align-items: center` se centraba sobre el layout viewport completo, quedando detrás del teclado o con el footer tapado). 2 preguntas de aclaración resueltas: aplica a todos los modales (centrados y el fullscreen del wizard); enfoque VisualViewport API (JS) en vez de `interactive-widget=resizes-content` porque este último no funciona en iOS Safari. Implementado en `src/common/modal.js` (listeners `resize`/`scroll` de `window.visualViewport` que anclan el overlay al área visual real vía `top`/`height` inline y activan `.modal-overlay--keyboard-open`; `focusin` en inputs/textarea/select recalcula tras 50ms y hace `scrollIntoView`) y `css/style.css` (`.modal-overlay--keyboard-open { align-items: flex-start }` + `.modal-panel { max-height: 100% }` dentro de esa clase). 251/251 tests pasan (guard `scrollIntoView?.()` necesario porque jsdom no lo implementa); build verificado (falla únicamente por falta de variables de entorno Supabase locales, no relacionado).
+
+**COMMON (Seguimiento — modal y teclado virtual): IMPLEMENTADA** — próximo paso del usuario: verificación manual en móvil real (iOS Safari y Android Chrome) — abrir varios modales (crear/editar lista, título de ticket, wizard de producto), tocar un input y comprobar que el modal sube arriba y el footer/botones quedan siempre visibles por encima del teclado.
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.
