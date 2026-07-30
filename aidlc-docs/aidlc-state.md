@@ -201,6 +201,11 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 
 **COMMON (Seguimiento — modal y teclado virtual): IMPLEMENTADA** — próximo paso del usuario: verificación manual en móvil real (iOS Safari y Android Chrome) — abrir varios modales (crear/editar lista, título de ticket, wizard de producto), tocar un input y comprobar que el modal sube arriba y el footer/botones quedan siempre visibles por encima del teclado.
 
+### Unidad 5 — Seguimiento: item de lista completo pulsable
+- [x] Bug reportado por el usuario: al pulsar una tarjeta de lista de la compra en el listado de inicio, solo respondía al tap la zona interna (icono+texto, `.list-card-open-area`), no el contenedor completo de la tarjeta. Causa: el listener de click estaba en `.list-card-main` en vez de en la tarjeta (`el`) completa. Implementado en `src/home/list-card.js` (listener movido al elemento raíz de `renderListCard`; el menú de 3 puntos ya hacía `stopPropagation()` en `common/dropdown-menu.js`, así que no dispara `onOpen`); `css/style.css` mueve `cursor: pointer` y el feedback táctil `:active` de `.list-card-main` a `.list-card` (toda la tarjeta). 2 tests nuevos en `tests/home/list-card.test.js` (click en el contenedor completo abre la lista; click en el menú de 3 puntos no la abre). 253/253 tests pasan.
+
+**UNIDAD 5 (Seguimiento — item completo pulsable): CORREGIDA** — próximo paso del usuario: verificación manual (tocar cualquier zona de una tarjeta de lista, incluido el padding fuera del icono/texto, y comprobar que abre la lista; comprobar que el menú de 3 puntos sigue funcionando sin abrir la lista).
+
 ## Notes
 - User supplied a pre-written Project Brief (docs style AI-DLC Inception brief) covering intent, actors, MVP scope, out-of-scope, assumptions, NFRs, draft data model, proposed bolts, success criteria, and open questions.
 - This will be used as the primary input to Requirements Analysis rather than starting from scratch.

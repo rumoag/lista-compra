@@ -398,13 +398,13 @@ button.danger {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
 }
 
 .list-card-main {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  cursor: pointer;
   flex: 1;
 }
 
@@ -881,7 +881,7 @@ button:active,
 .icon-button:active,
 .icon-text-button:active,
 .tab:active,
-.list-card-main:active {
+.list-card:active {
   transform: scale(0.94);
 }
 
@@ -892,7 +892,7 @@ button,
   transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
 }
 
-.list-card-main {
+.list-card {
   transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
 }
 

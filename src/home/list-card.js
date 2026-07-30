@@ -38,7 +38,7 @@ export function renderListCard(household, { onEdit, onDelete, onViewQr, onOpen }
     <div data-testid="list-card-menu-container"></div>
   `;
 
-  el.querySelector('[data-testid="list-card-open-area"]').addEventListener('click', () => onOpen(household.id));
+  el.addEventListener('click', () => onOpen(household.id));
 
   renderDropdownMenu(el.querySelector('[data-testid="list-card-menu-container"]'), {
     actions: [
