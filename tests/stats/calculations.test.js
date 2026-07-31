@@ -7,6 +7,7 @@ import {
   computeRanking,
   computeDistributionByWeekday,
   computeDistributionByPerson,
+  computeTimeSeries,
 } from '../../src/stats/calculations.js';
 
 function makeProduct(overrides = {}) {
@@ -152,6 +153,93 @@ describe('computeDistributionByPerson', () => {
         { person: 'Yo', count: 2 },
         { person: 'Mi pareja', count: 1 },
       ])
+    );
+  });
+});
+
+describe('computeTimeSeries — casos concretos (FR-36, BR-67, BR-68)', () => {
+  it('devuelve [] sin productos', () => {
+    expect(computeTimeSeries([], 'month')).toEqual([]);
+  });
+
+  it('agrupa por mes y rellena el mes sin compras con count 0 (BR-68)', () => {
+    const products = [
+      makeProduct({ bought_at: '2026-01-05T00:00:00.000Z' }),
+      makeProduct({ bought_at: '2026-01-20T00:00:00.000Z' }),
+      makeProduct({ bought_at: '2026-03-01T00:00:00.000Z' }),
+    ];
+    const series = computeTimeSeries(products, 'month');
+    expect(series.map((b) => b.periodKey)).toEqual(['2026-01', '2026-02', '2026-03']);
+    expect(series.map((b) => b.count)).toEqual([2, 0, 1]);
+    expect(series[0].label).toBe('ene 2026');
+  });
+
+  it('agrupa por semana ISO (lunes a domingo) y rellena la semana sin compras (BR-68)', () => {
+    const products = [
+      makeProduct({ bought_at: '2026-01-05T00:00:00.000Z' }), // lunes, semana 2
+      makeProduct({ bought_at: '2026-01-19T00:00:00.000Z' }), // lunes, semana 4
+    ];
+    const series = computeTimeSeries(products, 'week');
+    expect(series.map((b) => b.periodKey)).toEqual(['2026-W02', '2026-W03', '2026-W04']);
+    expect(series.map((b) => b.count)).toEqual([1, 0, 1]);
+    expect(series[0].label).toBe('05/01');
+  });
+
+  it('un producto comprado un domingo cuenta en la semana ISO que empezó el lunes anterior', () => {
+    const products = [makeProduct({ bought_at: '2026-01-11T00:00:00.000Z' })]; // domingo, semana 2
+    const series = computeTimeSeries(products, 'week');
+    expect(series).toEqual([{ periodKey: '2026-W02', label: '05/01', count: 1 }]);
+  });
+});
+
+describe('computeTimeSeries — invariantes (PBT-03, bloqueante)', () => {
+  const productsArbitrary = fc.array(
+    fc.record({
+      id: fc.uuid(),
+      name: fc.constant('Leche'),
+      bought_by: fc.constant('Yo'),
+      bought_at: fc
+        .date({ min: new Date('2023-01-01T00:00:00.000Z'), max: new Date('2027-12-31T00:00:00.000Z') })
+        .map((d) => d.toISOString()),
+    })
+  );
+
+  it('la suma de count de todos los buckets es igual al total de productos de entrada', () => {
+    fc.assert(
+      fc.property(productsArbitrary, fc.constantFrom('month', 'week'), (products, granularity) => {
+        const series = computeTimeSeries(products, granularity);
+        const total = series.reduce((sum, b) => sum + b.count, 0);
+        expect(total).toBe(products.length);
+      })
+    );
+  });
+
+  it('el array devuelto está ordenado ascendentemente por periodKey sin huecos', () => {
+    fc.assert(
+      fc.property(productsArbitrary, fc.constantFrom('month', 'week'), (products, granularity) => {
+        const series = computeTimeSeries(products, granularity);
+        const keys = series.map((b) => b.periodKey);
+        expect(keys).toEqual([...keys].sort());
+        expect(new Set(keys).size).toBe(keys.length);
+      })
+    );
+  });
+
+  it('ningún count es negativo', () => {
+    fc.assert(
+      fc.property(productsArbitrary, fc.constantFrom('month', 'week'), (products, granularity) => {
+        const series = computeTimeSeries(products, granularity);
+        expect(series.every((b) => b.count >= 0)).toBe(true);
+      })
+    );
+  });
+
+  it('el resultado no depende del orden de entrada', () => {
+    fc.assert(
+      fc.property(productsArbitrary, fc.constantFrom('month', 'week'), (products, granularity) => {
+        const shuffled = [...products].reverse();
+        expect(computeTimeSeries(products, granularity)).toEqual(computeTimeSeries(shuffled, granularity));
+      })
     );
   });
 });

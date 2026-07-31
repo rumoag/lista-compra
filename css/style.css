@@ -282,6 +282,20 @@ button.danger {
   padding: 2rem 1rem;
 }
 
+/* Ciclo 5 — alternativa textual accesible para las gráficas (oculta visualmente, disponible
+   para lectores de pantalla; se le quita esta clase si Chart.js no llega a cargar). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Ciclo 4 — motion system M3 (esquema Expressive) + skeletons de carga */
 
 /* Entrada escalonada de filas/tarjetas (BR-61ish): cada elemento recién insertado en una

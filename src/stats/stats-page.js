@@ -5,6 +5,7 @@ import { groupByNormalizedName } from './calculations.js';
 import { renderStatsRanking } from './stats-ranking.js';
 import { renderStatsCadence } from './stats-cadence.js';
 import { renderStatsDistribution } from './stats-distribution.js';
+import { renderStatsTimeseries } from './stats-timeseries.js';
 import { renderSkeleton } from '../common/skeleton.js';
 
 const STATS_FETCH_LIMIT = 2000;
@@ -12,11 +13,13 @@ const STATS_FETCH_LIMIT = 2000;
 export async function renderStatsPage(container, { householdId }) {
   container.innerHTML = `
     <div id="stats-ranking-container"></div>
+    <div id="stats-timeseries-container"></div>
     <div id="stats-cadence-container"></div>
     <div id="stats-distribution-container"></div>
   `;
 
   renderSkeleton(container.querySelector('#stats-ranking-container'), { variant: 'stat-block', count: 1 });
+  renderSkeleton(container.querySelector('#stats-timeseries-container'), { variant: 'stat-block', count: 1 });
   renderSkeleton(container.querySelector('#stats-cadence-container'), { variant: 'stat-block', count: 1 });
   renderSkeleton(container.querySelector('#stats-distribution-container'), { variant: 'stat-block', count: 1 });
 
@@ -35,7 +38,8 @@ export async function renderStatsPage(container, { householdId }) {
 
   const groups = groupByNormalizedName(data);
 
-  renderStatsRanking(container.querySelector('#stats-ranking-container'), { groups });
+  await renderStatsRanking(container.querySelector('#stats-ranking-container'), { groups });
+  await renderStatsTimeseries(container.querySelector('#stats-timeseries-container'), { products: data });
   renderStatsCadence(container.querySelector('#stats-cadence-container'), { groups });
-  renderStatsDistribution(container.querySelector('#stats-distribution-container'), { products: data });
+  await renderStatsDistribution(container.querySelector('#stats-distribution-container'), { products: data });
 }

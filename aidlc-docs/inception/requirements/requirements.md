@@ -385,3 +385,55 @@ Esta revisión **supersede** las decisiones de color/radios de FR-24, FR-26.2 y 
 
 ## Alcance de esta iteración (Revisión Ciclo 3)
 Se rehacen los Lotes 0 y 1 en un único lote combinado ("Lote 0-1 v2") con la nueva arquitectura M3, y se continúa después con los Lotes 2-4 ya planificados (ahora aplicando M3 en vez de Radix). Sin User Stories ni Functional/NFR/Infrastructure Design adicionales — mismo criterio que el resto del Ciclo 3 (cambio puramente visual, sin lógica de negocio).
+
+---
+
+## Ciclo 5 — Estadísticas de calidad con gráficas
+
+### Intent Analysis
+- **User Request**: "lee el proyecto y ten el contexto para mejorar y añadir estadisticas de calidad con sus graficas correspondientes."
+- **Request Type**: Enhancement (de la pantalla de estadísticas existente, Unidad 3) + New Feature (evolución temporal, estadística no existente hasta ahora)
+- **Scope Estimate**: Single Component (`src/stats/` y sus tests; sin cambios de esquema salvo, potencialmente, ninguno — toda la información necesaria ya existe en `products`)
+- **Complexity Estimate**: Moderate (introduce una dependencia de gráficos nueva, criterio distinto al resto de la app que es 100% vanilla JS)
+
+### Contexto (hallazgo de la lectura del código)
+La pantalla de estadísticas actual tiene 3 secciones, todas renderizadas como listas de texto (`<ol>`/`<ul>`), sin ningún gráfico:
+- `stats-ranking.js`: ranking de productos más comprados (lista numerada).
+- `stats-cadence.js`: cadencia media de recompra (no leído en detalle, mismo patrón de lista).
+- `stats-distribution.js`: distribución por día de la semana y por persona (dos listas).
+
+Los cálculos ya existen y son funciones puras en `calculations.js` (`groupByNormalizedName`, `computeRanking`, `computeAverageCadenceDays`, `computeDistributionByWeekday`, `computeDistributionByPerson`), reutilizables sin cambios para alimentar las nuevas gráficas.
+
+### Functional Requirements
+
+#### FR-33: Gráfica de ranking de productos más comprados
+- FR-33.1: La sección "Más comprados" (`stats-ranking.js`) se sustituye por un gráfico de **barras horizontales**, una barra por producto, longitud proporcional al número de compras (`purchaseCount`).
+- FR-33.2: Se mantiene la información ya visible hoy (nombre del producto, número de compras) como texto asociado a cada barra.
+
+#### FR-34: Gráfica de distribución por persona
+- FR-34.1: La sub-sección "Compras por persona" (`stats-distribution.js`) se sustituye por un **gráfico circular/donut**, un segmento por persona, tamaño proporcional al número de compras.
+
+#### FR-35: Gráfica de distribución por día de la semana
+- FR-35.1: La sub-sección "Compras por día de la semana" se sustituye por un **gráfico de barras** (una barra por día, Domingo a Sábado).
+
+#### FR-36: Nueva estadística — evolución temporal de compras
+- FR-36.1: Se añade una sección nueva que muestra la evolución del número de compras a lo largo del tiempo, agregando por **mes** o por **semana**, con un control (selector) para alternar entre ambas granularidades.
+- FR-36.2: Se representa como **gráfico de líneas**, eje X = periodo (mes o semana), eje Y = número de compras en ese periodo.
+- FR-36.3: La agregación se calcula a partir de `bought_at` de los productos comprados ya cargados (mismo dataset que el resto de `stats-page.js`, límite de 2000 compras ya existente — sin cambios de fetch).
+- FR-36.4: Formato de periodo: mes como "MMM AAAA" (ej. "jul 2026"); semana como fecha de inicio de semana (ISO, lunes) en formato "dd/mm".
+
+#### FR-37: Cadencia de recompra
+- FR-37.1: La sección de cadencia media de recompra se mantiene con su cálculo actual (`computeAverageCadenceDays`); no se especificó un tipo de gráfica distinto para ella, por lo que se mantiene su presentación actual (fuera de alcance salvo ajuste visual menor de coherencia con el resto de tarjetas, a definir en Functional Design si aplica).
+
+### Non-Functional Requirements
+
+**NFR-17**: Se introduce una librería de gráficos ligera (ej. Chart.js) como nueva dependencia npm — decisión explícita del usuario (Q4=B), que rompe el criterio previamente establecido de "sin dependencias nuevas de UI" (NFR-8/NFR-13). Se documenta como excepción aceptada para esta iteración; el resto de componentes de la app no adoptan la librería salvo en `src/stats/`.
+
+**NFR-18**: Las gráficas deben leer sus colores de los tokens CSS M3 ya definidos en `css/tokens.css` (roles semánticos `primary`, `secondary`, `tertiary`, superficies) y funcionar correctamente tanto en modo claro como oscuro (`prefers-color-scheme`), consistente con NFR-14/FR-25.
+
+**NFR-19**: Sin cambios de esquema de base de datos — todos los datos necesarios (nombre, `bought_at`, `bought_by`) ya existen en la tabla `products`; no se requiere el dato de precio (descartado en Q5, opción A no elegida).
+
+**NFR-20**: Se reutilizan las funciones de cálculo puras ya existentes en `calculations.js` sin modificarlas, salvo la función nueva de agregación temporal (mes/semana) que se añade siguiendo el mismo patrón (función pura, testeada con Vitest, coherente con PBT-03 si aplica a esta unidad).
+
+## Alcance de esta iteración (Ciclo 5)
+Cambio acotado a `src/stats/` (sin tocar Unidades 1-7 ni esquema de base de datos). Dado que introduce una nueva dependencia (decisión NFR relevante) y un tipo de dato agregado nuevo (evolución temporal), se ejecuta con Functional Design y NFR Requirements/Design antes de Code Generation (no se salta como los cambios puramente visuales del Ciclo 3/4) — ver Workflow Planning.

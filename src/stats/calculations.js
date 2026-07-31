@@ -74,3 +74,99 @@ export function computeDistributionByPerson(products) {
   }
   return [...counts.entries()].map(([person, count]) => ({ person, count }));
 }
+
+const MONTH_NAMES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+function monthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function monthLabel(key) {
+  const [year, month] = key.split('-').map(Number);
+  return `${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+function fillMonthRange(firstKey, lastKey) {
+  const [fy, fm] = firstKey.split('-').map(Number);
+  const [ly, lm] = lastKey.split('-').map(Number);
+  const keys = [];
+  let y = fy;
+  let m = fm;
+  while (y < ly || (y === ly && m <= lm)) {
+    keys.push(`${y}-${String(m).padStart(2, '0')}`);
+    m += 1;
+    if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+  }
+  return keys;
+}
+
+// Semana ISO 8601 (lunes a domingo). key = "YYYY-Www".
+function isoWeekKey(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = (d.getUTCDay() + 6) % 7; // lunes=0 ... domingo=6
+  d.setUTCDate(d.getUTCDate() - dayNum + 3); // jueves de esa semana (referencia ISO)
+  const firstThursday = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  const firstThursdayDayNum = (firstThursday.getUTCDay() + 6) % 7;
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - firstThursdayDayNum + 3);
+  const weekNum = 1 + Math.round((d - firstThursday) / (7 * 24 * 60 * 60 * 1000));
+  return `${d.getUTCFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+}
+
+function mondayOfIsoWeek(key) {
+  const [yearStr, weekStr] = key.split('-W');
+  const year = Number(yearStr);
+  const week = Number(weekStr);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4DayNum = (jan4.getUTCDay() + 6) % 7;
+  const monday = new Date(Date.UTC(year, 0, 4 - jan4DayNum + (week - 1) * 7));
+  return monday;
+}
+
+function weekLabel(key) {
+  const monday = mondayOfIsoWeek(key);
+  const dd = String(monday.getUTCDate()).padStart(2, '0');
+  const mm = String(monday.getUTCMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}`;
+}
+
+function fillWeekRange(firstKey, lastKey) {
+  const keys = [];
+  let current = mondayOfIsoWeek(firstKey);
+  const last = mondayOfIsoWeek(lastKey);
+  while (current.getTime() <= last.getTime()) {
+    keys.push(isoWeekKey(current));
+    current = new Date(current.getTime() + 7 * 24 * 60 * 60 * 1000);
+  }
+  return keys;
+}
+
+/**
+ * Agrega compras por periodo (mes o semana ISO), rellenando con count 0 los periodos
+ * sin compras dentro del rango observado (BR-68). Devuelve un array de
+ * { periodKey, label, count } ordenado ascendentemente (BR-67, FR-36).
+ */
+export function computeTimeSeries(products, granularity) {
+  if (products.length === 0) return [];
+
+  const toKey = granularity === 'week' ? isoWeekKey : monthKey;
+  const toLabel = granularity === 'week' ? weekLabel : monthLabel;
+  const fillRange = granularity === 'week' ? fillWeekRange : fillMonthRange;
+
+  const counts = new Map();
+  for (const product of products) {
+    const key = toKey(new Date(product.bought_at));
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  const sortedKeys = [...counts.keys()].sort();
+  const fullKeys = fillRange(sortedKeys[0], sortedKeys[sortedKeys.length - 1]);
+
+  return fullKeys.map((key) => ({
+    periodKey: key,
+    label: toLabel(key),
+    count: counts.get(key) ?? 0,
+  }));
+}

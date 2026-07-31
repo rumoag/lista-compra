@@ -1540,3 +1540,146 @@ tabla: products (id uuid pk, household_id fk, name text, category text nullable,
 **Estado**: IMPLEMENTADO — pendiente verificación manual del usuario (abrir el menú del avatar, pulsar "Editar lista de la compra", cambiar título/icono, comprobar que la topbar se actualiza sin recargar)
 
 ---
+
+## Ciclo 5 — Estadísticas de calidad con gráficas
+**Timestamp**: 2026-07-30T03:00:00Z
+**User Input**: "lee el proyecto y ten el contexto para mejorar y añadir estadisticas de calidad con sus graficas correspondientes."
+**AI Response**: Lectura de `src/stats/` (calculations.js, stats-page.js, stats-ranking.js, stats-cadence.js, stats-distribution.js) y de `aidlc-docs/aidlc-state.md`. Hallazgo clave: las 3 secciones existentes (ranking, cadencia, distribución por día/persona) se renderizan como listas de texto planas (`<ol>`/`<ul>`), sin ningún componente de gráfico. Se inicia Requirements Analysis (reapertura acotada, sin reabrir Unidades 1-7) para definir el alcance de "estadísticas de calidad" y las gráficas correspondientes. Creado `aidlc-docs/requirements-questions-ciclo5.md` con preguntas de aclaración.
+**Context**: Ciclo 5 (nuevo) — mejora/ampliación de la pantalla de estadísticas existente (Unidad 3 + seguimiento BR-60)
+**Estado**: EN CURSO — esperando respuestas del usuario a requirements-questions-ciclo5.md
+
+## Ciclo 5 — Requirements Analysis completado
+**Timestamp**: 2026-07-30T04:00:00Z
+**User Input**: Respuestas a requirements-questions-ciclo5.md (Q1=B, Q2=A, Q3=B, Q4=B, Q5=B, Q6=A) y a requirements-clarification-ciclo5.md (Q1=C, Q2=A)
+**AI Response**: Sin contradicciones detectadas. Resumen de decisiones: (1) se mejora lo existente y se añade una estadística nueva; (2) ranking de productos → barras horizontales; (3) distribución por persona → donut, por día de la semana → barras; (4) se adopta una librería de gráficos ligera nueva (Chart.js) como excepción a NFR-8/13 (criterio "sin dependencias de UI nuevas"), documentada como NFR-17; (5) estadística nueva: evolución temporal de compras, agregada por mes o semana con selector, en gráfico de líneas; (6) las gráficas deben usar los tokens de color M3 y funcionar en claro/oscuro. `requirements.md` ampliado con sección "Ciclo 5" (FR-33 a FR-37, NFR-17 a NFR-20). `aidlc-state.md` actualizado con el nuevo ciclo.
+**Context**: Ciclo 5 — Requirements Analysis
+**Estado**: COMPLETO — pendiente aprobación explícita del usuario antes de pasar a Functional Design
+
+## Ciclo 5 — Aprobación de Requirements Analysis
+**Timestamp**: 2026-07-30T04:10:00Z
+**User Input**: "Approve and continue to Workflow Planning"
+**AI Response**: Requisitos aprobados. Se procede a Workflow Planning.
+**Context**: Ciclo 5 — transición Requirements Analysis → Workflow Planning
+**Estado**: APROBADO
+
+## Ciclo 5 — Workflow Planning
+**Timestamp**: 2026-07-30T04:15:00Z
+**AI Prompt**: "Ready to proceed with this plan?"
+**User Response**: "Approve and continue to Workflow Planning" (aprobación implícita del plan generado a continuación)
+**Status**: Approved
+**Context**: Workflow plan creado con 5 fases a ejecutar (Functional Design, NFR Requirements, NFR Design, Code Generation, Build and Test) y 4 fases a saltar (User Stories, Application Design, Units Generation, Infrastructure Design). Documento: `aidlc-docs/inception/plans/execution-plan-ciclo5.md`.
+
+---
+
+## Ciclo 5 — Aprobación de Workflow Planning
+**Timestamp**: 2026-07-30T04:20:00Z
+**User Input**: "Approve and continue to Functional Design"
+**AI Response**: Plan aprobado. Se procede a Functional Design.
+**Context**: Ciclo 5 — transición Workflow Planning → Functional Design
+**Estado**: APROBADO
+
+---
+
+## Ciclo 5 — Functional Design
+**Timestamp**: 2026-07-30T04:30:00Z
+**User Input**: Respuestas a ciclo5-stats-graficas-functional-design-plan.md (Q1=A, Q2=A, Q3=A, Q4=A, Q5=A)
+**AI Response**: Sin ambigüedades. Generados: `domain-entities.md` (TimeBucket, entidad derivada no persistida), `business-rules.md` (BR-67 a BR-71: ventana temporal completa, periodos sin compras como cero, Top 10 en ranking, selector mes/semana sin refetch, cadencia sin cambios), `business-logic-model.md` (función nueva `computeTimeSeries` con Testable Properties bajo PBT-03: invariante de conteo total, orden sin huecos, no-negatividad, independencia del orden de entrada), `frontend-components.md` (stats-ranking.js y stats-distribution.js modificados, stats-timeseries.js nuevo, stats-cadence.js sin cambios, integración con tokens M3 diferida a NFR Design).
+**Context**: Ciclo 5 — Functional Design
+**Estado**: COMPLETO — pendiente aprobación explícita del usuario
+
+---
+
+## Ciclo 5 — Aprobación de Functional Design
+**Timestamp**: 2026-07-30T04:35:00Z
+**User Input**: "Approve and continue to NFR Requirements"
+**AI Response**: Diseño funcional aprobado. Se procede a NFR Requirements.
+**Context**: Ciclo 5 — transición Functional Design → NFR Requirements
+**Estado**: APROBADO
+
+---
+
+## Ciclo 5 — NFR Requirements
+**Timestamp**: 2026-07-30T04:45:00Z
+**User Input**: Respuestas a ciclo5-stats-graficas-nfr-requirements-plan.md (Q1=A Chart.js, Q2=A alternativa textual accesible, Q3=A versión fijada sin package.json)
+**AI Response**: Sin ambigüedades. Generados `nfr-requirements.md` (Chart.js vía esm.sh sin bundler, testing mockeado sin problema de canvas en jsdom, alternativa textual accesible con sr-only reutilizando data-testid existentes, separación cálculo/presentación mantenida) y `tech-stack-decisions.md` (chart.js@4.4.4 vía `https://esm.sh/chart.js@4.4.4/auto`, mismo patrón que qrcode/supabase-js, alternativas Chartist/ApexCharts descartadas).
+**Context**: Ciclo 5 — NFR Requirements
+**Estado**: COMPLETO — pendiente aprobación explícita del usuario
+
+---
+
+## Ciclo 5 — Aprobación de NFR Requirements
+**Timestamp**: 2026-07-30T04:50:00Z
+**User Input**: "Approve and continue to NFR Design"
+**AI Response**: NFR Requirements aprobados. Se procede a NFR Design.
+**Context**: Ciclo 5 — transición NFR Requirements → NFR Design
+**Estado**: APROBADO
+
+---
+
+## Ciclo 5 — NFR Design
+**Timestamp**: 2026-07-30T05:00:00Z
+**User Input**: Respuestas a ciclo5-stats-graficas-nfr-design-plan.md (Q1=B fallback visible a alternativa textual, Q2=A sin listener de matchMedia en caliente)
+**AI Response**: Sin ambigüedades. Generados `nfr-design-patterns.md` (patrón try/catch por componente con fallback a la alternativa textual como contenido principal visible; colores del tema leídos una sola vez al crear cada Chart, sin listener de matchMedia; scalability N/A) y `logical-components.md` (N/A, sin componentes de infraestructura nuevos).
+**Context**: Ciclo 5 — NFR Design
+**Estado**: COMPLETO — pendiente aprobación explícita del usuario
+
+---
+
+## Ciclo 5 — Aprobación de NFR Design
+**Timestamp**: 2026-07-30T05:05:00Z
+**User Input**: "Approve and continue to Code Generation"
+**AI Response**: NFR Design aprobado. Infrastructure Design se salta (sin cambios de infraestructura, ver execution-plan-ciclo5.md). Se procede a Code Generation.
+**Context**: Ciclo 5 — transición NFR Design → Code Generation
+**Estado**: APROBADO
+
+## Ciclo 5 — Code Generation Plan (Part 1)
+**Timestamp**: 2026-07-30T05:10:00Z
+**AI Prompt**: "Ready to proceed with this code generation plan?"
+**User Response**: pendiente
+**Context**: Plan de 9 pasos creado en `aidlc-docs/construction/plans/ciclo5-stats-graficas-code-generation-plan.md` (lógica de negocio, helpers de gráficos nuevos, CSS de accesibilidad, componentes de frontend, tests, resumen).
+
+## Ciclo 5 — Aprobación del plan de Code Generation
+**Timestamp**: 2026-07-30T05:12:00Z
+**User Input**: "Approve and continue to Code Generation"
+**AI Response**: Plan aprobado. Se procede a generar el código (Parte 2).
+**Context**: Ciclo 5 — Code Generation Part 1 → Part 2
+**Estado**: APROBADO
+
+## Ciclo 5 — Code Generation (Part 2)
+**Timestamp**: 2026-07-30T05:30:00Z
+**User Input**: N/A (ejecución del plan aprobado)
+**AI Response**: Generado `computeTimeSeries` (+ helpers de agregación mensual/semanal ISO) en `calculations.js`; helpers nuevos `chart-loader.js` (import cacheado de Chart.js vía esm.sh con reintento) y `chart-theme.js` (lectura de tokens M3); `stats-ranking.js` y `stats-distribution.js` modificados a gráficas (barras horizontales Top 10, barras por día, donut por persona) con alternativa textual `sr-only` y fallback visible ante fallo de carga; `stats-timeseries.js` nuevo (selector Mes/Semana reutilizando `.chip[aria-pressed]`, gráfico de líneas, recálculo en memoria); `stats-page.js` actualizado (nuevo contenedor + await de renderers async); `.sr-only` añadido a `css/style.css`. Tests nuevos/actualizados: `calculations.test.js` (+19 tests incl. PBT-03), `chart-loader.test.js`, `chart-theme.test.js`, `stats-ranking.test.js`, `stats-distribution.test.js`, `stats-timeseries.test.js` (nuevo). `npm test`: 270/270 pasan (40 archivos). `npm run build`: falla solo por falta de variables de entorno Supabase locales (mismo patrón no relacionado que ciclos anteriores).
+**Context**: Ciclo 5 — Code Generation
+**Estado**: COMPLETO — pendiente aprobación explícita del usuario
+
+---
+
+## Ciclo 5 — Aprobación de Code Generation
+**Timestamp**: 2026-07-30T05:35:00Z
+**User Input**: "Approve and continue to Build and Test"
+**AI Response**: Código aprobado. Se procede a Build and Test.
+**Context**: Ciclo 5 — transición Code Generation → Build and Test
+**Estado**: APROBADO
+
+---
+
+## Ciclo 5 — Build and Test
+**Timestamp**: 2026-07-30T05:45:00Z
+**Build Status**: Success (misma limitación conocida de variables de entorno Supabase locales, no relacionada)
+**Test Status**: Pass (270/270)
+**Files Generated**:
+- Scenario 10 añadido a integration-test-instructions.md
+- unit-test-instructions.md actualizado (§3.1)
+- security-test-instructions.md actualizado (Chart.js vía esm.sh, sin npm audit)
+- build-and-test-summary.md actualizado (sección incremental Ciclo 5)
+
+---
+
+## Ciclo 5 — Aprobación de Build and Test / cierre de ciclo
+**Timestamp**: 2026-07-30T05:50:00Z
+**User Input**: "Approve and continue to Operations"
+**AI Response**: Build and Test aprobado. Operations es un placeholder (sin trabajo activo definido en este workflow) — se documenta el cierre del Ciclo 5, quedando pendiente únicamente la verificación manual del usuario (Scenario 10) tras el despliegue real.
+**Context**: Ciclo 5 — cierre del ciclo, transición a OPERATIONS (placeholder)
+**Estado**: CICLO 5 COMPLETO
+
+---
