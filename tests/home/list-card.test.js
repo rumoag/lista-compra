@@ -34,6 +34,24 @@ describe('renderListCard', () => {
     expect(onOpen).toHaveBeenCalledWith('h1');
   });
 
+  it('llama a onOpen con el id al hacer click en el contenedor de la tarjeta (fuera del área principal)', () => {
+    const onOpen = vi.fn();
+    const el = mount(renderListCard(makeHousehold(), { onEdit: vi.fn(), onDelete: vi.fn(), onViewQr: vi.fn(), onOpen }));
+
+    el.click();
+
+    expect(onOpen).toHaveBeenCalledWith('h1');
+  });
+
+  it('no llama a onOpen al hacer click en el menú de 3 puntos', () => {
+    const onOpen = vi.fn();
+    const el = mount(renderListCard(makeHousehold(), { onEdit: vi.fn(), onDelete: vi.fn(), onViewQr: vi.fn(), onOpen }));
+
+    el.querySelector('[data-testid="dropdown-menu-toggle"]').click();
+
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
   it('llama a onEdit con el household completo desde el menú de 3 puntos', () => {
     const onEdit = vi.fn();
     const household = makeHousehold();

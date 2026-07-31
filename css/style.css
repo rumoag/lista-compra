@@ -7,6 +7,7 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Transición nativa entre documentos (Chrome 126+, cross-document View Transitions):
@@ -412,13 +413,13 @@ button.danger {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
 }
 
 .list-card-main {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  cursor: pointer;
   flex: 1;
 }
 
@@ -496,6 +497,17 @@ button.danger {
 
 .modal-overlay--closing {
   animation: modal-scrim-out var(--motion-duration-short2) var(--motion-easing-standard-accelerate) both;
+}
+
+/* Teclado virtual (ver modal.js): el overlay se ancla arriba del área visible en vez de
+   centrarse, y el panel se limita a esa altura para que su footer quede siempre por encima
+   del teclado en lugar de detrás de él. */
+.modal-overlay--keyboard-open {
+  align-items: flex-start;
+}
+
+.modal-overlay--keyboard-open .modal-panel {
+  max-height: 100%;
 }
 
 .modal-panel {
@@ -884,7 +896,7 @@ button:active,
 .icon-button:active,
 .icon-text-button:active,
 .tab:active,
-.list-card-main:active {
+.list-card:active {
   transform: scale(0.94);
 }
 
@@ -895,7 +907,7 @@ button,
   transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
 }
 
-.list-card-main {
+.list-card {
   transition: transform var(--motion-duration-short1) var(--motion-easing-emphasized-accelerate);
 }
 

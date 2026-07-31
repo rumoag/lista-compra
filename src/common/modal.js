@@ -28,6 +28,10 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
   // él, un solo caso así dejaría el overlay bloqueando la pantalla para siempre.
   function close() {
     document.removeEventListener('keydown', onKeydown);
+    if (visualViewport) {
+      visualViewport.removeEventListener('resize', syncKeyboardViewport);
+      visualViewport.removeEventListener('scroll', syncKeyboardViewport);
+    }
     if (onClose) onClose();
     overlay.classList.add('modal-overlay--closing');
     void overlay.offsetWidth; // fuerza el layout para que la animación ya esté en curso al leerla
@@ -55,6 +59,40 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
     if (event.target === overlay) close();
   });
   document.addEventListener('keydown', onKeydown);
+
+  // Teclado virtual en móvil: al enfocar un input, el layout viewport no cambia pero el visual
+  // viewport se encoge. Sin esto, el overlay (position: fixed sobre el layout viewport) queda
+  // centrado detrás del teclado y el footer con los botones se tapa. Se sincroniza el overlay
+  // con window.visualViewport (si existe) para que ocupe solo el área realmente visible y el
+  // panel se ancle arriba, dejando el footer siempre por encima del teclado.
+  const visualViewport = window.visualViewport;
+  function syncKeyboardViewport() {
+    if (!visualViewport) return;
+    const keyboardOpen = visualViewport.height < window.innerHeight - 120;
+    if (keyboardOpen) {
+      overlay.style.top = `${visualViewport.offsetTop}px`;
+      overlay.style.height = `${visualViewport.height}px`;
+      overlay.classList.add('modal-overlay--keyboard-open');
+    } else {
+      overlay.style.top = '';
+      overlay.style.height = '';
+      overlay.classList.remove('modal-overlay--keyboard-open');
+    }
+  }
+  function onFocusIn(event) {
+    if (event.target.matches?.('input, textarea, select')) {
+      // Se espera a que el teclado termine de abrirse antes de recalcular y hacer scroll.
+      setTimeout(() => {
+        syncKeyboardViewport();
+        event.target.scrollIntoView?.({ block: 'nearest' });
+      }, 50);
+    }
+  }
+  if (visualViewport) {
+    visualViewport.addEventListener('resize', syncKeyboardViewport);
+    visualViewport.addEventListener('scroll', syncKeyboardViewport);
+  }
+  overlay.addEventListener('focusin', onFocusIn);
 
   document.body.appendChild(overlay);
 
