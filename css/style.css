@@ -512,6 +512,17 @@ button.danger {
   animation: modal-scrim-in var(--motion-duration-short4) var(--motion-easing-standard-decelerate) both;
 }
 
+/* Full-screen dialog M3 (m3.material.io/components/dialogs/specs): cubre todo el
+   viewport de borde a borde, sin el scrim ni el hueco del overlay estándar (ese
+   padding/scrim son para el diálogo básico centrado, no para pantalla completa).
+   El fondo del overlay pasa del scrim oscuro al mismo color que el panel — no
+   transparente del todo, si no el scale-in del panel (mismo que el diálogo básico)
+   dejaría ver un fogonazo de la app de fondo sin atenuar mientras se abre. */
+.modal-overlay:has(.modal-panel--fullscreen) {
+  padding: 0;
+  background: var(--md-sys-color-surface-container-high);
+}
+
 .modal-overlay--closing {
   animation: modal-scrim-out var(--motion-duration-short2) var(--motion-easing-standard-accelerate) both;
 }
@@ -696,10 +707,15 @@ button.danger {
   width: 100%;
   height: 100%;
   max-height: 100%;
-  border-radius: var(--md-sys-shape-corner-extra-large);
+  border-radius: var(--md-sys-shape-corner-none);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Ahora que cubre el viewport de borde a borde (sin el padding del overlay
+     estándar), la barra de estado/gestos (env(), 0 si el dispositivo no tiene
+     recortes) puede solaparse con el header/footer si no se reserva su hueco aquí. */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .modal-panel--fullscreen .modal-body {
