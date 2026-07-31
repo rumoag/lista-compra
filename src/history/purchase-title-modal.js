@@ -18,7 +18,7 @@ export function openPurchaseTitleModal({ onConfirm }) {
         data-testid="purchase-title-input"
         maxlength="50"
       />
-      <div class="error-message" data-testid="purchase-title-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="purchase-title-error" hidden></div>
     </form>
   `;
 

@@ -8,7 +8,7 @@ import { renderSkeleton } from '../common/skeleton.js';
 
 export async function renderHomeScreen(container) {
   container.innerHTML = `
-    <div class="error-message" data-testid="home-load-error" hidden></div>
+    <div class="error-message" role="alert" data-testid="home-load-error" hidden></div>
     <div data-testid="home-list-container"></div>
     <div class="empty-state" data-testid="home-empty-state" hidden>Aún no hay listas, crea la primera</div>
   `;

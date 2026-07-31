@@ -16,6 +16,7 @@ import { createRealtimeSubscription } from '../common/realtime-subscription.js';
 import { openConfirmModal } from '../common/confirm-modal.js';
 import { openPurchaseTitleModal } from '../history/purchase-title-modal.js';
 import { renderSkeleton } from '../common/skeleton.js';
+import { showGlobalErrorToast } from '../common/global-error-toast.js';
 
 const PAGE_SIZE = 20;
 
@@ -141,7 +142,7 @@ export async function renderProductList(container, { householdId }) {
       // Sin esto, el skeleton de carga (Ciclo 4) se queda animando para siempre si
       // la primera página falla — antes de los skeletons esto pasaba desapercibido
       // porque no había ningún indicador de carga.
-      itemsContainer.innerHTML = '<p class="error-message" data-testid="product-list-load-error">No se pudo cargar la lista. Inténtalo de nuevo.</p>';
+      itemsContainer.innerHTML = '<p class="error-message" role="alert" data-testid="product-list-load-error">No se pudo cargar la lista. Inténtalo de nuevo.</p>';
       isLoadingMore = false;
       return;
     }
@@ -303,12 +304,7 @@ export async function renderProductList(container, { householdId }) {
   }
 
   function showGlobalError(message) {
-    const errorEl = document.createElement('div');
-    errorEl.className = 'error-message';
-    errorEl.dataset.testid = 'product-list-global-error';
-    errorEl.textContent = message;
-    container.prepend(errorEl);
-    setTimeout(() => errorEl.remove(), 4000);
+    showGlobalErrorToast(container, message, { testid: 'product-list-global-error' });
   }
 
   // BR-8: Realtime — insertar/quitar de la vista según el evento, e idempotente frente a ecos propios

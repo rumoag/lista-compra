@@ -9,6 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="manifest" href="/manifest.json" />
+  <!-- manifest.json no declara theme_color a propósito: el spec de Web App Manifest no admite
+       variarlo por prefers-color-scheme, así que un valor fijo ahí ganaba sobre estos dos meta
+       (Chrome usaba el claro del manifest para la barra de gestos de Android incluso en modo
+       oscuro). Sin theme_color en el manifest, Chrome cae a estos meta dinámicos. -->
   <meta name="theme-color" content="#fafaee" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)" />
   <link rel="icon" href="/icons/icon-192.png" />

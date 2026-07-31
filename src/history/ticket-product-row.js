@@ -1,6 +1,7 @@
 // Fila de producto dentro del modal de ticket (BR-53) — nombre + cantidad + acciones
 // individuales, sin fecha/quién (ya se muestran a nivel de ticket, Q10 de Functional Design).
 import { icon } from '../common/icon.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 export function renderTicketProductRow(product, { onUnmark, onDelete }) {
   const el = document.createElement('div');
@@ -36,8 +37,4 @@ export function renderTicketProductRow(product, { onUnmark, onDelete }) {
   el.querySelector('[data-testid="ticket-product-delete-button"]').addEventListener('click', () => onDelete(product.id));
 
   return el;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

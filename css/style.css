@@ -512,6 +512,17 @@ button.danger {
   animation: modal-scrim-in var(--motion-duration-short4) var(--motion-easing-standard-decelerate) both;
 }
 
+/* Full-screen dialog M3 (m3.material.io/components/dialogs/specs): cubre todo el
+   viewport de borde a borde, sin el scrim ni el hueco del overlay estándar (ese
+   padding/scrim son para el diálogo básico centrado, no para pantalla completa).
+   El fondo del overlay pasa del scrim oscuro al mismo color que el panel — no
+   transparente del todo, si no el scale-in del panel (mismo que el diálogo básico)
+   dejaría ver un fogonazo de la app de fondo sin atenuar mientras se abre. */
+.modal-overlay:has(.modal-panel--fullscreen) {
+  padding: 0;
+  background: var(--md-sys-color-surface-container-high);
+}
+
 .modal-overlay--closing {
   animation: modal-scrim-out var(--motion-duration-short2) var(--motion-easing-standard-accelerate) both;
 }
@@ -530,7 +541,6 @@ button.danger {
 .modal-panel {
   background: var(--md-sys-color-surface-container-high);
   border-radius: var(--md-sys-shape-corner-extra-large);
-  padding: var(--spacing);
   max-width: 420px;
   width: 100%;
   max-height: 90vh;
@@ -568,11 +578,24 @@ button.danger {
   }
 }
 
+/* Espaciado del diálogo M3 (m3.material.io/components/dialogs/specs, valores oficiales
+   de material-web _dialog.scss): 24px de margen a los lados y arriba, 16px entre el
+   título y el cuerpo, 24px entre el cuerpo y las acciones (8px del cuerpo + 16px del
+   pie), 24px abajo. .modal-panel ya no tiene padding propio — cada región aplica el
+   suyo para poder variar el hueco entre ellas. */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing);
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.modal-body {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.modal-body:has(+ .modal-footer:not(:empty)) {
+  padding-bottom: 0.5rem;
 }
 
 .modal-header h2 {
@@ -676,9 +699,7 @@ button.danger {
 }
 
 .modal-footer:not(:empty) {
-  margin-top: var(--spacing);
-  padding-top: var(--spacing);
-  border-top: 1px solid var(--md-sys-color-outline-variant);
+  padding: 1rem 1.5rem 1.5rem;
 }
 
 .modal-panel--fullscreen {
@@ -686,20 +707,33 @@ button.danger {
   width: 100%;
   height: 100%;
   max-height: 100%;
-  border-radius: var(--md-sys-shape-corner-extra-large);
+  border-radius: var(--md-sys-shape-corner-none);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Ahora que cubre el viewport de borde a borde (sin el padding del overlay
+     estándar), la barra de estado/gestos (env(), 0 si el dispositivo no tiene
+     recortes) puede solaparse con el header/footer si no se reserva su hueco aquí. */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .modal-panel--fullscreen .modal-body {
   flex: 1;
   overflow-y: auto;
+  /* El header a pantalla completa ya no aporta padding-bottom (es una barra compacta,
+     ver override de abajo) — el hueco bajo la barra lo pone el body en su lugar. */
+  padding-top: 1.5rem;
 }
 
+/* El header a pantalla completa es una barra de app compacta (top app bar M3), no el
+   bloque de título de un diálogo básico: altura fija (56px, la de una small top app
+   bar M3) con solo el margen lateral de 24px del spec, sin el padding vertical 24/16
+   del header estándar (desbordaría). */
 .modal-panel--fullscreen .modal-header {
   flex-shrink: 0;
-  height: 48px;
+  height: 56px;
+  padding: 0 1.5rem;
 }
 
 .modal-panel--fullscreen .modal-close-button {
@@ -712,23 +746,20 @@ button.danger {
   padding: 0;
 }
 
+/* Altura por padding en vez de fija (antes 64px): con la barra de progreso + los
+   botones de acción, el alto fijo dejaba el contenido apretado contra los bordes.
+   Mismo padding vertical 16/24 que las acciones de un diálogo básico. */
 .modal-panel--fullscreen .modal-footer {
   flex-shrink: 0;
-  height: 64px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 0 calc(var(--spacing) * -1) calc(var(--spacing) * -1);
-  padding: 0 var(--spacing);
-  border-top: 1px solid var(--md-sys-color-outline-variant);
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.5rem;
 }
 
 .wizard-progress {
   display: flex;
   gap: 4px;
-  margin: 0 calc(var(--spacing) * -1);
-  margin-top: -1px;
 }
 
 .wizard-progress-segment {
@@ -839,7 +870,7 @@ button.danger {
 }
 
 .tab-icon {
-  font-size: 1rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 

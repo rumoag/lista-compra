@@ -25,7 +25,7 @@ export function renderSelectionBar(
     <div class="selection-header ${wasEmpty ? 'selection-header--entering' : ''}" data-testid="selection-bar">
       <div class="selection-header-left">
         <button type="button" class="icon-button" data-testid="selection-bar-close-button" aria-label="Deseleccionar todos">${icon('x')}</button>
-        <span data-testid="selection-bar-count">${selectedCount} seleccionados</span>
+        <span data-testid="selection-bar-count" aria-live="polite">${selectedCount} seleccionados</span>
       </div>
       <div class="selection-header-right">
         <button

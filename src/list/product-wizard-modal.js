@@ -12,6 +12,7 @@ import {
   validateNote,
 } from '../common/validation.js';
 import { FREQUENT_CATEGORIES, getCategoryIcon } from './categories.js';
+import { escapeHtml, escapeHtml as escapeAttr } from '../common/escape-html.js';
 
 const QUANTITY_MIN = 1;
 const QUANTITY_MAX = 999;
@@ -76,7 +77,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
           )
           .join('')}
       </div>
-      <div class="error-message" data-testid="wizard-step1-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="wizard-step1-error" hidden></div>
     `;
 
     const nameInput = body.querySelector('[data-testid="wizard-product-name-input"]');
@@ -134,7 +135,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         value="${escapeAttr(state.quantityUnit)}"
         autocomplete="off"
       />
-      <div class="error-message" data-testid="wizard-step2-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="wizard-step2-error" hidden></div>
     `;
 
     const quantityInput = body.querySelector('[data-testid="wizard-quantity-input"]');
@@ -206,7 +207,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         autocomplete="off"
         ${state.isCustomCategory ? '' : 'hidden'}
       />
-      <div class="error-message" data-testid="wizard-step3-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="wizard-step3-error" hidden></div>
     `;
 
     const categoryInput = body.querySelector('[data-testid="wizard-category-input"]');
@@ -260,7 +261,7 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
         placeholder="Añade una nota, ej. marca preferida"
         autocomplete="off"
       >${escapeHtml(state.note)}</textarea>
-      <div class="error-message" data-testid="wizard-step4-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="wizard-step4-error" hidden></div>
     `;
 
     const noteInput = body.querySelector('[data-testid="wizard-note-input"]');
@@ -308,12 +309,4 @@ export function openProductWizardModal({ mode, product, suggestedProducts = [], 
     nameInput.focus();
     nameInput.select();
   }
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value);
 }

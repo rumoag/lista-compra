@@ -1,13 +1,14 @@
 // Modal de confirmación genérico (generaliza home/delete-confirm-modal.js, Unidad 5,
 // para reutilizarlo en el borrado individual y en lote de productos, Unidad 6).
 import { openModal } from './modal.js';
+import { escapeHtml } from './escape-html.js';
 
 export function openConfirmModal({ title, message, confirmLabel = 'Confirmar', onConfirm }) {
   const { body, footer, close } = openModal({ title });
 
   body.innerHTML = `
     <p data-testid="confirm-modal-message">${escapeHtml(message)}</p>
-    <div class="error-message" data-testid="confirm-modal-error" hidden></div>
+    <div class="error-message" role="alert" data-testid="confirm-modal-error" hidden></div>
   `;
 
   footer.innerHTML = `
@@ -32,8 +33,4 @@ export function openConfirmModal({ title, message, confirmLabel = 'Confirmar', o
       confirmButton.disabled = false;
     }
   });
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

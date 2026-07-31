@@ -2,6 +2,7 @@
 import { computeRanking } from './calculations.js';
 import { loadChart } from './chart-loader.js';
 import { getChartColors } from './chart-theme.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 const RANKING_LIMIT = 10;
 
@@ -49,8 +50,4 @@ export async function renderStatsRanking(container, { groups }) {
 function showFallback(container) {
   container.querySelector('[data-testid="stats-ranking-list"]')?.classList.remove('sr-only');
   container.querySelector('[data-testid="stats-ranking-canvas"]')?.remove();
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

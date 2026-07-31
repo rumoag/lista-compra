@@ -2,6 +2,7 @@
 import { computeDistributionByWeekday, computeDistributionByPerson } from './calculations.js';
 import { loadChart } from './chart-loader.js';
 import { getChartColors } from './chart-theme.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 export async function renderStatsDistribution(container, { products }) {
   if (products.length === 0) {
@@ -62,8 +63,4 @@ export async function renderStatsDistribution(container, { products }) {
     container.querySelectorAll('.sr-only').forEach((el) => el.classList.remove('sr-only'));
     container.querySelectorAll('canvas').forEach((el) => el.remove());
   }
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
