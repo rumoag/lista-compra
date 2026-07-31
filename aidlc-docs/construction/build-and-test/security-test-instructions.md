@@ -14,6 +14,7 @@ npm audit
 - **Hallazgo restante (aceptado como excepción documentada)**: cadena `vitest → vite-node → vite → esbuild` con una vulnerabilidad moderada ("esbuild enables any website to send any requests to the development server and read the response"). Esta vulnerabilidad **solo afecta al servidor de desarrollo local de Vite/Vitest durante la ejecución de tests**, nunca al sitio desplegado en producción (que es HTML/JS estático servido por Vercel, sin ningún servidor Vite involucrado). Corregirla requeriría actualizar a `vitest@4.x`, un cambio mayor con riesgo de romper la suite de tests actual. Se documenta como **excepción aceptada**: riesgo real nulo en producción, coste de corrección desproporcionado para un proyecto personal.
 - **Todas las demás dependencias**: sin vulnerabilidades conocidas tras la actualización.
 - **Unidad 7**: no añade ninguna dependencia nueva de npm (reutiliza `@supabase/supabase-js` vía import map, ver nota más abajo); `npm audit` re-ejecutado tras esta unidad con el mismo resultado (misma excepción aceptada, sin hallazgos nuevos).
+- **Ciclo 5 (estadísticas con gráficas)**: añade `Chart.js@4.4.4` vía `esm.sh` (mismo patrón que `qrcode`/`@supabase/supabase-js`, ver nota más abajo) — **no** es una dependencia de npm, `npm audit` re-ejecutado tras este ciclo con el mismo resultado (misma excepción aceptada, sin hallazgos nuevos, ya que Chart.js no aparece en `package-lock.json`).
 
 ### Verificación de SECURITY-10
 - [x] Lockfile (`package-lock.json`) existe y debe commitearse al repositorio.
@@ -22,8 +23,8 @@ npm audit
 - [x] Dependencias de fuentes oficiales (registro npm).
 - [ ] SBOM: no generado (fuera de alcance para un proyecto personal; `package-lock.json` cumple una función equivalente básica).
 
-### Nota importante: `@supabase/supabase-js` y `qrcode` ya no son dependencias de npm
-Tras un problema de import maps no funcionando en producción (ver `aidlc-docs/construction/unidad-1/infrastructure-design/infrastructure-design.md`), ambas librerías se cargan en el navegador mediante `import ... from 'https://esm.sh/...'` directamente en el código fuente, en vez de instalarse vía npm. Esto significa que **`npm audit` ya no las escanea** — quedan fuera del alcance automático de SECURITY-10. Como mitigación, las versiones están fijadas explícitamente en la URL (`@2.110.8`, `@1.5.4`), y se recomienda revisar manualmente los avisos de seguridad de estos paquetes en el registro de npm/GitHub Advisories periódicamente (o antes de cada actualización de versión), ya que no hay escaneo automático para dependencias cargadas por CDN.
+### Nota importante: `@supabase/supabase-js`, `qrcode` y `chart.js` no son dependencias de npm
+Tras un problema de import maps no funcionando en producción (ver `aidlc-docs/construction/unidad-1/infrastructure-design/infrastructure-design.md`), estas librerías se cargan en el navegador mediante `import ... from 'https://esm.sh/...'` directamente en el código fuente, en vez de instalarse vía npm (decisión explícita del usuario para `chart.js`, ver `aidlc-docs/construction/ciclo5-stats-graficas/nfr-requirements/`). Esto significa que **`npm audit` ya no las escanea** — quedan fuera del alcance automático de SECURITY-10. Como mitigación, las versiones están fijadas explícitamente en la URL (`@2.110.8`, `@1.5.4`, `@4.4.4`), y se recomienda revisar manualmente los avisos de seguridad de estos paquetes en el registro de npm/GitHub Advisories periódicamente (o antes de cada actualización de versión), ya que no hay escaneo automático para dependencias cargadas por CDN.
 
 ## 2. Cabeceras de seguridad HTTP (SECURITY-04)
 

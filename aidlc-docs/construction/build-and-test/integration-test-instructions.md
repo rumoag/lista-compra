@@ -91,6 +91,20 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - **Expected Results**: paleta M3 consistente en toda la app en ambos modos; sin regresiones visuales en el receipt; sin colores de iteraciones anteriores (azul/violeta original, o Lime/Sand de Radix) visibles en ningún componente.
 - **Cleanup**: ninguno (solo inspección visual).
 
+### Scenario 10 (Ciclo 5): Estadísticas de calidad con gráficas
+- **Description**: la pantalla de Estadísticas pasa de listas de texto a gráficas (Chart.js vía CDN, FR-33 a FR-37); requiere verificación manual del renderizado real (no cubierto por los tests unitarios, que mockean Chart.js).
+- **Setup**: household con al menos 15 productos comprados, con fechas repartidas en varios meses y con al menos 2 personas distintas en `bought_by`, para poblar bien las 4 secciones.
+- **Test Steps**:
+  1. Entrar en la pestaña "Estadísticas" y verificar que el ranking muestra un gráfico de barras horizontales con como máximo 10 productos (BR-69), ordenados de mayor a menor.
+  2. Verificar la sección "Evolución de compras": por defecto agrupada por mes (gráfico de líneas); pulsar el chip "Semana" y comprobar que el gráfico se recalcula sin recargar la página ni hacer una nueva petición de red (revisar la pestaña Network del navegador — no debe haber una llamada nueva a Supabase al cambiar de granularidad, BR-70).
+  3. Verificar que un mes/semana sin compras dentro del rango aparece como un punto en cero en la línea, no como un hueco (BR-68).
+  4. Verificar la distribución por día de la semana (gráfico de barras) y por persona (gráfico donut).
+  5. Verificar que las 4 gráficas usan colores coherentes con el resto de la app (roles M3: primario/secundario/terciario) tanto en modo claro como oscuro (NFR-18).
+  6. Con las herramientas de desarrollador, bloquear la petición de red a `esm.sh` (simulando que el CDN de Chart.js no responde) y recargar la pantalla de Estadísticas → verificar que cada sección muestra su alternativa de texto en vez del gráfico, sin bloquear el resto de la pantalla (patrón de resiliencia, NFR Design).
+  7. Con un lector de pantalla (o inspeccionando el DOM), verificar que cada gráfico tiene una alternativa textual accesible en el HTML (aunque esté oculta visualmente vía `.sr-only`) con los mismos datos.
+- **Expected Results**: las 4 secciones se ven como gráficas coherentes con el resto de la app; el selector Mes/Semana no genera tráfico de red nuevo; los fallos de carga de Chart.js degradan a texto en vez de romper la pantalla.
+- **Cleanup**: ninguno (solo lectura).
+
 ## Setup Integration Test Environment
 
 ### 1. Requisitos
@@ -99,7 +113,7 @@ Esta app es un único frontend (sin microservicios) que integra con Supabase (Po
 - Sitio desplegado en Vercel (o servido localmente con `npx serve .` tras `npm run build`).
 
 ### 2. Ejecución
-Seguir manualmente los 8 escenarios anteriores, usando dos pestañas/dispositivos.
+Seguir manualmente los 10 escenarios anteriores, usando dos pestañas/dispositivos.
 
 ## Limitación en este entorno de trabajo
 No se dispone de un proyecto Supabase real conectado en este entorno para ejecutar estos escenarios automáticamente. **Quedan pendientes de verificación manual por el usuario** tras el despliegue.

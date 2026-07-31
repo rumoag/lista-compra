@@ -78,3 +78,36 @@ Remaquetado visual completo de la app (Lotes 0 a 4): tokens de color/forma/tipog
 
 ### Next Steps (Ciclo 3)
 El usuario revisa visualmente la app (Scenario 9) en modo claro y oscuro. No requiere ninguna migración de base de datos ni redeploy de infraestructura — es un cambio de frontend únicamente (CSS/HTML), desplegable igual que cualquier otro cambio de UI ya hecho en ciclos anteriores.
+
+---
+
+## Build and Test (incremental) — Ciclo 5: Estadísticas de calidad con gráficas
+
+### Alcance
+Sustitución de las listas de texto de la pantalla de Estadísticas por gráficas (Chart.js 4.4.4 vía `esm.sh`, sin bundler) y nueva sección de evolución temporal (mes/semana). Cambio acotado a `src/stats/`, `css/style.css` y sus tests — sin cambios de esquema de base de datos ni de infraestructura (FR-33 a FR-37, BR-67 a BR-71).
+
+### Unit Tests
+- **Total Tests**: 270 (antes 251 + los añadidos por el seguimiento de Unidad 6 no reflejados aquí — ver detalle exacto en `unit-test-instructions.md` §3.1)
+- **Passed**: 270
+- **Failed**: 0
+- **PBT-03 (bloqueante)**: `computeTimeSeries` verificada con 4 propiedades (conservación del conteo total, orden ascendente sin huecos, no-negatividad, independencia del orden de entrada)
+- **Status**: Pass
+
+### Integration Tests
+- **Nuevo**: Scenario 10 en `integration-test-instructions.md` — verificación manual del renderizado real de las 4 gráficas, el selector Mes/Semana sin refetch, el relleno de periodos vacíos, la coherencia de color en modo claro/oscuro, y el fallback a texto si Chart.js no carga. **No ejecutable automáticamente** (Chart.js está mockeado en los tests unitarios); pendiente de verificación manual del usuario.
+- Escenarios 1-9 sin cambios de comportamiento esperado.
+
+### Build
+- `npm run build`: falla únicamente por falta de variables de entorno Supabase en local, mismo comportamiento no relacionado que en ciclos anteriores.
+
+### Security Tests
+- `npm audit`: mismo resultado que en ciclos anteriores (5 vulnerabilidades en la cadena `vitest`/`vite`/`esbuild`, dev-only, excepción ya aceptada). Chart.js **no** es una dependencia de npm (cargada vía `esm.sh`, versión fijada `@4.4.4`), por lo que no aparece en `npm audit` — documentado en `security-test-instructions.md` junto con `qrcode`/`@supabase/supabase-js`, mismo criterio ya aceptado.
+
+### Overall Status
+- **Build**: Success (aparte de la limitación conocida de env vars locales)
+- **All Automated Tests**: Pass (270/270)
+- **Manual Visual/Functional Verification**: Pendiente de confirmación del usuario (Scenario 10 — gráficas reales, selector sin refetch, fallback ante fallo de Chart.js)
+- **Ready for Operations**: Sí, condicionado a la verificación manual del Scenario 10 tras el despliegue. No requiere ninguna migración de `schema.sql` (NFR-19, sin cambios de esquema)
+
+### Next Steps (Ciclo 5)
+Desplegar el cambio (mismo proceso que ciclos anteriores, sin pasos de base de datos). El usuario verifica manualmente el Scenario 10 en un navegador real: las 4 gráficas, el selector Mes/Semana, y opcionalmente simular el fallo de carga de Chart.js bloqueando `esm.sh` en las herramientas de desarrollador para confirmar el fallback accesible.

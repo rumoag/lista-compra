@@ -196,6 +196,24 @@ Pendientes de que el usuario las describa una a una (a petición explícita: "va
 
 **UNIDAD 6 (Seguimiento): COMPLETA** — próximo paso del usuario: verificación manual (abrir el menú del avatar, pulsar "Editar lista de la compra", cambiar título/icono, comprobar que la topbar se actualiza).
 
+## CICLO 5 — Estadísticas de calidad con gráficas (iniciado 2026-07-30)
+
+**Contexto**: Nueva solicitud del usuario para mejorar la pantalla de estadísticas (`src/stats/`, hoy solo listas de texto) añadiendo gráficas y una estadística nueva. Preguntas de aclaración respondidas: mejorar+añadir estadísticas (no solo gráficas); ranking → barras horizontales; distribución por persona → donut, por día → barras; librería de gráficos ligera nueva (Chart.js) en vez de SVG a mano; nueva estadística de evolución temporal (mes/semana con selector) en gráfico de líneas; gráficas deben respetar tokens M3 claro/oscuro.
+
+- [x] Requirements Analysis — 6 preguntas + 2 de aclaración (granularidad y tipo de gráfica de evolución temporal) respondidas; `requirements.md` ampliado con sección "Ciclo 5" (FR-33 a FR-37, NFR-17 a NFR-20); aprobado por el usuario
+- [x] Workflow Planning — `execution-plan-ciclo5.md` generado y aprobado; User Stories/Application Design/Units Generation/Infrastructure Design SKIP, Functional Design/NFR Requirements/NFR Design/Code Generation/Build and Test EXECUTE
+- [x] Functional Design — 5 preguntas de aclaración respondidas (ventana temporal completa, periodos vacíos = 0, ranking Top 10, selector Mes/Semana sin refetch, cadencia sin cambios); BR-67 a BR-71, domain-entities/business-logic-model (con Testable Properties bajo PBT-03)/frontend-components generados en `aidlc-docs/construction/ciclo5-stats-graficas/functional-design/`; aprobado
+- [x] NFR Requirements — 3 preguntas respondidas (Chart.js, alternativa textual accesible, versión fijada sin `package.json`); `nfr-requirements.md`/`tech-stack-decisions.md` generados (Chart.js 4.4.4 vía esm.sh, mismo patrón que `qrcode`/`supabase-js`, mockeado en tests); aprobado
+- [x] NFR Design — 2 preguntas respondidas (fallback a alternativa textual visible si Chart.js no carga; sin listener de tema en caliente); `nfr-design-patterns.md`/`logical-components.md` generados; aprobado
+- [ ] Infrastructure Design — SKIP (sin cambios de infraestructura, ver execution-plan-ciclo5.md)
+- [x] Code Generation — `computeTimeSeries` en `calculations.js`; `chart-loader.js`/`chart-theme.js` nuevos; `stats-ranking.js`/`stats-distribution.js` modificados a gráficas (Chart.js); `stats-timeseries.js` nuevo; `stats-page.js` actualizado; `.sr-only` en `css/style.css`; 233→270 tests (37 nuevos/actualizados en `tests/stats/`); `npm test`: 270/270 pasan; `npm run build`: falla solo por falta de env vars Supabase locales (no relacionado)
+- [x] Build and Test (incremental) — build success (misma limitación de env vars), 270/270 tests, `npm audit` sin hallazgos nuevos (Chart.js no es dependencia npm); Scenario 10 añadido a `integration-test-instructions.md`; `unit-test-instructions.md`/`security-test-instructions.md`/`build-and-test-summary.md` actualizados
+
+**CICLO 5 (Estadísticas de calidad con gráficas): COMPLETO** — próximo paso del usuario: verificar manualmente el Scenario 10 tras el despliegue (gráficas reales, selector Mes/Semana sin refetch, fallback ante fallo de Chart.js, colores en modo claro/oscuro). No requiere ninguna migración de `schema.sql`.
+
+### OPERATIONS PHASE (Ciclo 5)
+- [ ] Placeholder — sin trabajo activo definido en este workflow; despliegue y verificación manual (Scenario 10) quedan como próximos pasos del usuario
+
 ### Common — Seguimiento: modal y teclado virtual en móvil
 - [x] Petición del usuario: al enfocar un input dentro de un modal en móvil, el modal debe subir al tope de la pantalla y el footer con los botones debe quedar siempre por encima del teclado virtual (antes, `position: fixed` con `align-items: center` se centraba sobre el layout viewport completo, quedando detrás del teclado o con el footer tapado). 2 preguntas de aclaración resueltas: aplica a todos los modales (centrados y el fullscreen del wizard); enfoque VisualViewport API (JS) en vez de `interactive-widget=resizes-content` porque este último no funciona en iOS Safari. Implementado en `src/common/modal.js` (listeners `resize`/`scroll` de `window.visualViewport` que anclan el overlay al área visual real vía `top`/`height` inline y activan `.modal-overlay--keyboard-open`; `focusin` en inputs/textarea/select recalcula tras 50ms y hace `scrollIntoView`) y `css/style.css` (`.modal-overlay--keyboard-open { align-items: flex-start }` + `.modal-panel { max-height: 100% }` dentro de esa clase). 251/251 tests pasan (guard `scrollIntoView?.()` necesario porque jsdom no lo implementa); build verificado (falla únicamente por falta de variables de entorno Supabase locales, no relacionado).
 

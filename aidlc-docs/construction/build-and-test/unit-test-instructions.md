@@ -55,6 +55,19 @@ npm test
 | tests/home/home-screen.test.js | 5 |
 | **Total** | **216** |
 
+### 3.1 Actualización — Ciclo 5 (Estadísticas de calidad con gráficas)
+270/270 tests pasan (40 archivos; la tabla de arriba no se ha reescrito completa desde Ciclo 3 en adelante, ver notas incrementales de cada ciclo en `build-and-test-summary.md`). Archivos nuevos/modificados en este ciclo:
+
+| Archivo | Tests |
+|---|---|
+| tests/stats/calculations.test.js | 19 (antes 11, +8 de `computeTimeSeries`, incluye PBT-03) |
+| tests/stats/chart-loader.test.js | 3 (nuevo) |
+| tests/stats/chart-theme.test.js | 1 (nuevo) |
+| tests/stats/stats-ranking.test.js | 4 (antes 2, +2: límite Top 10 y fallback) |
+| tests/stats/stats-distribution.test.js | 3 (antes 2, +1: fallback) |
+| tests/stats/stats-timeseries.test.js | 4 (nuevo) |
+| tests/stats/stats-cadence.test.js | 3 (sin cambios, BR-71) |
+
 ### 4. Fix Failing Tests
 Si un test falla:
 1. Revisar la salida de Vitest en consola (incluye diff esperado/recibido y, para PBT con fast-check, el caso mínimo reproducible tras shrinking).
