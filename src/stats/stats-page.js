@@ -32,7 +32,7 @@ export async function renderStatsPage(container, { householdId }) {
     .limit(STATS_FETCH_LIMIT);
 
   if (error) {
-    container.innerHTML = '<p class="error-message">No se pudieron cargar las estadísticas.</p>';
+    container.innerHTML = '<p class="error-message" role="alert">No se pudieron cargar las estadísticas.</p>';
     return;
   }
 

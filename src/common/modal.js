@@ -1,6 +1,7 @@
 // Modal genérico reutilizable (BR-33, Unidad 5) — overlay + panel + botón "X" en esquina
 // superior derecha. El llamante monta su propio contenido en el nodo devuelto por openModal().
 import { icon } from './icon.js';
+import { escapeHtml } from './escape-html.js';
 
 export function openModal({ title, onClose, fullScreen = false } = {}) {
   const overlay = document.createElement('div');
@@ -104,8 +105,4 @@ export function openModal({ title, onClose, fullScreen = false } = {}) {
     titleEl: overlay.querySelector('[data-testid="modal-title"]'),
     close,
   };
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

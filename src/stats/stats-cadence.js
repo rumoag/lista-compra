@@ -1,4 +1,6 @@
 // Cadencia media entre compras por producto (US-4.2) — lista simple.
+import { escapeHtml } from '../common/escape-html.js';
+
 export function renderStatsCadence(container, { groups }) {
   if (groups.length === 0) {
     container.innerHTML = '<p class="empty-state" data-testid="stats-cadence-empty">Aún no hay datos suficientes.</p>';
@@ -21,8 +23,4 @@ export function renderStatsCadence(container, { groups }) {
       </ul>
     </div>
   `;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

@@ -1,6 +1,8 @@
 // Identidad local (US-5.1). ensureLocalName es el flujo de primer uso (Unidad 1).
 // renderNameForm se exporta (Unidad 6, BR-45) para que list/change-name-modal.js lo reutilice
 // dentro de un modal en vez del botón "Cambiar nombre" inline de la Unidad 4 (ya retirado).
+import { escapeHtml as escapeAttr } from '../common/escape-html.js';
+
 const LOCAL_NAME_KEY = 'localName';
 
 export function getLocalName() {
@@ -18,7 +20,7 @@ export function renderNameForm(container, { currentName = '', onSave, footer }) 
   const bodyHtml = `
     <p>Ej. "Yo", "Mi pareja"</p>
     <input type="text" class="text-input" data-testid="name-prompt-input" maxlength="30" value="${escapeAttr(currentName)}" />
-    <div class="error-message" data-testid="name-prompt-error" hidden></div>
+    <div class="error-message" role="alert" data-testid="name-prompt-error" hidden></div>
   `;
   const saveButtonHtml = `<button type="button" data-testid="name-prompt-save-button">Guardar</button>`;
 
@@ -69,8 +71,4 @@ export function ensureLocalName(container) {
   return new Promise((resolve) => {
     renderNameForm(container, { onSave: resolve });
   });
-}
-
-function escapeAttr(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

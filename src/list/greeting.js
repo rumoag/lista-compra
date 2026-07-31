@@ -7,6 +7,7 @@
 import { getLocalName } from '../onboarding/name-prompt.js';
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
 import { openQrModal } from '../common/qr-modal.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 export function renderGreeting(container, { household, onChangeName, onEditList }) {
   const name = getLocalName() ?? '';
@@ -33,8 +34,4 @@ export function renderGreeting(container, { household, onChangeName, onEditList 
       { testid: 'back', label: 'Volver al listado de listas', onClick: () => (window.location.href = '/') },
     ],
   });
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

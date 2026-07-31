@@ -16,6 +16,7 @@ import { applyOptimistic } from '../common/optimistic.js';
 import { renderTicketProductRow } from './ticket-product-row.js';
 import { updatePurchaseTitle } from './purchases-api.js';
 import { validatePurchaseTitle } from '../common/validation.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, onTicketRestored }) {
   // (Seguimiento) la cabecera del modal muestra el título del ticket (dónde se compró) en
@@ -33,7 +34,7 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
       <div class="receipt-content">
         <div class="receipt-header" data-testid="ticket-modal-header"></div>
         <div class="receipt-divider"></div>
-        <div class="error-message" data-testid="ticket-modal-error" hidden></div>
+        <div class="error-message" role="alert" data-testid="ticket-modal-error" hidden></div>
         <div class="receipt-items" data-testid="ticket-modal-products"></div>
         <div class="receipt-divider"></div>
         <div class="receipt-total">
@@ -278,8 +279,4 @@ export function openTicketModal(purchase, { onTicketChanged, onTicketRemoved, on
   renderProducts();
 
   return { close };
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

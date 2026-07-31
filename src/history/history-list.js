@@ -11,6 +11,7 @@ import { filterByDateRange, filterByName } from './filters.js';
 import { renderTicketRow } from './ticket-row.js';
 import { openTicketModal } from './ticket-modal.js';
 import { renderSkeleton } from '../common/skeleton.js';
+import { showGlobalErrorToast } from '../common/global-error-toast.js';
 
 const PAGE_SIZE = 20;
 const FILTERED_FETCH_LIMIT = 2000;
@@ -202,11 +203,7 @@ export async function renderHistoryList(container, { householdId }) {
   }
 
   function showGlobalError(message) {
-    const errorEl = document.createElement('div');
-    errorEl.className = 'error-message';
-    errorEl.textContent = message;
-    container.prepend(errorEl);
-    setTimeout(() => errorEl.remove(), 4000);
+    showGlobalErrorToast(container, message);
   }
 
   // BR-59: historial en vivo — solo mientras el modo paginado (sin filtro) está activo.
@@ -253,7 +250,7 @@ export async function renderHistoryList(container, { householdId }) {
     // Sin esto, el skeleton de carga (Ciclo 4) se queda animando para siempre si la
     // primera página falla — antes de los skeletons esto pasaba desapercibido porque
     // no había ningún indicador de carga.
-    itemsContainer.innerHTML = '<p class="error-message" data-testid="history-list-load-error">No se pudo cargar el historial. Inténtalo de nuevo.</p>';
+    itemsContainer.innerHTML = '<p class="error-message" role="alert" data-testid="history-list-load-error">No se pudo cargar el historial. Inténtalo de nuevo.</p>';
     return cleanup;
   }
   if (paginator.getItems().length < PAGE_SIZE) hasMore = false;

@@ -1,5 +1,6 @@
 // Vista de QR (US-5.3, BR-19) — genera el QR client-side a partir de la URL del household.
 import QRCode from 'https://esm.sh/qrcode@1.5.4';
+import { escapeHtml } from '../common/escape-html.js';
 
 export async function renderQrView(container, { householdId }) {
   const url = `${window.location.origin}/${householdId}`;
@@ -23,10 +24,6 @@ export async function renderQrView(container, { householdId }) {
     imageContainer.appendChild(img);
   } catch (err) {
     imageContainer.innerHTML =
-      '<p class="error-message" data-testid="qr-view-error">No se pudo generar el código QR.</p>';
+      '<p class="error-message" role="alert" data-testid="qr-view-error">No se pudo generar el código QR.</p>';
   }
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

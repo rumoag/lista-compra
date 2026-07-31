@@ -3,6 +3,7 @@
 // la misma línea, y número total de productos. Click abre el modal de detalle (Unidad 7).
 // Sin borde propio (BR-63) — se apoya en el contenedor de la lista.
 import { icon } from '../common/icon.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 export function renderTicketRow(purchase, { onOpen }) {
   const el = document.createElement('div');
@@ -38,8 +39,4 @@ function formatShortDate(dateValue) {
     year: 'numeric',
   }).format(new Date(dateValue));
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

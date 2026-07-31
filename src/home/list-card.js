@@ -1,5 +1,6 @@
 // Tarjeta de una lista activa (FR-1) — icono, título, participantes truncados, menú de 3 puntos.
 import { renderDropdownMenu } from '../common/dropdown-menu.js';
+import { escapeHtml } from '../common/escape-html.js';
 import { formatParticipants } from './participants.js';
 
 export function renderCreateListCard(onClick) {
@@ -49,8 +50,4 @@ export function renderListCard(household, { onEdit, onDelete, onViewQr, onOpen }
   });
 
   return el;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

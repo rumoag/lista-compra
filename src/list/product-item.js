@@ -3,6 +3,7 @@
 // selección. Tap alterna selección (BR-41, con fondo resaltado); mantener pulsado abre
 // edición directamente.
 import { getCategoryIcon } from './categories.js';
+import { escapeHtml } from '../common/escape-html.js';
 
 const LONG_PRESS_MS = 500;
 
@@ -18,7 +19,7 @@ export function renderProductItem(product, { onEdit, onToggleSelect, selected = 
     <div class="product-item-body" data-testid="product-item-body">
       ${
         onToggleSelect
-          ? `<input type="checkbox" class="checkbox" data-testid="product-item-select-checkbox" ${selected ? 'checked' : ''} />`
+          ? `<input type="checkbox" class="checkbox" data-testid="product-item-select-checkbox" aria-label="Seleccionar ${escapeHtml(product.name)}" ${selected ? 'checked' : ''} />`
           : ''
       }
       <span class="product-item-category-icon" data-testid="product-item-category-icon">${getCategoryIcon(product.category)}</span>
@@ -68,8 +69,4 @@ export function renderProductItem(product, { onEdit, onToggleSelect, selected = 
   });
 
   return el;
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

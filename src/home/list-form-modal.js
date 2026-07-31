@@ -1,6 +1,7 @@
 // Modal compartido de crear/editar lista (FR-2, FR-3, BR-32).
 import { openModal } from '../common/modal.js';
 import { validateHouseholdTitle, validateHouseholdIcon, HOUSEHOLD_ICON_SET } from '../common/validation.js';
+import { escapeHtml as escapeAttr } from '../common/escape-html.js';
 import { createHousehold, updateHousehold } from './households-api.js';
 
 export function openListFormModal({ mode, household, onSaved }) {
@@ -21,7 +22,7 @@ export function openListFormModal({ mode, household, onSaved }) {
         maxlength="50"
         value="${isEdit ? escapeAttr(household.title) : ''}"
       />
-      <div class="error-message" data-testid="list-form-title-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="list-form-title-error" hidden></div>
 
       <label class="form-label" for="list-form-icon-picker">Selecciona un icono para tu lista de la compra</label>
       <div class="icon-picker" id="list-form-icon-picker" data-testid="list-form-icon-picker">
@@ -30,7 +31,7 @@ export function openListFormModal({ mode, household, onSaved }) {
             `<button type="button" class="icon-picker-option" data-testid="list-form-icon-${icon}" data-icon="${icon}" aria-pressed="${icon === selectedIcon}">${icon}</button>`
         ).join('')}
       </div>
-      <div class="error-message" data-testid="list-form-icon-error" hidden></div>
+      <div class="error-message" role="alert" data-testid="list-form-icon-error" hidden></div>
     </form>
   `;
 
@@ -93,8 +94,4 @@ export function openListFormModal({ mode, household, onSaved }) {
       submitButton.disabled = false;
     }
   });
-}
-
-function escapeAttr(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
