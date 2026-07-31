@@ -727,11 +727,12 @@ button.danger {
 }
 
 /* El header a pantalla completa es una barra de app compacta (top app bar M3), no el
-   bloque de título de un diálogo básico: altura fija de 48px con solo el margen lateral
-   de 24px del spec, sin el padding vertical 24/16 del header estándar (desbordaría). */
+   bloque de título de un diálogo básico: altura fija (56px, la de una small top app
+   bar M3) con solo el margen lateral de 24px del spec, sin el padding vertical 24/16
+   del header estándar (desbordaría). */
 .modal-panel--fullscreen .modal-header {
   flex-shrink: 0;
-  height: 48px;
+  height: 56px;
   padding: 0 1.5rem;
 }
 
@@ -745,14 +746,15 @@ button.danger {
   padding: 0;
 }
 
+/* Altura por padding en vez de fija (antes 64px): con la barra de progreso + los
+   botones de acción, el alto fijo dejaba el contenido apretado contra los bordes.
+   Mismo padding vertical 16/24 que las acciones de un diálogo básico. */
 .modal-panel--fullscreen .modal-footer {
   flex-shrink: 0;
-  height: 64px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0 1.5rem;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.5rem;
 }
 
 .wizard-progress {
