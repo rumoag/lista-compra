@@ -69,6 +69,21 @@ describe('renderDropdownMenu', () => {
     expect(container.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(true);
   });
 
+  it('abrir un segundo dropdown cierra el primero (el stopPropagation del toggle no debe bloquear el cierre)', () => {
+    const containerA = mount();
+    const containerB = mount();
+    renderDropdownMenu(containerA, { actions: makeActions() });
+    renderDropdownMenu(containerB, { actions: makeActions() });
+
+    containerA.querySelector('[data-testid="dropdown-menu-toggle"]').click();
+    expect(containerA.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(false);
+
+    containerB.querySelector('[data-testid="dropdown-menu-toggle"]').click();
+
+    expect(containerA.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(true);
+    expect(containerB.querySelector('[data-testid="dropdown-menu-list"]').hidden).toBe(false);
+  });
+
   it('sin personalizar, el toggle son los "3 puntos" por defecto (icono Phosphor)', () => {
     const container = mount();
     renderDropdownMenu(container, { actions: makeActions() });
