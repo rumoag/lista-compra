@@ -327,8 +327,12 @@ button.danger {
   }
 }
 
+/* fill-mode "backwards" (no "both"): mantiene oculta la fila durante el retraso del
+   stagger, pero al terminar la animación no deja un transform residual aplicado — si
+   se quedara, cada fila crearía su propio stacking context y el dropdown de 3 puntos
+   quedaría atrapado por debajo de la siguiente tarjeta en vez de flotar sobre ella. */
 .motion-row-enter {
-  animation: row-enter var(--motion-duration-medium2) var(--motion-easing-emphasized-decelerate) both;
+  animation: row-enter var(--motion-duration-medium2) var(--motion-easing-emphasized-decelerate) backwards;
   animation-delay: calc(var(--stagger-index, 0) * 30ms);
 }
 

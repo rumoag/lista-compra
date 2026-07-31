@@ -5,6 +5,12 @@
 // los "3 puntos" por defecto.
 import { icon } from './icon.js';
 
+// Un único dropdown abierto a la vez: el toggle de cada instancia llama a
+// event.stopPropagation(), así que el listener de "click fuera" de un dropdown ya
+// abierto nunca se entera de que se pulsó el toggle de otro (la propagación se corta
+// antes de llegar a document) y ambos quedaban abiertos a la vez.
+let closeOpenDropdown = null;
+
 export function renderDropdownMenu(
   container,
   { actions, toggleClass = 'icon-button', toggleContent = icon('dots-three-vertical'), toggleLabel = 'Más opciones' }
@@ -26,6 +32,7 @@ export function renderDropdownMenu(
   function close() {
     dropdown.hidden = true;
     document.removeEventListener('click', onOutsideClick);
+    if (closeOpenDropdown === close) closeOpenDropdown = null;
   }
 
   function onOutsideClick(event) {
@@ -34,9 +41,13 @@ export function renderDropdownMenu(
 
   toggle.addEventListener('click', (event) => {
     event.stopPropagation();
-    dropdown.hidden = !dropdown.hidden;
-    if (!dropdown.hidden) {
+    if (dropdown.hidden) {
+      if (closeOpenDropdown) closeOpenDropdown();
+      dropdown.hidden = false;
       document.addEventListener('click', onOutsideClick);
+      closeOpenDropdown = close;
+    } else {
+      close();
     }
   });
 

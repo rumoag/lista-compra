@@ -25,6 +25,30 @@
     <main id="app-main" data-testid="app-main"></main>
   </div>
 
+  <!-- Síncrono e inline a propósito: al entrar directo en /{householdId} (recarga completa
+       de página), el <script type="module"> de main.js se descarga/ejecuta después del
+       primer pintado, así que en conexiones lentas se llegaba a ver un instante la cabecera
+       estática "Lista de la Compra" con el <main> vacío antes de que el JS lo corrigiera. Este
+       script corre durante el parseo del HTML, antes de pintar nada, así que oculta la
+       cabecera y monta el skeleton sin que llegue a haber ese hueco. -->
+  <script>
+    (function () {
+      var hasHouseholdId = location.pathname.replace(/^\/+/, '').split('/')[0];
+      if (!hasHouseholdId) return;
+
+      var header = document.querySelector('.app-header');
+      if (header) header.hidden = true;
+
+      var main = document.getElementById('app-main');
+      if (main) {
+        main.innerHTML = Array.from({ length: 5 })
+          .map(function () {
+            return '<div class="skeleton-list-row" aria-hidden="true"><div class="skeleton-block"></div><div class="skeleton-block"></div></div>';
+          })
+          .join('');
+      }
+    })();
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

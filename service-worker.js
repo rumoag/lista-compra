@@ -2,7 +2,7 @@
 // la PWA sea instalable y abra offline. Las peticiones a Supabase (datos en vivo) y a los
 // módulos de /src siempre van a red — cachearlas daría datos obsoletos o rompería el CSP.
 // Ver aidlc-docs/construction/pwa/.
-const CACHE_NAME = 'lista-compra-shell-v1';
+const CACHE_NAME = 'lista-compra-shell-v3';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
