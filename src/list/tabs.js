@@ -38,13 +38,21 @@ export function renderTabs(navContainer, viewContainer, { views, householdId, in
     renderNav(viewKey);
 
     viewContainer.classList.add('view-transition-in');
-    const cleanup = await views[viewKey].render(viewContainer, { householdId });
-    if (typeof cleanup === 'function') currentCleanup = cleanup;
+    // render() pinta su skeleton de forma síncrona antes de su primer await (fetch de
+    // datos); si esperáramos aquí a que la promesa entera se resuelva, la clase que
+    // oculta la vista (opacity:0) seguiría aplicada durante toda la carga y el skeleton
+    // nunca llegaría a verse — aparecería ya sustituido por el contenido real justo
+    // cuando la vista se hace visible. Por eso el fade-in se dispara ya, sin esperar
+    // a que termine la carga de datos.
+    const renderPromise = views[viewKey].render(viewContainer, { householdId });
 
     // Fuerza el layout con el estado "in" (desplazado) ya aplicado, para que quitar
     // la clase en el siguiente frame dispare la transición hacia su posición final.
     void viewContainer.offsetWidth;
     requestAnimationFrame(() => viewContainer.classList.remove('view-transition-in'));
+
+    const cleanup = await renderPromise;
+    if (typeof cleanup === 'function') currentCleanup = cleanup;
   }
 
   activate(initialView);
