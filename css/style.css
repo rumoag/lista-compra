@@ -37,6 +37,15 @@
   vertical-align: -0.125em;
 }
 
+/* html hereda el mismo fondo que body: en Android instalada como PWA (edge-to-edge),
+   la barra de estado y la barra de navegación del sistema quedan superpuestas sobre la
+   página en vez de pintadas aparte — lo que se ve detrás son los márgenes de html fuera
+   del max-width de body. Sin este fondo, esos márgenes caían al blanco/negro por defecto
+   del navegador en vez de fundirse con el resto de la app. */
+html {
+  background: var(--md-sys-color-background);
+}
+
 body {
   margin: 0;
   font-family: var(--md-sys-typescale-body-large-font);
@@ -48,6 +57,10 @@ body {
   max-width: 480px;
   margin-inline: auto;
   padding: var(--spacing);
+  /* Deja hueco para la barra de estado y la barra de gestos (env() cae a 0 en
+     navegadores/dispositivos sin recortes, así que es un no-op fuera de Android/iOS). */
+  padding-top: max(var(--spacing), env(safe-area-inset-top));
+  padding-bottom: max(var(--spacing), env(safe-area-inset-bottom));
 }
 
 .app-header h1 {
@@ -961,6 +974,7 @@ button,
   background: var(--md-sys-color-surface-container);
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
   padding: 0.6rem var(--spacing);
+  padding-top: max(0.6rem, env(safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
