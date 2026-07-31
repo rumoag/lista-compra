@@ -19,6 +19,14 @@ import { icon } from './common/icon.js';
 const appMain = document.getElementById('app-main');
 const appHeader = document.querySelector('[data-testid="app-header"]');
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch((error) => {
+      console.error('No se pudo registrar el service worker:', error);
+    });
+  });
+}
+
 function getHouseholdIdFromPath() {
   const segment = window.location.pathname.replace(/^\/+/, '').split('/')[0];
   return segment || null;
