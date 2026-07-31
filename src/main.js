@@ -15,6 +15,7 @@ import { renderHistoryList } from './history/history-list.js';
 import { renderStatsPage } from './stats/stats-page.js';
 import { openAddProductWizard } from './list/add-product.js';
 import { icon } from './common/icon.js';
+import { renderSkeleton } from './common/skeleton.js';
 
 const appMain = document.getElementById('app-main');
 const appHeader = document.querySelector('[data-testid="app-header"]');
@@ -49,6 +50,11 @@ async function start() {
   // La cabecera estática solo tiene sentido en la pantalla de inicio (listado de
   // listas); dentro de una lista concreta, greeting.js ya muestra icono+título+menú.
   if (appHeader) appHeader.hidden = true;
+
+  // Al entrar directo en /{householdId} (navegación de página completa desde el listado),
+  // ensureLocalName + fetchHousehold pueden tardar (red); sin esto, app-main se quedaba en
+  // blanco ese rato porque el HTML inicial no trae nada dentro del <main>.
+  renderSkeleton(appMain, { variant: 'list-row', count: 5 });
 
   await ensureLocalName(appMain);
   const household = await fetchHousehold(householdId);
